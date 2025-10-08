@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday, Juhi!</title>
 
+    <!-- External Libraries & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,496 +13,1040 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        /* --- Base and Countdown Styles --- */
-        body { margin:0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        #countdownOverlay {
-            position: fixed; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center;
-            background: rgba(189, 26, 26, 0.9); color:white; z-index:9999; text-align:center;
+        /* --- Base & Body Styles --- */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
         }
-        #overlayTimer div { margin:5px; padding:15px; border-radius:10px; background: rgb(255, 4, 4); min-width:70px; display:inline-block; }
-        #overlayTimer span { font-size:2rem; font-weight:bold; display:block; }
 
-        /* --- Main Birthday Page Styles --- */
-        .font-pacifico { font-family: 'Pacifico', cursive; }
-        .gradient-bg { background: linear-gradient(135deg, #0b79ff, #00e1ff, #0870ba, #0055ff); background-size: 400% 400%; animation: gradient-animation 15s ease infinite; }
-        @keyframes gradient-animation { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+        /* --- Countdown Overlay --- */
+        #countdownOverlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(189, 26, 26, 0.9);
+            color: white;
+            z-index: 9999;
+            text-align: center;
+        }
 
-        canvas#animationCanvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-        .content-wrapper { position: relative; z-index:1; display: none; } /* Initially hidden */
+        #overlayTimer div {
+            margin: 5px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgb(255, 4, 4);
+            min-width: 70px;
+            display: inline-block;
+        }
 
-        /* --- Original Animation Styles --- */
-        #animation-container { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background-color: #000000; /* Start with black background */
-            z-index: 1000; /* High z-index to cover everything */
+        #overlayTimer span {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        /* --- Main Content Page Styles --- */
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #0b79ff, #00e1ff, #0870ba, #0055ff);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        canvas#animationCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            display: none; /* Initially hidden */
+        }
+
+        /* --- Intro Animation Sequence Styles --- */
+        #animation-container {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: #000000;
+            z-index: 1000;
             transition: background-color linear 5s;
         }
-        #animation-container.peach { background-color: #4169E1 !important; }
-        #animation-container.peach-after { animation:peach_alive linear 8s infinite; }
-        @keyframes peach_alive { 0%{ background-color: #122b75; } 25%{ background-color: #003ef9; } 50%{ background-color: #809ae8; } 75%{ background-color: #4169E1; } 100%{ background-color: #053fee; } }
-        .bulb { width: 50px; height: 50px; margin: auto; background-repeat: no-repeat; background-position:center 0px; background-size: 50px 50px; background-image: url('bulb.png'); }
-        .bulb-holder { height: 70px; }
-        .bulb-glow-yellow { animation: bulb_glow_yellow linear 5s; background-image: url('bulb_yellow.png');}
-        @keyframes bulb_glow_yellow { 0%{ opacity: 0; } 50%{ opacity: 1; } 100%{ opacity: 1; }}
-        .bulb-glow-yellow-after { animation: bulb_glow_yellow_after linear 1s infinite; }
-        @keyframes bulb_glow_yellow_after { 0%, 100%{ background-image: url('bulb.png'); } 50%{ background-image: url('bulb_yellow.png'); }}
-        .bannar { max-width: 100%; transform:translate(0px,-500px); visibility: hidden; }
-        .bannar-come { animation: bannar_come linear 6s; transform:translate(0px,0px); }
-        @keyframes bannar_come { 0%{ transform:translate(0px,-1000px); } 33%{ transform:translate(0px,0px) rotate(10deg); } 66% { transform:translate(0px,100px) rotate(-10deg); } 100% { transform:translate(0px,0px); } }
-        .balloons { position: fixed; bottom: -200px; opacity: 0.6; z-index: 99; width: 100px; height: 183px; background-repeat: no-repeat; background-size: 100px 183px; color: #BF4136; text-shadow: 2px 2px 2px #FFF; }
-        .balloons h2 { text-transform: uppercase; font-family: 'Signika', sans-serif; font-size: 50px; display: none; text-align: center; margin-top: 50px; }
-        #b1,#b11 { background-image: url('b1.png'); } #b2,#b22 { background-image: url('b2.png'); } #b3,#b33 { background-image: url('b3.png'); } #b4,#b44 { background-image: url('b4.png'); } #b5,#b55 { background-image: url('b5.png'); } #b6,#b66 { background-image: url('b6.png'); } #b7,#b77 { background-image: url('https://raw.githubusercontent.com/sneh-sinha/hbd/main/b7.png'); }
-        .balloons-rotate-behaviour-one { animation: balloons_rotate_one linear 10s infinite; transform: rotate(30deg); }
-        @keyframes balloons_rotate_one { 0%, 100% { transform: rotate(30deg); } 50% { transform: rotate(-30deg); } }
-        .balloons-rotate-behaviour-two { animation: balloons_rotate_two linear 10s infinite; transform: rotate(-20deg); }
-        @keyframes balloons_rotate_two { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
-        .control-panel { position: fixed; bottom: 0; padding:10px 0px; width: 100%; text-align: center; z-index: 100; }
-        .control-panel .btn-primary { display: none; border: none; border-radius: 8px; padding: 15px 25px; text-transform: uppercase; font-family: 'Signika', sans-serif; font-weight: 700; color: #fff; background-color: #466baf; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.2s ease-in-out; margin: 5px; }
-        .control-panel .btn-primary:hover, .control-panel .btn-primary:focus { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
-        .cake-cover { margin-top: 50px; display: none; }
-        .cake{ position:absolute; left:50%; width:300px; height:300px; margin-left:-150px; }
-        .cake:after{ background:rgba(255,255,255,1); border-radius:300px; content:""; position:absolute; bottom:0; left:0; width:300px; height:6px; }
-        .velas{ background:rgba(255,255,255,1); border-radius:100%; position:absolute; top:50%; left:50%; margin-left:-7.5px; margin-top:-25px; width:15px; height:50px; }
-        .velas:after, .velas:before{ background:rgba(255,0,0,0.4); content:""; position:absolute; width:100%; height:6.66px; }
-        .velas:after{ top:25%; left:0; } .velas:before{ top:45%; left:0; }
-        .fuego{ display:none; border-radius:100%; box-shadow:0 0 40px 10px rgba(248,233,209,0.2); position:absolute; top:-12px; left:50%; margin-left:-10px; width:20px; height:37.5px; }
-        .fuego:nth-child(1){ animation:fuego 2s infinite; } .fuego:nth-child(2){ animation:fuego 1.5s infinite; } .fuego:nth-child(3){ animation:fuego 1s infinite; } .fuego:nth-child(4){ animation:fuego 0.5s infinite; } .fuego:nth-child(5){ animation:fuego 0.2s infinite; }
-        @keyframes fuego{ 0%, 100%{ background:rgba(254,248,97,0.5); transform:translateY(0) scale(1); } 50%{ background:rgba(255,50,0,0.1); transform:translateY(-60px) scale(0); } }
-        .cobertura{ background:rgba(236,231,227,1); border-radius:150px; position:absolute; top:60%; left:50%; margin-left:-83.33px; margin-top:-15px; width:166.66px; height:37.5px; z-index:10; }
-        .cobertura:after, .cobertura:before{ background:rgba(236,231,227,1); border-radius:300px; content:""; position:absolute; width:15px; height:30px; }
-        .cobertura:after{ top:20px; right:42.85px; } .cobertura:before{ top:30px; right:27.27px; }
-        .bizcocho{ background:rgba(109,56,38,1); position:absolute; bottom:0; left:50%; margin-left:-75px; width:150px; height:100px; }
-        .bizcocho:after, .bizcocho:before{ background:rgba(236,231,227,0.6); content:""; position:absolute; width:100%; height:15px; }
-        .bizcocho:after{ top:30%; left:0; } .bizcocho:before{ top:60%; left:0; }
 
-        /* --- Modal and New Content Styles --- */
-        #cake-section { position: relative; }
-        .flame { fill: #ffda77; animation: flicker 1.5s ease-in-out infinite; transform-origin: bottom center; }
-        @keyframes flicker { 0%,100%{transform:scaleY(1);opacity:1;} 50%{transform:scaleY(0.95) skewX(2deg);opacity:0.9;} }
-        #cake-container.cutting .flame { animation: blow-out 0.5s forwards; }
-        @keyframes blow-out { to{opacity:0; transform:scale(0);} }
-        #cake-container.cutting #cake-top-layer { animation: slice-cake 0.5s ease-in-out 1s forwards; }
-        @keyframes slice-cake { 100% { transform: translate(10px, 5px) rotate(2deg); } }
-        #knife { position: absolute; width: 20px; height: 100px; background: linear-gradient(45deg,#c0c0c0,#e0e0e0); border:1px solid #a0a0a0; border-radius:10px 0 0 10px; top:50%; left:50%; opacity:0; transform-origin: bottom right; pointer-events:none; }
-        #cake-container.cutting #knife { animation: cut-animation 3s ease-in-out forwards; }
-        @keyframes cut-animation { 0%{opacity:1;transform:translate(-150px,-150px) rotate(20deg);} 30%{opacity:1;transform:translate(20px,-50px) rotate(-35deg);} 60%{opacity:1;transform:translate(20px,-40px) rotate(-35deg);} 100%{opacity:0;transform:translate(150px,-150px) rotate(-50deg);} }
-        .modal { position: fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter: blur(4px); display:flex; justify-content:center; align-items:center; padding:1rem; transition: all 0.5s; opacity:0; pointer-events:none; z-index:1050; }
-        .modal-content { background:white; border-radius:1rem; box-shadow:0 10px 40px rgba(0,0,0,0.2); padding:2rem; max-width:600px; width:100%; position:relative; transform:scale(0.9); transition: all 0.5s; }
-        .modal.show { opacity:1; pointer-events:auto; } .modal.show .modal-content { transform:scale(1); }
-        .diary { text-align:center; } .book { position: relative; height:100%; } .page { display:none; animation: fadeIn 0.6s ease; }
-        .page.active { display:block; } .page img { max-width:100%; border-radius:15px; margin-bottom:15px; box-shadow:0 6px 12px rgba(0,0,0,0.2); }
-        .diary h1 { font-family: 'Pacifico', cursive; color:#333; margin-bottom:10px; } .diary p { color:#555; line-height:1.6; margin:5px 0; }
-        .diary-controls { margin-top:20px; } .diary-controls button { padding:12px 20px; margin:5px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; background:#ff4da6; color:#fff; transition:all 0.3s ease; }
-        .diary-controls button:hover { background:#e63e90; transform:scale(1.05); }
-        @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
-        .reasons-container::-webkit-scrollbar { width: 8px; } .reasons-container::-webkit-scrollbar-track { background: #fde4e4; border-radius: 10px; }
-        .reasons-container::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 10px; } .reasons-container::-webkit-scrollbar-thumb:hover { background: #fb7185; }
-        #specialModal .modal-content { background: linear-gradient(to top right, #fff1f2, #fde4e4); }
-        .reasons-container p { background: rgba(255, 255, 255, 0.7); color: #4b5563; padding: 0.75rem 1rem 0.75rem 3rem; margin-bottom: 0.75rem; border-radius: 0.75rem; border-left: 6px solid #f472b6; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative; font-weight: 500; }
-        .reasons-container p:nth-child(even) { border-left-color: #fb7185; }
-        .reasons-container p:hover { transform: translateX(5px) scale(1.02); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .reasons-container p::before { content: '✨'; position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: #f472b6; }
-        .reasons-container p:nth-child(even)::before { color: #fb7185; }
+        #animation-container.peach {
+            background-color: #4169E1 !important;
+        }
+
+        #animation-container.peach-after {
+            animation: peach_alive linear 8s infinite;
+        }
+
+        @keyframes peach_alive {
+            0% { background-color: #122b75; }
+            25% { background-color: #003ef9; }
+            50% { background-color: #809ae8; }
+            75% { background-color: #4169E1; }
+            100% { background-color: #053fee; }
+        }
+
+        .bulb {
+            width: 50px;
+            height: 50px;
+            margin: auto;
+            background-repeat: no-repeat;
+            background-position: center 0px;
+            background-size: 50px 50px;
+            background-image: url('bulb.png');
+        }
+
+        .bulb-glow-yellow {
+            animation: bulb_glow_yellow linear 5s;
+            background-image: url('bulb_yellow.png');
+        }
+
+        @keyframes bulb_glow_yellow {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        .bulb-glow-yellow-after {
+            animation: bulb_glow_yellow_after linear 1s infinite;
+        }
+
+        @keyframes bulb_glow_yellow_after {
+            0%, 100% { background-image: url('bulb.png'); }
+            50% { background-image: url('bulb_yellow.png'); }
+        }
+
+        .bannar {
+            max-width: 100%;
+            transform: translate(0px, -500px);
+            visibility: hidden;
+        }
+
+        .bannar-come {
+            animation: bannar_come linear 6s;
+            transform: translate(0px, 0px);
+        }
+
+        @keyframes bannar_come {
+            0% { transform: translate(0px, -1000px); }
+            33% { transform: translate(0px, 0px) rotate(10deg); }
+            66% { transform: translate(0px, 100px) rotate(-10deg); }
+            100% { transform: translate(0px, 0px); }
+        }
+
+        .balloons {
+            position: fixed;
+            bottom: -200px;
+            opacity: 0.6;
+            z-index: 99;
+            width: 100px;
+            height: 183px;
+            background-repeat: no-repeat;
+            background-size: 100px 183px;
+            color: #BF4136;
+            text-shadow: 2px 2px 2px #FFF;
+        }
+
+        .balloons h2 {
+            text-transform: uppercase;
+            font-family: 'Signika', sans-serif;
+            font-size: 50px;
+            display: none;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #b1 { background-image: url('b1.png'); }
+        #b2 { background-image: url('b2.png'); }
+        #b3 { background-image: url('b3.png'); }
+        #b4 { background-image: url('b4.png'); }
+        #b5 { background-image: url('b5.png'); }
+        #b6 { background-image: url('b6.png'); }
+        #b7 { background-image: url('b7.png'); }
+
+        .balloons-rotate-behaviour-one {
+            animation: balloons_rotate_one linear 10s infinite;
+            transform: rotate(30deg);
+        }
+
+        @keyframes balloons_rotate_one {
+            0%, 100% { transform: rotate(30deg); }
+            50% { transform: rotate(-30deg); }
+        }
+
+        .balloons-rotate-behaviour-two {
+            animation: balloons_rotate_two linear 10s infinite;
+            transform: rotate(-20deg);
+        }
+
+        @keyframes balloons_rotate_two {
+            0%, 100% { transform: rotate(-20deg); }
+            50% { transform: rotate(20deg); }
+        }
+
+        .control-panel {
+            position: fixed;
+            bottom: 0;
+            padding: 10px 0px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .control-panel .btn-primary {
+            display: none;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 25px;
+            text-transform: uppercase;
+            font-family: 'Signika', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            background-color: #466baf;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+            margin: 5px;
+        }
+
+        .control-panel .btn-primary:hover,
+        .control-panel .btn-primary:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* --- Old Cake Styles --- */
+        .cake-cover {
+            margin-top: 50px;
+            display: none;
+        }
+        .cake {
+            position: absolute;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            margin-left: -150px;
+        }
+        .cake:after {
+            background: rgba(255, 255, 255, 1);
+            border-radius: 300px;
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 300px;
+            height: 6px;
+        }
+        .velas {
+            background: rgba(255, 255, 255, 1);
+            border-radius: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -7.5px;
+            margin-top: -25px;
+            width: 15px;
+            height: 50px;
+        }
+        .velas:after, .velas:before {
+            background: rgba(255, 0, 0, 0.4);
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 6.66px;
+        }
+        .velas:after { top: 25%; left: 0; }
+        .velas:before { top: 45%; left: 0; }
+        .fuego {
+            display: none;
+            border-radius: 100%;
+            box-shadow: 0 0 40px 10px rgba(248, 233, 209, 0.2);
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            margin-left: -10px;
+            width: 20px;
+            height: 37.5px;
+        }
+        .fuego:nth-child(1) { animation: fuego 2s infinite; }
+        .fuego:nth-child(2) { animation: fuego 1.5s infinite; }
+        .fuego:nth-child(3) { animation: fuego 1s infinite; }
+        .fuego:nth-child(4) { animation: fuego 0.5s infinite; }
+        .fuego:nth-child(5) { animation: fuego 0.2s infinite; }
+        @keyframes fuego {
+            0%, 100% {
+                background: rgba(254, 248, 97, 0.5);
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                background: rgba(255, 50, 0, 0.1);
+                transform: translateY(-60px) scale(0);
+            }
+        }
+        .cobertura {
+            background: rgba(236, 231, 227, 1);
+            border-radius: 150px;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            margin-left: -83.33px;
+            margin-top: -15px;
+            width: 166.66px;
+            height: 37.5px;
+            z-index: 10;
+        }
+        .cobertura:after, .cobertura:before {
+            background: rgba(236, 231, 227, 1);
+            border-radius: 300px;
+            content: "";
+            position: absolute;
+            width: 15px;
+            height: 30px;
+        }
+        .cobertura:after { top: 20px; right: 42.85px; }
+        .cobertura:before { top: 30px; right: 27.27px; }
+        .bizcocho {
+            background: rgba(109, 56, 38, 1);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            margin-left: -75px;
+            width: 150px;
+            height: 100px;
+        }
+        .bizcocho:after, .bizcocho:before {
+            background: rgba(236, 231, 227, 0.6);
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 15px;
+        }
+        .bizcocho:after { top: 30%; left: 0; }
+        .bizcocho:before { top: 60%; left: 0; }
+
+        /* --- SVG Cake & Animation Styles --- */
+        #cake-section {
+            position: relative;
+        }
+        .flame {
+            fill: #ffda77;
+            animation: flicker 1.5s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+        @keyframes flicker {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.95) skewX(2deg); opacity: 0.9; }
+        }
+        #cake-container.cutting .flame {
+            animation: blow-out 0.5s forwards;
+        }
+        @keyframes blow-out {
+            to { opacity: 0; transform: scale(0); }
+        }
+        #cake-container.cutting #cake-top-layer {
+            animation: slice-cake 0.5s ease-in-out 1s forwards;
+        }
+        @keyframes slice-cake {
+            100% { transform: translate(10px, 5px) rotate(2deg); }
+        }
+        #knife {
+            position: absolute;
+            width: 20px;
+            height: 100px;
+            background: linear-gradient(45deg, #c0c0c0, #e0e0e0);
+            border: 1px solid #a0a0a0;
+            border-radius: 10px 0 0 10px;
+            top: 50%;
+            left: 50%;
+            opacity: 0;
+            transform-origin: bottom right;
+            pointer-events: none;
+        }
+        #cake-container.cutting #knife {
+            animation: cut-animation 3s ease-in-out forwards;
+        }
+        @keyframes cut-animation {
+            0% { opacity: 1; transform: translate(-150px, -150px) rotate(20deg); }
+            30% { opacity: 1; transform: translate(20px, -50px) rotate(-35deg); }
+            60% { opacity: 1; transform: translate(20px, -40px) rotate(-35deg); }
+            100% { opacity: 0; transform: translate(150px, -150px) rotate(-50deg); }
+        }
+
+        /* --- Modal Styles --- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            transition: all 0.5s;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1050;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            transform: scale(0.9);
+            transition: all 0.5s;
+        }
+        .modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        
+        /* --- Diary Modal Styles --- */
+        .diary {
+            text-align: center;
+        }
+        .book {
+            position: relative;
+            height: 100%;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        .page img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .diary h1 {
+            font-family: 'Pacifico', cursive;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .diary p {
+            color: #555;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        .diary-controls {
+            margin-top: 20px;
+        }
+        .diary-controls button {
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #ff4da6;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .diary-controls button:hover {
+            background: #e63e90;
+            transform: scale(1.05);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Special Reasons Modal Styles --- */
+        #specialModal .modal-content {
+            background: linear-gradient(to top right, #fff1f2, #fde4e4);
+        }
+        .reasons-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .reasons-container::-webkit-scrollbar-track {
+            background: #fde4e4;
+            border-radius: 10px;
+        }
+        .reasons-container::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 10px;
+        }
+        .reasons-container::-webkit-scrollbar-thumb:hover {
+            background: #fb7185;
+        }
+        .reasons-container p {
+            background: rgba(255, 255, 255, 0.7);
+            color: #4b5563;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.75rem;
+            border-left: 6px solid #f472b6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            font-weight: 500;
+        }
+        .reasons-container p:nth-child(even) {
+            border-left-color: #fb7185;
+        }
+        .reasons-container p:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .reasons-container p::before {
+            content: '✨';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: #f472b6;
+        }
+        .reasons-container p:nth-child(even)::before {
+            color: #fb7185;
+        }
     </style>
 </head>
+
 <body class="text-white">
 
-<div id="countdownOverlay">
-  <h1>Countdown to 25th Sep 2025</h1>
-  <div id="overlayTimer" class="flex"></div>
-</div>
-
-<div id="animation-container">
-    <div class="row">
-        <div class="col-md-12 text-center" style="padding-top: 20px;">
-              <div class="bulb" id="bulb_yellow"></div>
-        </div>
+    <!-- Section 1: Initial Countdown Overlay -->
+    <div id="countdownOverlay">
+        <h1>Countdown to 25th Dec 2025</h1>
+        <div id="overlayTimer" class="flex"></div>
     </div>
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <img src="banner.png" class="bannar" />
-            <div class="cake-cover">
-                <div class="cake">
-                    <div class="velas"><div class="fuego"></div><div class="fuego"></div><div class="fuego"></div><div class="fuego"></div><div class="fuego"></div></div>
-                    <div class="cobertura"></div><div class="bizcocho"></div>
+
+    <!-- Section 2: Interactive Animation Sequence -->
+    <div id="animation-container">
+        <div class="row">
+            <div class="col-md-12 text-center" style="padding-top: 20px;">
+                <div class="bulb" id="bulb_yellow"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <img src="banner.png" class="bannar" />
+                <div class="cake-cover">
+                    <div class="cake">
+                        <div class="velas">
+                            <div class="fuego"></div>
+                            <div class="fuego"></div>
+                            <div class="fuego"></div>
+                            <div class="fuego"></div>
+                            <div class="fuego"></div>
+                        </div>
+                        <div class="cobertura"></div>
+                        <div class="bizcocho"></div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="control-panel">
+            <button class="btn-primary" id="turn_on">Turn On Lights</button>
+            <button class="btn-primary" id="play">Play Music</button>
+            <button class="btn-primary" id="bannar_coming">Let's Decorate</button>
+            <button class="btn-primary" id="balloons_flying">Fly Balloons</button>
+            <button class="btn-primary" id="cake_fadein">Most Important!</button>
+            <button class="btn-primary" id="light_candle">Light the Candle</button>
+            <button class="btn-primary" id="wish_message">Make a Wish</button>
+        </div>
+        <div class="balloons" id="b1"><h2>H</h2></div>
+        <div class="balloons" id="b2"><h2>A</h2></div>
+        <div class="balloons" id="b3"><h2>P</h2></div>
+        <div class="balloons" id="b4"><h2>P</h2></div>
+        <div class="balloons" id="b5"><h2>Y</h2></div>
+        <div class="balloons" id="b6"><h2>B</h2></div>
+        <div class="balloons" id="b7"><h2>DAY</h2></div>
+        <audio class="song" src="hbd1.mp3" loop="loop"></audio>
     </div>
-    <div class="control-panel">
-        <button class="btn-primary" id="turn_on">Turn On Lights</button>
-        <button class="btn-primary" id="play">Play Music</button>
-        <button class="btn-primary" id="bannar_coming">Let's Decorate</button>
-        <button class="btn-primary" id="balloons_flying">Fly Balloons</button>
-        <button class="btn-primary" id="cake_fadein">Most Important!</button>
-        <button class="btn-primary" id="light_candle">Light the Candle</button>
-        <button class="btn-primary" id="wish_message">Make a Wish</button>
+
+    <!-- Section 3: Main Birthday Content -->
+    <div class="content-wrapper min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+        <canvas id="animationCanvas"></canvas>
+        <header class="my-8">
+            <h1 class="font-pacifico text-5xl md:text-7xl animate-pulse">🎉 Happy Birthday Juhi 🎉</h1>
+            <p class="mt-4 text-xl md:text-2xl">Wishing you the best on your special day</p>
+        </header>
+        <section id="countdown" class="bg-white/20 backdrop-blur-md rounded-2xl shadow-xl p-6 my-8 w-full max-w-4xl">
+            <h2 class="text-3xl font-bold mb-4">Countdown to Your Next Birthday!</h2>
+            <div id="timer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-lg"></div>
+        </section>
+        <section id="cake-section" class="my-8">
+            <div id="cake-container" class="relative w-64 h-64 mx-auto">
+                <div id="knife"></div>
+                <svg viewBox="0 0 100 100" id="birthday-cake">
+                    <rect x="10" y="60" width="80" height="30" rx="5" fill="#a16207" />
+                    <circle cx="20" cy="60" r="8" fill="#f9a8d4" />
+                    <circle cx="40" cy="60" r="10" fill="#f9a8d4" />
+                    <circle cx="60" cy="60" r="9" fill="#f9a8d4" />
+                    <circle cx="80" cy="60" r="8" fill="#f9a8d4" />
+                    <rect x="10" y="55" width="80" height="10" fill="#f9a8d4" />
+                    <g id="cake-top-layer">
+                        <rect x="15" y="40" width="70" height="20" rx="5" fill="#f472b6" />
+                        <rect x="15" y="38" width="70" height="5" fill="#ec4899" />
+                    </g>
+                    <g class="candle">
+                        <rect x="30" y="25" width="5" height="15" fill="#fde047" />
+                        <path class="flame" d="M32.5 25 Q35 20 32.5 15 Q30 20 32.5 25 Z" />
+                    </g>
+                    <g class="candle">
+                        <rect x="50" y="25" width="5" height="15" fill="#a78bfa" />
+                        <path class="flame" d="M52.5 25 Q55 20 52.5 15 Q50 20 52.5 25 Z" />
+                    </g>
+                    <g class="candle">
+                        <rect x="70" y="25" width="5" height="15" fill="#60a5fa" />
+                        <path class="flame" d="M72.5 25 Q75 20 72.5 15 Q70 20 72.5 25 Z" />
+                    </g>
+                </svg>
+            </div>
+            <button id="cutCakeBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">Cut the Cake!</button>
+        </section>
+        <section class="my-6 flex flex-wrap justify-center gap-4">
+            <button id="memoriesBtn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">See Memories</button>
+            <button id="horoscopeBtn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">Birthday Horoscope</button>
+            <button id="specialBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">Do you know why you are special?</button>
+        </section>
+        <section class="my-10 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl p-8 max-w-2xl">
+            <h3 class="font-pacifico text-3xl mb-4">A Little Something For You</h3>
+            <div class="text-xl italic leading-relaxed">
+                <p>Saal bhar jiska intezaar hai, wo din aaya hai,</p>
+                <p>Khushiyon ka bhandaar saath laya hai.</p>
+                <p>Har dua mein shaamil ho naam tumhara,</p>
+                <p>Mile tumhe duniya ka har sukh pyara.</p>
+                <p>Chehre pe muskaan, dil mein khushi rahe,</p>
+                <p>Har kadam par tumhe safalta mile.</p>
+                <p>Janamdin ki dher saari shubhkamnayein, Juhi,</p>
+                <p>Tumhari zindagi hamesha mehakti rahe.</p>
+            </div>
+        </section>
     </div>
-    <div class="balloons" id="b1"><h2>H</h2></div><div class="balloons" id="b2"><h2>A</h2></div><div class="balloons" id="b3"><h2>P</h2></div><div class="balloons" id="b4"><h2>P</h2></div><div class="balloons" id="b5"><h2>Y</h2></div><div class="balloons" id="b6"><h2>B</h2></div><div class="balloons" id="b7"><h2>DAY</h2></div>
-    <!-- A silent audio file is used as a placeholder. Replace the src with your actual audio file URL -->
-    <audio class="song" src="hbd1.mp3" loop="loop"></audio>
-</div>
 
-<div class="content-wrapper min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 text-center">
-  <canvas id="animationCanvas"></canvas>
-  <header class="my-8">
-    <h1 class="font-pacifico text-5xl md:text-7xl animate-pulse">🎉 Happy Birthday Juhi 🎉</h1>
-    <p class="mt-4 text-xl md:text-2xl">Wishing you the best on your special day</p>
-  </header>
-  <section id="countdown" class="bg-white/20 backdrop-blur-md rounded-2xl shadow-xl p-6 my-8 w-full max-w-4xl">
-    <h2 class="text-3xl font-bold mb-4">Countdown to Your Next Birthday!</h2>
-    <div id="timer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-lg"></div>
-  </section>
-  <section id="cake-section" class="my-8">
-    <div id="cake-container" class="relative w-64 h-64 mx-auto">
-      <div id="knife"></div>
-      <svg viewBox="0 0 100 100" id="birthday-cake"><rect x="10" y="60" width="80" height="30" rx="5" fill="#a16207"/><circle cx="20" cy="60" r="8" fill="#f9a8d4"/><circle cx="40" cy="60" r="10" fill="#f9a8d4"/><circle cx="60" cy="60" r="9" fill="#f9a8d4"/><circle cx="80" cy="60" r="8" fill="#f9a8d4"/><rect x="10" y="55" width="80" height="10" fill="#f9a8d4"/><g id="cake-top-layer"><rect x="15" y="40" width="70" height="20" rx="5" fill="#f472b6"/><rect x="15" y="38" width="70" height="5" fill="#ec4899"/></g><g class="candle"><rect x="30" y="25" width="5" height="15" fill="#fde047"/><path class="flame" d="M32.5 25 Q35 20 32.5 15 Q30 20 32.5 25 Z"/></g><g class="candle"><rect x="50" y="25" width="5" height="15" fill="#a78bfa"/><path class="flame" d="M52.5 25 Q55 20 52.5 15 Q50 20 52.5 25 Z"/></g><g class="candle"><rect x="70" y="25" width="5" height="15" fill="#60a5fa"/><path class="flame" d="M72.5 25 Q75 20 72.5 15 Q70 20 72.5 25 Z"/></g></svg>
+    <!-- Section 4: Modals -->
+    <div id="diaryModal" class="modal">
+        <div class="modal-content diary">
+            <button id="closeDiary" class="absolute top-2 right-4 text-2xl z-10">&times;</button>
+            <div class="book">
+                <div class="page active">
+                     <img src="Screenshot%202025-09-25%20100206.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+1';" />
+                    <h1>Cherished Moment</h1>
+                    <p>Beautiful memory that brings joy.</p>
+                </div>
+                <div class="page">
+                    <img src="Durga%20Puja.jpg" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+2';" />
+                    <h1>Unforgettable Time</h1>
+                    <p>Durga Puja moments with happiness.</p>
+                </div>
+                <div class="page">
+                    <img src="marathon.jpg" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+3';" />
+                    <h1>Good Times</h1>
+                    <p>Running towards achievements and fun.</p>
+                </div>
+                <div class="page">
+                     <img src="Nature.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+4';" />
+                    <h1>Nature</h1>
+                    <p>Sunny days and laughter at the hills.</p>
+                </div>
+                <div class="page">
+                     <img src="Event.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+5';" />
+                    <h1>Event</h1>
+                    <p>Memorable event at Dhonodhayan Auditorium.</p>
+                </div>
+                <div class="page">
+                     <img src="traditional.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+6';" />
+                    <h1>Traditional</h1>
+                    <p>Joy and tradition in every smile 🌸✨.</p>
+                </div>
+            </div>
+            <div class="diary-controls">
+                <button onclick="prevPage()">⏪ Prev</button>
+                <button onclick="nextPage()">Next ⏩</button>
+                <button id="backDiary" class="bg-gray-500 hover:bg-gray-700">⬅ Back to Home</button>
+            </div>
+        </div>
     </div>
-    <button id="cutCakeBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">Cut the Cake!</button>
-  </section>
-  <section class="my-6 flex flex-wrap justify-center gap-4">
-    <button id="memoriesBtn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">See Memories</button>
-    <button id="horoscopeBtn" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">Birthday Horoscope</button>
-    <button id="specialBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105">Do you know why you are special?</button>
-  </section>
-  <section class="my-10 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl p-8 max-w-2xl">
-    <h3 class="font-pacifico text-3xl mb-4">A Little Something For You</h3>
-    <div class="text-xl italic leading-relaxed">
-            <p>Saal bhar jiska intezaar hai, wo din aaya hai,</p>
-            <p>Khushiyon ka bhandaar saath laya hai.</p>
-            <p>Har dua mein shaamil ho naam tumhara,</p>
-            <p>Mile tumhe duniya ka har sukh pyara.</p>
-            <p>Chehre pe muskaan, dil mein khushi rahe,</p>
-            <p>Har kadam par tumhe safalta mile.</p>
-            <p>Janamdin ki dher saari shubhkamnayein, Juhi,</p>
-            <p>Tumhari zindagi hamesha mehakti rahe.</p></div>
-  </section>
-</div>
 
-<!-- Modals -->
-<div id="diaryModal" class="modal">
-    <div class="modal-content diary">
-        <button id="closeDiary" class="absolute top-2 right-4 text-2xl z-10">&times;</button>
-        <div class="book"><div class="page active">
-            <div style="width:320px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
-                <img src="Screenshot%202025-09-25%20100206.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+1';"/></div>
-                <h1>Cherished Moment</h1><p>Beautiful memory that brings joy.</p></div>
-                <div class="page"><div style="width:320px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);"><img src="Durga%20Puja.jpg" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+2';"/></div><h1>Unforgettable Time</h1><p>Durga Puja moments with happiness.</p></div><div class="page"><div style="width:320px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);"><img src="marathon.jpg" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+3';"/></div><h1>Good Times</h1><p>Running towards achievements and fun.</p></div><div class="page"><div style="width:320px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);"><img src="Nature.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+4';"/></div><h1>Nature</h1><p>Sunny days and laughter at the hills.</p></div><div class="page"><div style="width:320px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);"><img src="Event.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+5';"/></div><h1>Event</h1><p>Memorable event at Dhonodhayan Auditorium.</p></div><div class="page"><div style="width:320px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);"><img src="traditional.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='https://placehold.co/320x420/EEE/31343C?text=Image+6';"/></div><h1>Traditional</h1><p>Joy and tradition in every smile 🌸✨.</p></div></div><div class="diary-controls"><button onclick="prevPage()">⏪ Prev</button><button onclick="nextPage()">Next ⏩</button><button id="backDiary" class="bg-gray-500 hover:bg-gray-700">⬅ Back to Home</button></div></div></div>
+    <div id="horoscopeModal" class="modal">
+        <div class="modal-content text-blue-800">
+            <button id="closeHoroscope" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            <h2 class="font-pacifico text-4xl mb-4 text-blue-700">Your Birthday Horoscope</h2>
+            <p class="text-lg">A Capricorn born on Christmas Day! You are destined for a year filled with warmth, joy, and leadership. Embrace your creativity and generous spirit. Happy Birthday! 🌟</p>
+            <button id="backHoroscope" class="mt-6 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">⬅ Back to Home</button>
+        </div>
+    </div>
 
+    <div id="specialModal" class="modal">
+        <div class="modal-content text-gray-700 flex flex-col">
+            <button id="closeSpecial" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl z-10">&times;</button>
+            <h2 class="font-pacifico text-4xl mb-4 text-center text-rose-500">Reasons Why You Are Special</h2>
+            <div class="reasons-container h-96 overflow-y-auto pr-4 text-lg text-left">
+                <p>You are special because you bring the world at peace.</p>
+                <p>Because your smile is like sunrise after a long, dark night.</p>
+                <p>Because your eyes express what words never can.</p>
+                <p>Because whenever I look at you, my heart stops beating.</p>
+                <p>Because you hear me — even when I am silent.</p>
+                <p>Because you make silence feel at home.</p>
+                <p>Because you encourage me to be a better man.</p>
+                <p>Because your laughter sounds like music specifically created for me.</p>
+                <p>Because your gentleness transforms the people around you.</p>
+                <p>Because you give simple days a special touch.</p>
+                <p>Because your name sounds like home.</p>
+                <p>Because you never pretend.</p>
+                <p>Because you care more than you let on.</p>
+                <p>Because you make love become real once more.</p>
+                <p>Because your being near heals my mess.</p>
+                <p>Because your sincerity is hard to find and lovely.</p>
+                <p>Because you know the language of my silence.</p>
+                <p>Because you can silence me with a look.</p>
+                <p>Because you're my reason to believe in destiny.</p>
+                <p>Because your touch feels like safety.</p>
+                <p>Because even your flaws make you perfect to me.</p>
+                <p>Because I can be myself around you.</p>
+                <p>Because you never give up on people you care about.</p>
+                <p>Because you light up every dark moment.</p>
+                <p>Because your smile is my favorite view.</p>
+                <p>Because you forgive easily.</p>
+                <p>Because you love deeply.</p>
+                <p>Because you don't pretend to be someone else.</p>
+                <p>Because your voice makes everything better.</p>
+                <p>Because you have the kind heart I've ever had.</p>
+                <p>Because you make me want to become a better person.</p>
+                <p>Because you see the tiny things others don't.</p>
+                <p>Because you make loving me seem so easy.</p>
+                <p>Because you're tough even when you're battered.</p>
+                <p>Because your goals are important to you — and now they are to me.</p>
+                <p>Because your hugs are homecoming.</p>
+                <p>Because you're the silence after every storm.</p>
+                <p>Because you're my go-to story to share.</p>
+                <p>Because your flaws make you special.</p>
+                <p>Because you never pretend to feel anything.</p>
+                <p>Because you make my mornings meaningful.</p>
+                <p>Because your eyes hold entire universes.</p>
+                <p>Because you see beauty in small doses.</p>
+                <p>Because you're magic, disguised as human.</p>
+                <p>Because your love is easy but deep.</p>
+                <p>Because you care without expectation.</p>
+                <p>Because you make me laugh for no reason.</p>
+                <p>Because you're the missing piece of my soul.</p>
+                <p>Because you believe in me when I can't even believe in myself.</p>
+                <p>Because you show me what love really means.</p>
+                <p>Because you transform fear into peace.</p>
+                <p>Because you never tire of hearing my tales.</p>
+                <p>Because you're handsome within and without.</p>
+                <p>Because even your anger is cute.</p>
+                <p>Because you're my best morning thought.</p>
+                <p>Because you're my calm after storm.</p>
+                <p>Because your sincerity keeps me on ground.</p>
+                <p>Because you're both tough and fragile.</p>
+                <p>Because your love seems endless.</p>
+                <p>Because your kindness melts me.</p>
+                <p>Because you trust me with your vulnerability.</p>
+                <p>Because you get even my silent meanings.</p>
+                <p>Because you see the best in me.</p>
+                <p>Because you're my favorite person to annoy.</p>
+                <p>Because your laugh makes everything lighter.</p>
+                <p>Because you make me forget the world.</p>
+                <p>Because I can picture forever with you.</p>
+                <p>Because even your silence says "I care."</p>
+                <p>Because your heart is pure gold.</p>
+                <p>Because you're my peace in chaos.</p>
+                <p>Because you complete every missing piece in me.</p>
+                <p>Because you never make love feel like effort.</p>
+                <p>Because you're not perfect — and that's perfect.</p>
+                <p>Because your life is what makes living worthwhile.</p>
+                <p>Because being with you comforts me.</p>
+                <p>Because loving you is poetry.</p>
+                <p>Because the stories your eyes tell me, I never tire of hearing.</p>
+                <p>Because you make me laugh like a child.</p>
+                <p>Because I could never picture my life without you.</p>
+                <p>Because you cause time to stand still when I am around you.</p>
+                <p>Because you remind me that love does not always have to be brutal. </p>
+                <p>Because you are the peace in my every tempest.</p>
+                <p>Because even distance can't erase your memory.</p>
+                <p>Because you make love pure.</p>
+                <p>Because being with you is like a blessing.</p>
+                <p>Because you're not only in my heart — you are my heart.</p>
+                <p>Because you get me more than I get myself.</p>
+                <p>Because you make pain into lessons.</p>
+                <p>Because you never have to try to be lovable — you simply are.</p>
+                <p>Because your smile feels like homecoming.</p>
+                <p>Because you make me believe in forever.</p>
+                <p>Because every melody begins to make sense after you. </p>
+                <p>Because I see my tomorrow in your eyes. </p>
+                <p>Because you push me to be my best self. </p>
+                <p>Because your soul feels comfortable — like I've known you before. </p>
+                <p>Because your love is my greatest comfort. </p>
+                <p>Because you're why I wake up looking forward to tomorrow. </p>
+                <p>Because you make life poetic. </p>
+                <p>Because you're not just someone I love — you're someone I need.</p>
+                <p>Because you're my "once in a lifetime."</p>
+                <p>Because there is nothing better than you(If there still i would go for you) ❤️</p>
+            </div>
+            <div class="text-center mt-auto">
+                <button id="backSpecial" class="mt-6 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">⬅ Back to Home</button>
+            </div>
+        </div>
+    </div>
 
-                <div id="horoscopeModal" class="modal"><div class="modal-content text-blue-800"><button id="closeHoroscope" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button><h2 class="font-pacifico text-4xl mb-4 text-blue-700">Your Birthday Horoscope</h2><p class="text-lg">A Capricorn born on Christmas Day! You are destined for a year filled with warmth, joy, and leadership. Embrace your creativity and generous spirit. Happy Birthday! 🌟</p><button id="backHoroscope" class="mt-6 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">⬅ Back to Home</button></div></div>
-<div id="specialModal" class="modal">
-    <div class="modal-content text-gray-700 flex flex-col">
-        <button id="closeSpecial" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl z-10">&times;</button>
-        <h2 class="font-pacifico text-4xl mb-4 text-center text-rose-500">Reasons Why You Are Special</h2>
-        <div class="reasons-container h-96 overflow-y-auto pr-4 text-lg text-left"><p>You are special because you bring the world at peace.</p>
-                                                                                   <p>Because your smile is like sunrise after a long, dark night.</p>
-                                                                                   <p>Because your eyes express what words never can.</p>
-                                                                                   <p>Because whenever I look at you, my heart stops beating.</p>
-                                                                                   <p>Because you hear me — even when I am silent.</p>
-                                                                                   <p>Because you make silence feel at home.</p>
-                                                                                   <p>Because you encourage me to be a better man.</p>
-                                                                                   <p>Because your laughter sounds like music specifically created for me.</p>
-                                                                                   <p>Because your gentleness transforms the people around you.</p>
-                                                                                   <p>Because you give simple days a special touch.</p>
-                                                                                   <p>Because your name sounds like home.</p>
-                                                                                   <p>Because you never pretend.</p>
-                                                                                   <p>Because you care more than you let on.</p>
-                                                                                   <p>Because you make love become real once more.</p>
-                                                                                   <p>Because your being near heals my mess.</p>
-                                                                                   <p>Because your sincerity is hard to find and lovely.</p>
-                                                                                   <p>Because you know the language of my silence.</p>
-                                                                                   <p>Because you can silence me with a look.</p>
-                                                                                   <p>Because you're my reason to believe in destiny.</p>
-                                                                                   <p>Because your touch feels like safety.</p>
-                                                                                   <p>Because even your flaws make you perfect to me.</p>
-                                                                                   <p>Because I can be myself around you.</p>
-                                                                                   <p>Because you never give up on people you care about.</p>
-                                                                                   <p>Because you light up every dark moment.</p>
-                                                                                   <p>Because your smile is my favorite view.</p>
-                                                                                   <p>Because you forgive easily.</p>
-                                                                                   <p>Because you love deeply.</p>
-                                                                                   <p>Because you don't pretend to be someone else.</p>
-                                                                                   <p>Because your voice makes everything better.</p>
-                                                                                   <p>Because you have the kind heart I've ever had.</p>
-                                                                                   <p>Because you make me want to become a better person.</p>
-                                                                                   <p>Because you see the tiny things others don't.</p>
-                                                                                   <p>Because you make loving me seem so easy.</p>
-                                                                                   <p>Because you're tough even when you're battered.</p>
-                                                                                   <p>Because your goals are important to you — and now they are to me.</p>
-                                                                                   <p>Because your hugs are homecoming.</p>
-                                                                                   <p>Because you're the silence after every storm.</p>
-                                                                                   <p>Because you're my go-to story to share.</p>
-                                                                                   <p>Because your flaws make you special.</p>
-                                                                                   <p>Because you never pretend to feel anything.</p>
-                                                                                   <p>Because you make my mornings meaningful.</p>
-                                                                                   <p>Because your eyes hold entire universes.</p>
-                                                                                   <p>Because you see beauty in small doses.</p>
-                                                                                   <p>Because you're magic, disguised as human.</p>
-                                                                                   <p>Because your love is easy but deep.</p>
-                                                                                   <p>Because you care without expectation.</p>
-                                                                                   <p>Because you make me laugh for no reason.</p>
-                                                                                   <p>Because you're the missing piece of my soul.</p>
-                                                                                   <p>Because you believe in me when I can't even believe in myself.</p>
-                                                                                   <p>Because you show me what love really means.</p>
-                                                                                   <p>Because you transform fear into peace.</p>
-                                                                                   <p>Because you never tire of hearing my tales.</p>
-                                                                                   <p>Because you're handsome within and without.</p>
-                                                                                   <p>Because even your anger is cute.</p>
-                                                                                   <p>Because you're my best morning thought.</p>
-                                                                                   <p>Because you're my calm after storm.</p>
-                                                                                   <p>Because your sincerity keeps me on ground.</p>
-                                                                                   <p>Because you're both tough and fragile.</p>
-                                                                                   <p>Because your love seems endless.</p>
-                                                                                   <p>Because your kindness melts me.</p>
-                                                                                   <p>Because you trust me with your vulnerability.</p>
-                                                                                   <p>Because you get even my silent meanings.</p>
-                                                                                   <p>Because you see the best in me.</p>
-                                                                                   <p>Because you're my favorite person to annoy.</p>
-                                                                                   <p>Because your laugh makes everything lighter.</p>
-                                                                                   <p>Because you make me forget the world.</p>
-                                                                                   <p>Because I can picture forever with you.</p>
-                                                                                   <p>Because even your silence says "I care."</p>
-                                                                                   <p>Because your heart is pure gold.</p>
-                                                                                   <p>Because you're my peace in chaos.</p>
-                                                                                   <p>Because you complete every missing piece in me.</p>
-                                                                                   <p>Because you never make love feel like effort.</p>
-                                                                                   <p>Because you're not perfect — and that's perfect.</p>
-                                                                                   <p>Because your life is what makes living worthwhile.</p>
-                                                                                   <p>Because being with you comforts me.</p>
-                                                                                   <p>Because loving you is poetry.</p>
-                                                                                   <p>Because the stories your eyes tell me, I never tire of hearing.</p>
-                                                                                   <p>Because you make me laugh like a child.</p>
-                                                                                   <p>Because I could never picture my life without you.</p>
-                                                                                   <p>Because you cause time to stand still when I am around you.</p>
-                                                                                   <p>Because you remind me that love does not always have to be brutal. </p>
-                                                                                   <p>Because you are the peace in my every tempest.</p>
-                                                                                   <p>Because even distance can't erase your memory.</p>
-                                                                                   <p>Because you make love pure.</p>
-                                                                                   <p>Because being with you is like a blessing.</p>
-                                                                                   <p>Because you're not only in my heart — you are my heart.</p>
-                                                                                   <p>Because you get me more than I get myself.</p>
-                                                                                   <p>Because you make pain into lessons.</p>
-                                                                                   <p>Because you never have to try to be lovable — you simply are.</p>
-                                                                                   <p>Because your smile feels like homecoming.</p>
-                                                                                   <p>Because you make me believe in forever.</p>
-                                                                                   <p>Because every melody begins to make sense after you. </p>
-                                                                                   <p>Because I see my tomorrow in your eyes. </p>
-                                                                                   <p>Because you push me to be my best self. </p>
-                                                                                   <p>Because your soul feels comfortable — like I've known you before. </p>
-                                                                                   <p>Because your love is my greatest comfort. </p>
-                                                                                   <p>Because you're why I wake up looking forward to tomorrow. </p>
-                                                                                   <p>Because you make life poetic. </p>
-                                                                                   <p>Because you're not just someone I love — you're someone I need.</p>
-                                                                                   <p>Because you're my "once in a lifetime."</p>
-                                                                                   <p>Because there is nothing better than you(If there still i would go for you) ❤️</p>
-                                                                                </div><div class="text-center mt-auto"><button id="backSpecial" class="mt-6 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">⬅ Back to Home</button></div></div></div>
+    <script>
+        $(document).ready(function() {
+            // --- Global Variables & Constants ---
+            const overlayTimerEl = $('#overlayTimer');
+            const countdownOverlay = $('#countdownOverlay');
+            const animationContainer = $('#animation-container');
+            const contentWrapper = $('.content-wrapper');
+            // Set target date to 25th Dec 2025, 00:00 (midnight) Kolkata time
+            const kolkataNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+            const targetDate = new Date(
+                Date.UTC(2025, 11, 24, 18, 30, 0) // 00:00 IST on 25 Dec 2025 = 18:30 UTC on 24 Dec 2025, month is 0-indexed (11 = December)
+            );
 
-<script>
-// --- Combined and Managed Scripts ---
-$(document).ready(function() {
-    const overlayTimerEl = $('#overlayTimer');
-    const countdownOverlay = $('#countdownOverlay');
-    const animationContainer = $('#animation-container');
-    const contentWrapper = $('.content-wrapper');
+            // --- 1. Initial Countdown Logic ---
+            function updateOverlayCountdown() {
+                const now = new Date();
+                let diff = targetDate - now;
 
-    // Target date for the main event
-    const targetDate = new Date("2025-09-25T00:00:00+05:30");
+                // FOR DEVELOPMENT: Set to 0 to skip countdown. Comment out for production.
+                // diff = 0; 
 
-    function updateOverlayCountdown() {
-        const now = new Date();
-        let diff = targetDate - now;
+                if (diff <= 0) {
+                    countdownOverlay.hide();
+                    $('body').css('background', '#000'); // Set black background for animation start
+                    animationContainer.fadeIn('fast');
+                    $('#turn_on').fadeIn('fast');
+                    clearInterval(overlayInterval);
+                    return;
+                }
 
-        // FOR DEVELOPMENT: Set diff to 0 to skip countdown. 
-        // Remove or comment this out for the real countdown.
-        // diff = 0; 
+                const totalSeconds = Math.floor(diff / 1000);
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
 
-        if (diff <= 0) {
-              countdownOverlay.hide();
-              // This sets the background to black for the initial animation sequence.
-              $('body').css('background', '#000'); 
-              animationContainer.fadeIn('fast');
-              $('#turn_on').fadeIn('fast');
-              clearInterval(overlayInterval);
-              return;
-        }
+                overlayTimerEl.html(`
+                    <div><span>${String(days).padStart(2, '0')}</span>Days</div>
+                    <div><span>${String(hours).padStart(2, '0')}</span>Hours</div>
+                    <div><span>${String(minutes).padStart(2, '0')}</span>Minutes</div>
+                    <div><span>${String(seconds).padStart(2, '0')}</span>Seconds</div>
+                `);
+            }
 
-        const totalSeconds = Math.floor(diff / 1000);
-        const days = Math.floor(totalSeconds / 86400);
-        const hours = Math.floor((totalSeconds % 86400) / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
+            const overlayInterval = setInterval(updateOverlayCountdown, 1000);
+            updateOverlayCountdown();
 
-        overlayTimerEl.html(`
-            <div><span>${String(days).padStart(2, '0')}</span>Days</div>
-            <div><span>${String(hours).padStart(2, '0')}</span>Hours</div>
-            <div><span>${String(minutes).padStart(2, '0')}</span>Minutes</div>
-            <div><span>${String(seconds).padStart(2, '0')}</span>Seconds</div>
-        `);
-    }
-
-    const overlayInterval = setInterval(updateOverlayCountdown, 1000);
-    updateOverlayCountdown();
-
-    // --- Original Animation Logic ---
-    $('#turn_on').click(function(){
-        $('#bulb_yellow').addClass('bulb-glow-yellow');
-        animationContainer.addClass('peach');
-        $(this).fadeOut('slow').delay(5000).promise().done(function(){
-            $('#play').fadeIn('slow');
-        });
-    });
-
-    $('#play').click(function(){
-        var audio = $('.song')[0];
-        var playPromise = audio.play();
-
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.error("Audio playback failed:", error);
+            // --- 2. Interactive Animation Sequence Logic ---
+            $('#turn_on').click(function() {
+                $('#bulb_yellow').addClass('bulb-glow-yellow');
+                animationContainer.addClass('peach');
+                $(this).fadeOut('slow').delay(5000).promise().done(function() {
+                    $('#play').fadeIn('slow');
+                });
             });
-        }
-        
-        $('#bulb_yellow').addClass('bulb-glow-yellow-after');
-        animationContainer.addClass('peach-after');
-        $(this).fadeOut('slow').delay(6000).promise().done(function(){
-            $('#bannar_coming').fadeIn('slow');
-        });
-    });
 
-    $('#bannar_coming').click(function(){
-        $('.bannar').css('visibility', 'visible').addClass('bannar-come');
-        $(this).fadeOut('slow').delay(6000).promise().done(function(){
-            $('#balloons_flying').fadeIn('slow');
-        });
-    });
+            $('#play').click(function() {
+                const audio = $('.song')[0];
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => console.error("Audio playback failed:", error));
+                }
+                $('#bulb_yellow').addClass('bulb-glow-yellow-after');
+                animationContainer.addClass('peach-after');
+                $(this).fadeOut('slow').delay(6000).promise().done(function() {
+                    $('#bannar_coming').fadeIn('slow');
+                });
+            });
 
-    function loopOne() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b1').animate({left:randleft,bottom:randtop},10000,function(){ loopOne(); }); }
-    function loopTwo() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b2').animate({left:randleft,bottom:randtop},10000,function(){ loopTwo(); }); }
-    function loopThree() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b3').animate({left:randleft,bottom:randtop},10000,function(){ loopThree(); }); }
-    function loopFour() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b4').animate({left:randleft,bottom:randtop},10000,function(){ loopFour(); }); }
-    function loopFive() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b5').animate({left:randleft,bottom:randtop},10000,function(){ loopFive(); }); }
-    function loopSix() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b6').animate({left:randleft,bottom:randtop},10000,function(){ loopSix(); }); }
-    function loopSeven() { var randleft = ($(window).width()-100)*Math.random(); var randtop = 500*Math.random(); $('#b7').animate({left:randleft,bottom:randtop},10000,function(){ loopSeven(); }); }
-
-    $('#balloons_flying').click(function(){
-        $('#b1,#b4,#b5,#b7').addClass('balloons-rotate-behaviour-one');
-        $('#b2,#b3,#b6').addClass('balloons-rotate-behaviour-two');
-        loopOne(); loopTwo(); loopThree(); loopFour(); loopFive(); loopSix(); loopSeven();
-        $(this).fadeOut('slow').delay(5000).promise().done(function(){
-            $('#cake_fadein').fadeIn('slow');
-        });
-    });	
-
-    $('#cake_fadein').click(function(){
-        $('.cake-cover').fadeIn('slow');
-        $(this).fadeOut('slow').delay(3000).promise().done(function(){
-            $('#light_candle').fadeIn('slow');
-        });
-    });
-
-    $('#light_candle').click(function(){
-        $('.fuego').fadeIn('slow');
-        $(this).fadeOut('slow').promise().done(function(){
-            $('#wish_message').fadeIn('slow');
-        });
-    });
-        
-    $('#wish_message').click(function(){
-        animationContainer.fadeOut('slow', function() {
-            // FIX: Remove the inline style to allow the CSS class to take effect
-            $('body').removeAttr('style').addClass('gradient-bg');
-            contentWrapper.fadeIn('slow');
-            initializeNewContent();
-        });
-    });
-
-    // --- New Content Logic ---
-    function initializeNewContent() {
-        const timerEl = document.getElementById('timer');
-        function updatePageCountdown() {
-            const now = new Date();
-            let nextBirthday = new Date(now.getFullYear(), 8, 25); // Month is 0-indexed, so 8 is September
-            if (now > nextBirthday) {
-                nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
-            }
-            if(now.getMonth() === 8 && now.getDate() === 25) {
-                timerEl.innerHTML = `<div class="col-span-full p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">🎉 Happy Birthday! 🎉</span></div>`;
-                return;
-            }
-            let diff = nextBirthday - now;
-            const totalSeconds = Math.floor(diff/1000);
-            const days = Math.floor(totalSeconds / (3600*24));
-            const hours = Math.floor((totalSeconds % (3600*24)) / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            const months = Math.floor(days / 30.44);
-            const weeks = Math.floor((days % 30.44) / 7);
-            const remainingDays = Math.floor(days % 7);
+            $('#bannar_coming').click(function() {
+                $('.bannar').css('visibility', 'visible').addClass('bannar-come');
+                $(this).fadeOut('slow').delay(6000).promise().done(function() {
+                    $('#balloons_flying').fadeIn('slow');
+                });
+            });
             
-            timerEl.innerHTML=`
-                <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${months}</span><br>Months</div>
-                <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${weeks}</span><br>Weeks</div>
-                <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${remainingDays}</span><br>Days</div>
-                <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${String(hours).padStart(2, '0')}</span><br>Hours</div>
-                <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${String(minutes).padStart(2, '0')}</span><br>Minutes</div>
-                <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${String(seconds).padStart(2, '0')}</span><br>Seconds</div>
-            `;
-        }
-        setInterval(updatePageCountdown,1000);
-        updatePageCountdown();
+            // Balloon animation functions
+            function loopOne() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b1').animate({ left: randleft, bottom: randtop }, 10000, function() { loopOne(); }); }
+            function loopTwo() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b2').animate({ left: randleft, bottom: randtop }, 10000, function() { loopTwo(); }); }
+            function loopThree() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b3').animate({ left: randleft, bottom: randtop }, 10000, function() { loopThree(); }); }
+            function loopFour() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b4').animate({ left: randleft, bottom: randtop }, 10000, function() { loopFour(); }); }
+            function loopFive() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b5').animate({ left: randleft, bottom: randtop }, 10000, function() { loopFive(); }); }
+            function loopSix() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b6').animate({ left: randleft, bottom: randtop }, 10000, function() { loopSix(); }); }
+            function loopSeven() { let randleft = ($(window).width() - 100) * Math.random(); let randtop = 500 * Math.random(); $('#b7').animate({ left: randleft, bottom: randtop }, 10000, function() { loopSeven(); }); }
 
-        const diaryModal=document.getElementById('diaryModal');
-        const horoscopeModal = document.getElementById('horoscopeModal');
-        const specialModal = document.getElementById('specialModal');
+            $('#balloons_flying').click(function() {
+                $('#b1, #b4, #b5, #b7').addClass('balloons-rotate-behaviour-one');
+                $('#b2, #b3, #b6').addClass('balloons-rotate-behaviour-two');
+                loopOne(); loopTwo(); loopThree(); loopFour(); loopFive(); loopSix(); loopSeven();
+                $(this).fadeOut('slow').delay(5000).promise().done(function() {
+                    $('#cake_fadein').fadeIn('slow');
+                });
+            });
 
-        document.getElementById('cutCakeBtn').addEventListener('click',()=>{
-            document.getElementById('cake-container').classList.add('cutting');
-            document.getElementById('cutCakeBtn').disabled=true;
-            document.getElementById('cutCakeBtn').innerText="Happy Birthday!";
+            $('#cake_fadein').click(function() {
+                $('.cake-cover').fadeIn('slow');
+                $(this).fadeOut('slow').delay(3000).promise().done(function() {
+                    $('#light_candle').fadeIn('slow');
+                });
+            });
+
+            $('#light_candle').click(function() {
+                $('.fuego').fadeIn('slow');
+                $(this).fadeOut('slow').promise().done(function() {
+                    $('#wish_message').fadeIn('slow');
+                });
+            });
+
+            $('#wish_message').click(function() {
+                animationContainer.fadeOut('slow', function() {
+                    $('body').removeAttr('style').addClass('gradient-bg');
+                    contentWrapper.fadeIn('slow');
+                    initializeNewContent();
+                });
+            });
+
+            // --- 3. Main Content Page Initialization ---
+            function initializeNewContent() {
+                // Main Page Countdown
+                const timerEl = document.getElementById('timer');
+                function updatePageCountdown() {
+                    const now = new Date();
+                    // Set next birthday to 25 Dec 2026
+                    let nextBirthday = new Date(2026, 11, 25); // Month is 0-indexed (11 = Dec)
+                    if (now > nextBirthday) {
+                        nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+                    }
+                    if (now.getFullYear() === 2026 && now.getMonth() === 11 && now.getDate() === 25) {
+                        timerEl.innerHTML = `<div class="col-span-full p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">🎉 Happy Birthday! 🎉</span></div>`;
+                        return;
+                    }
+                    const diff = nextBirthday - now;
+                    const totalSeconds = Math.floor(diff / 1000);
+                    const days = Math.floor(totalSeconds / (3600 * 24));
+                    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    const seconds = totalSeconds % 60;
+                    const months = Math.floor(days / 30.44);
+                    const weeks = Math.floor((days % 30.44) / 7);
+                    const remainingDays = Math.floor(days % 7);
+
+                    timerEl.innerHTML = `
+                        <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${months}</span><br>Months</div>
+                        <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${weeks}</span><br>Weeks</div>
+                        <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${remainingDays}</span><br>Days</div>
+                        <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${String(hours).padStart(2, '0')}</span><br>Hours</div>
+                        <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${String(minutes).padStart(2, '0')}</span><br>Minutes</div>
+                        <div class="p-3 bg-white/20 rounded-lg"><span class="text-4xl font-bold">${String(seconds).padStart(2, '0')}</span><br>Seconds</div>
+                    `;
+                }
+                setInterval(updatePageCountdown, 1000);
+                updatePageCountdown();
+
+                // Modal Logic
+                const diaryModal = document.getElementById('diaryModal');
+                const horoscopeModal = document.getElementById('horoscopeModal');
+                const specialModal = document.getElementById('specialModal');
+                
+                document.getElementById('cutCakeBtn').addEventListener('click', () => {
+                    document.getElementById('cake-container').classList.add('cutting');
+                    const btn = document.getElementById('cutCakeBtn');
+                    btn.disabled = true;
+                    btn.innerText = "Happy Birthday!";
+                });
+
+                document.getElementById('memoriesBtn').addEventListener('click', () => diaryModal.classList.add('show'));
+                document.getElementById('closeDiary').addEventListener('click', () => diaryModal.classList.remove('show'));
+                document.getElementById('backDiary').addEventListener('click', () => diaryModal.classList.remove('show'));
+                
+                document.getElementById('horoscopeBtn').addEventListener('click', () => horoscopeModal.classList.add('show'));
+                document.getElementById('closeHoroscope').addEventListener('click', () => horoscopeModal.classList.remove('show'));
+                document.getElementById('backHoroscope').onclick = () => horoscopeModal.classList.remove('show');
+                
+                document.getElementById('specialBtn').addEventListener('click', () => specialModal.classList.add('show'));
+                document.getElementById('closeSpecial').addEventListener('click', () => specialModal.classList.remove('show'));
+                document.getElementById('backSpecial').addEventListener('click', () => specialModal.classList.remove('show'));
+
+                // Diary Navigation
+                let currentPage = 0;
+                const pages = document.querySelectorAll('.page');
+                window.nextPage = () => { pages[currentPage].classList.remove('active'); currentPage = (currentPage + 1) % pages.length; pages[currentPage].classList.add('active'); }
+                window.prevPage = () => { pages[currentPage].classList.remove('active'); currentPage = (currentPage - 1 + pages.length) % pages.length; pages[currentPage].classList.add('active'); }
+
+                // Canvas Confetti Animation
+                const canvas = document.getElementById('animationCanvas');
+                const ctx = canvas.getContext('2d');
+                let confetti = [];
+                function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+                function ConfettiParticle() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height - canvas.height;
+                    this.r = 5 + Math.random() * 5;
+                    this.d = Math.random() * 150 + 10;
+                    this.color = `hsl(${Math.random()*360}, 100%, 50%)`;
+                    this.tilt = Math.random() * 10 - 10;
+                    this.tiltAngleIncrement = 0.05 + Math.random() / 10;
+                    this.tiltAngle = 0;
+                }
+                function initConfetti() { confetti = []; for (let i = 0; i < 150; i++) { confetti.push(new ConfettiParticle()); } }
+                function drawConfetti() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    confetti.forEach(c => {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.lineWidth = c.r / 2;
+                        ctx.strokeStyle = c.color;
+                        ctx.moveTo(c.x + c.tilt + c.r, c.y);
+                        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r);
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+                    updateConfetti();
+                }
+                function updateConfetti() {
+                    confetti.forEach(c => {
+                        c.tiltAngle += c.tiltAngleIncrement;
+                        c.y += (Math.cos(c.d) + 1 + c.r / 2) / 2;
+                        c.tilt = Math.sin(c.tiltAngle) * 15;
+                        if (c.y > canvas.height) {
+                            c.y = -20;
+                            c.x = Math.random() * canvas.width;
+                        }
+                    });
+                }
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+                initConfetti();
+                (function animateConfetti() {
+                    drawConfetti();
+                    requestAnimationFrame(animateConfetti);
+                })();
+            }
         });
-        
-        document.getElementById('memoriesBtn').addEventListener('click',()=>{diaryModal.classList.add('show');});
-        document.getElementById('closeDiary').addEventListener('click',()=>{diaryModal.classList.remove('show');});
-        document.getElementById('backDiary').addEventListener('click',()=>{diaryModal.classList.remove('show');});
-        document.getElementById('horoscopeBtn').addEventListener('click',()=>{horoscopeModal.classList.add('show');});
-        document.getElementById('closeHoroscope').addEventListener('click',()=>{horoscopeModal.classList.remove('show');});
-        document.getElementById('backHoroscope').onclick = function() { horoscopeModal.classList.remove('show'); };
-        document.getElementById('specialBtn').addEventListener('click', () => { specialModal.classList.add('show'); });
-        document.getElementById('closeSpecial').addEventListener('click', () => { specialModal.classList.remove('show'); });
-        document.getElementById('backSpecial').addEventListener('click', () => { specialModal.classList.remove('show'); });
-
-        // Diary navigation
-        let currentPage=0;
-        const pages=document.querySelectorAll('.page');
-        window.nextPage=()=>{pages[currentPage].classList.remove('active'); currentPage=(currentPage+1)%pages.length; pages[currentPage].classList.add('active');}
-        window.prevPage=()=>{pages[currentPage].classList.remove('active'); currentPage=(currentPage-1+pages.length)%pages.length; pages[currentPage].classList.add('active');}
-
-        // Canvas Confetti
-        const canvas=document.getElementById('animationCanvas');
-        const ctx=canvas.getContext('2d');
-        let confetti=[];
-        function resizeCanvas() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-        function Confetti(){ this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height - canvas.height; this.r=5+Math.random()*5; this.d=Math.random() * 150 + 10; this.color=`hsl(${Math.random()*360},100%,50%)`; this.tilt=Math.random()*10-10; this.tiltAngleIncrement=0.05+Math.random()/10; this.tiltAngle=0; }
-        function initConfetti(){ confetti = []; for(let i=0;i<150;i++){ confetti.push(new Confetti()); } }
-        function drawConfetti(){
-            ctx.clearRect(0,0,canvas.width,canvas.height); 
-            confetti.forEach(c=>{ ctx.save(); ctx.beginPath(); ctx.lineWidth=c.r/2; ctx.strokeStyle=c.color; ctx.moveTo(c.x + c.tilt + c.r, c.y); ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r); ctx.stroke(); ctx.restore(); }); 
-            updateConfetti();
-        }
-        function updateConfetti(){
-            confetti.forEach(c=>{ c.tiltAngle+=c.tiltAngleIncrement; c.y += (Math.cos(c.d) + 1 + c.r/2) / 2; c.tilt = Math.sin(c.tiltAngle) * 15; if(c.y > canvas.height){ c.y = -20; c.x = Math.random()*canvas.width; } });
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        initConfetti(); 
-        function animateConfetti(){ drawConfetti(); requestAnimationFrame(animateConfetti); }
-        animateConfetti();
-    }
-});
-</script>
-
+    </script>
 </body>
 </html>
+
