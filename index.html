@@ -66,39 +66,48 @@
   @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
 
   .reasons-container::-webkit-scrollbar { width: 8px; }
-  .reasons-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  .reasons-container::-webkit-scrollbar-track { background: #fde4e4; border-radius: 10px; }
   .reasons-container::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 10px; }
   .reasons-container::-webkit-scrollbar-thumb:hover { background: #fb7185; }
 
   #specialModal .modal-content {
-      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      background: linear-gradient(to top right, #fff1f2, #fde4e4);
   }
 
   .reasons-container p {
-    background: #fff0f5; /* Lavender blush */
-    color: #5c5c5c;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    color: #4b5563;
+    padding: 0.75rem 1rem 0.75rem 3rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.75rem;
+    border-left: 6px solid #f472b6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
-    padding-left: 2.5rem; /* Space for the icon */
     font-weight: 500;
   }
 
+  .reasons-container p:nth-child(even) {
+      border-left-color: #fb7185;
+  }
+
   .reasons-container p:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateX(5px) scale(1.02);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
 
   .reasons-container p::before {
-    content: '💖'; /* Heart icon */
+    content: '✨';
     position: absolute;
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1rem;
+    font-size: 1.2rem;
+    color: #f472b6;
+  }
+  
+  .reasons-container p:nth-child(even)::before {
+    color: #fb7185;
   }
 </style>
 </head>
