@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Periodic Table of You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX, #desktopSidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        #mainContent, .nav-panel, #desktopSidebar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        #desktopSidebar::-webkit-scrollbar {
+            display: none;
+        }
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        :root {
+            --neon-green: #ccff00;
+            --neon-blue: #00f0ff;
+            --bg-dark: #050505;
+            --color-text-light: #f3f4f6;
+            --bg-primary: var(--bg-dark);
+            --text-primary: var(--color-text-light);
+            --nav-bg: rgba(5, 5, 5, 0.8);
+        }
+
+        body.light-mode {
+            --bg-primary: #f0fdfa; 
+            --text-primary: #1f2937;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --neon-green: #16a34a; 
+            --neon-blue: #0284c7;  
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.5s, color 0.5s;
+        }
+        
+        .dark-nav-style {
+            background-color: rgba(10, 10, 10, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            color: var(--color-text-light);
+            backdrop-filter: blur(5px);
+        }
+        .dark-nav-style a.nav-link {
+            color: var(--color-text-light);
+            transition: color 0.2s;
+        }
+        .dark-nav-style a.nav-link:hover {
+            color: var(--neon-green);
+        }
+
+        .nav-link-desktop {
+            position: relative;
+            transition: all 0.2s;
+        }
+        .nav-link-desktop:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--neon-green);
+            padding-left: 1.2rem;
+        }
+        
+        .periodic-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); 
+            gap: 0.25rem; 
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .element-card {
+            background: transparent; 
+            border-radius: 4px; 
+            padding: 0.3rem 0.2rem;
+            height: 5.5rem; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            border: 1.5px solid currentColor; 
+            overflow: hidden;
+            text-align: center;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .element-card:hover {
+            transform: scale(1.1); 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .element-active {
+            box-shadow: 0 0 20px currentColor;
+            transform: scale(1.15);
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 20;
+        }
+        
+        .color-neon-green { color: var(--neon-green); text-shadow: 0 0 3px rgba(204, 255, 0, 0.3); }
+        .color-neon-blue { color: var(--neon-blue); text-shadow: 0 0 3px rgba(0, 240, 255, 0.3); }
+
+        .atomic-number {
+            font-size: 0.6rem; 
+            text-align: left;
+            opacity: 0.9;
+            width: 100%;
+            padding-left: 0.2rem;
+            font-weight: 600;
+        }
+
+        .symbol {
+            font-size: 1.3rem; 
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .atomic-weight {
+            font-size: 0.4rem; 
+            opacity: 0.7;
+            margin-bottom: 0.1rem;
+        }
+
+        .name {
+            font-size: 0.5rem; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background-color: #111;
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            border: 2px solid var(--neon-green);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            color: white;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .close-button {
+            transition: color 0.2s;
+        }
+
+        .close-button:hover {
+            color: var(--neon-blue);
+        }
+
+        .science-decor {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            transition: all 0.5s ease;
+            opacity: 1; 
+        }
+
+        body.light-mode .science-decor {
+            color: var(--text-primary);
+            filter: none;
+            opacity: 0.1; 
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .science-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .glow-green {
+            color: var(--neon-green);
+            filter: drop-shadow(0 0 5px var(--neon-green)) drop-shadow(0 0 10px rgba(204, 255, 0, 0.5));
+            opacity: 0.8;
+        }
+        
+        .glow-blue {
+            color: var(--neon-blue);
+            filter: drop-shadow(0 0 5px var(--neon-blue)) drop-shadow(0 0 10px rgba(0, 240, 255, 0.5));
+            opacity: 0.8;
+        }
+
+        .science-flask { top: 5%; left: 3%; font-size: 9rem; transform: rotate(-10deg); }
+        .science-atom { top: 3%; left: 30%; font-size: 9rem; }
+        .science-dna-1 { top: 8%; left: 50%; font-size: 7rem; transform: rotate(45deg); }
+        .science-microscope-1 { top: 3%; left: 63%; font-size: 8rem; }
+        .science-beaker { top: 5%; right: 20%; font-size: 7rem; }
+        .science-meteor-1 { top: 3%; right: 3%; font-size: 8rem; transform: rotate(10deg); }
+        
+        .science-planet { top: 22%; left: 20%; font-size: 8rem; transform: rotate(-10deg); }
+        .science-rocket { top: 20%; left: 38%; font-size: 8rem; transform: rotate(-15deg); }
+        .science-telescope { top: 23%; right: 40%; font-size: 8rem; transform: rotate(-10deg); }
+        .science-alien { top: 25%; right: 3%; font-size: 8rem; }
+        
+        .science-dna-2 { bottom: 30%; right: 2%; font-size: 7rem; transform: rotate(-45deg); }
+        
+        .science-telescope-2 { bottom: 5%; left: 3%; font-size: 8rem; transform: rotate(10deg); }
+        .science-microscope-2 { bottom: 5%; left: 15%; font-size: 8rem; }
+        .science-meteor-2 { bottom: 5%; right: 3%; font-size: 8rem; transform: rotate(180deg); }
+
+
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .periodic-grid {
+                grid-template-columns: repeat(10, 1fr); 
+            }
+            .element-card {
+                height: 6rem;
+                padding: 0.6rem 0.3rem;
+            }
+            .symbol {
+                font-size: 1.4rem;
+            }
+            .atomic-number {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .periodic-grid {
+                grid-template-columns: repeat(18, 1fr); 
+                gap: 0.35rem;
+                max-width: 1300px;
+                margin: 0 auto;
+                padding-top: 2rem;
+            }
+
+            .element-card {
+                height: 5.5vw; 
+                max-height: 90px;
+                padding: 0.4rem 0.2rem;
+                border-width: 2px; 
+            }
+            
+            .symbol { font-size: 1.6vw; }
+            .name { font-size: 0.6vw; }
+            .atomic-number { font-size: 0.7vw; }
+
+            .element-card:nth-child(2) { grid-column: 18; }
+
+            .element-card:nth-child(5) { grid-column: 13; }
+
+            .element-card:nth-child(13) { grid-column: 13; }
+
+            .element-card:nth-child(57) { 
+                grid-row: 8; 
+                grid-column: 4; 
+                margin-top: 2rem; 
+            }
+            .element-card:nth-child(58), .element-card:nth-child(59),
+            .element-card:nth-child(60), .element-card:nth-child(61),
+            .element-card:nth-child(62), .element-card:nth-child(63),
+            .element-card:nth-child(64), .element-card:nth-child(65),
+            .element-card:nth-child(66), .element-card:nth-child(67),
+            .element-card:nth-child(68), .element-card:nth-child(69),
+            .element-card:nth-child(70), .element-card:nth-child(71) {
+                grid-row: 8;
+                margin-top: 2rem;
+            }
+
+            .element-card:nth-child(72) { grid-row: 6; grid-column: 4; }
+
+            .element-card:nth-child(89) { 
+                grid-row: 9; 
+                grid-column: 4; 
+            }
+            .element-card:nth-child(90), .element-card:nth-child(91),
+            .element-card:nth-child(92), .element-card:nth-child(93),
+            .element-card:nth-child(94), .element-card:nth-child(95),
+            .element-card:nth-child(96), .element-card:nth-child(97),
+            .element-card:nth-child(98), .element-card:nth-child(99),
+            .element-card:nth-child(100), .element-card:nth-child(101),
+            .element-card:nth-child(102), .element-card:nth-child(103) {
+                grid-row: 9;
+            }
+
+            .element-card:nth-child(104) { grid-row: 7; grid-column: 4; }
+        }
+
+        button {
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden">
+
+    <button id="navToggle" class="fixed top-6 left-6 z-[70] p-2 bg-neutral-950 text-purple-400 rounded-full shadow-lg hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 transition-transform hover:scale-110">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+    <button id="themeToggle" class="fixed top-6 right-6 z-[70] p-2 rounded-full border border-purple-500/50 bg-neutral-950/50 backdrop-blur-md hover:bg-purple-500/20 transition-all text-yellow-300 hover:text-yellow-100 focus:outline-none hover:scale-110 shadow-lg">
+        <i id="themeIcon" class="ph ph-sun text-xl"></i>
+    </button>
+
+    <aside id="desktopSidebar" class="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-72 bg-neutral-950/90 backdrop-blur-xl border-r border-white/10 z-[60] overflow-hidden -translate-x-full">
+        
+        <div class="flex items-center gap-3 p-6 pl-20 border-b border-white/10">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-yellow-400 flex items-center justify-center shadow-lg shadow-purple-500/30 shrink-0">
+                <i class="ph ph-atom text-xl text-white"></i>
+            </div>
+            <span class="text-xl font-bold festive-text bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-purple-300 to-pink-300">
+                The Periodic Table
+            </span>
+        </div>
+
+        <div class="flex flex-col flex-grow py-6 px-4 gap-2 overflow-y-auto">
+            
+            <a href="index.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-house text-lg text-purple-400"></i> Home
+            </a>
+            <a href="Cake.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-cake text-lg text-green-400"></i> Cake
+            </a>
+            <a href="21_Wish.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-door text-lg text-green-400"></i> 21_Door
+            </a>
+            <a href="chat.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-cloud-fog text-lg text-blue-300"></i> Heaven
+            </a>
+            <a href="Diary.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-notebook text-lg text-purple-400"></i> Diary
+            </a>
+            <a href="anatomy.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-user text-lg text-orange-400"></i> Anatomy
+            </a>
+            <a href="Box.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-package text-lg text-purple-400"></i> Box
+            </a>
+            <a href="Special.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-star text-lg text-yellow-400"></i> Special
+            </a>
+            <a href="color.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-palette text-lg text-purple-400"></i> Color
+            </a>
+            <a href="you.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-heart text-lg text-red-500"></i> You
+            </a>
+            <a href="Teacher.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-chalkboard-teacher text-lg text-purple-400"></i> Teacher
+            </a>
+            <a href="Universe.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-planet text-lg text-purple-400"></i> Universe
+            </a>
+            <a href="The_River.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-waves text-lg text-purple-400"></i> River
+            </a>
+            <a href="Mountain.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-mountains text-lg text-purple-400"></i> Mountain
+            </a>
+            <a href="Skill.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-lightning text-lg text-green-400"></i> Skill
+            </a>
+            <a href="Paper_Star.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-star text-lg text-purple-400"></i> Paper Star
+            </a>
+            <a href="Carttoon.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-film-strip text-lg text-purple-400"></i> Cartoon
+            </a>
+            <a href="Periodik_table.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">
+                <i class="ph ph-grid-four text-lg text-green-400"></i> Periodic Table
+            </a>
+            <a href="Concept.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-lightbulb text-lg text-green-400"></i> Concept
+            </a>
+            <a href="Calender.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-calendar text-lg text-green-400"></i> Calender
+            </a>
+            <a href="Perspective.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-eye text-lg text-green-400"></i> Perspective
+            </a>
+            <a href="Santa.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-gift text-lg text-purple-400"></i> Santa
+            </a>
+            <a href="Presence.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-user-focus text-lg text-green-400"></i> Presence
+            </a>
+            <a href="Cloud.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-cloud text-lg text-purple-400"></i> Cloud
+            </a>
+            <a href="Ink.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-paint-brush-broad text-lg text-purple-400"></i> Paint
+            </a>
+            <a href="Butterfly.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-butterfly text-lg text-purple-400"></i> Butterfly
+            </a>
+            <a href="Weather.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-sun text-lg text-purple-400"></i> Weather
+            </a>
+            <a href="Spotlight.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-aperture text-lg text-green-400"></i> Spotlight
+            </a>
+            <a href="Room.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-house-line text-lg text-green-400"></i> Room
+            </a>
+            <a href="Radio.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-radio text-lg text-green-400"></i> Radio
+            </a>
+            <a href="Food.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-pizza text-lg text-green-400"></i> Food
+            </a>
+            <a href="Music.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-music-notes text-lg text-green-400"></i> Music
+            </a>
+            <a href="letter.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-envelope-open text-lg text-pink-400"></i> Letter
+            </a>
+            <a href="Msg.html" class="nav-link-desktop px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-medium text-gray-300">
+                <i class="ph ph-chat-circle-text text-lg text-green-400"></i> Message
+            </a>
+            
+        </div>
+        
+        <div class="p-6 border-t border-white/10 flex justify-center items-center bg-black/20">
+            <span class="text-xs text-gray-500 font-mono">v2.1</span>
+        </div>
+    </aside>
+    
+    <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 shadow-md flex items-center justify-center space-x-2 -translate-y-full dark-nav-style lg:hidden">
+        <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Massege</a>
+        <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Letter</a>
+        <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Music</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 shadow-md flex items-center justify-center space-x-2 translate-y-full dark-nav-style lg:hidden">
+        <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20 dark-nav-style lg:hidden">
+        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Home</a>
+        <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Cake</a>
+        <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">21_Door</a>
+        <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Heaven</a>
+        <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Diary</a>
+        <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Anatomy</a>
+        <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Box</a>
+        <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Special</a>
+        <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Color</a>
+        <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">You</a>
+        <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Teacher</a>
+        <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Universe</a>
+        <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">River</a>
+        <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Mountain</a>
+    </nav>
+    
+    <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20 dark-nav-style lg:hidden">
+        <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Periodik_table</a>
+        <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Calender</a>
+        <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Perspective</a>
+        <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Butterfly</a>
+        <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Room</a>
+        <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Radio</a>
+        <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Food</a>
+    </nav>
+
+    <div id="mainContent" class="absolute inset-0 pt-28 lg:pt-20 overflow-y-auto">
+
+        <div class="hidden lg:block fixed inset-0 pointer-events-none overflow-hidden z-0">
+            <i class="ph ph-flask science-decor science-flask glow-green"></i>
+            <i class="ph ph-atom science-decor science-atom glow-green"></i>
+            <i class="ph ph-dna science-decor science-dna-1 glow-green"></i>
+            <i class="ph ph-microscope science-decor science-microscope-1 glow-green"></i>
+            <i class="ph ph-beaker science-decor science-beaker glow-green"></i>
+            <i class="ph ph-meteor science-decor science-meteor-1 glow-blue"></i>
+            
+            <i class="ph ph-planet science-decor science-planet glow-blue"></i>
+            <i class="ph ph-rocket-launch science-decor science-rocket glow-blue"></i>
+            <i class="ph ph-telescope science-decor science-telescope glow-blue"></i>
+            <i class="ph ph-alien science-decor science-alien glow-blue"></i>
+
+            <i class="ph ph-gear-six science-decor glow-green" style="top: 35%; left: 42%; font-size: 6rem; transform: rotate(30deg);"></i>
+            <i class="ph ph-chart-line science-decor glow-blue" style="top: 55%; left: 60%; font-size: 5rem; transform: rotate(-20deg);"></i>
+            <i class="ph ph-brain science-decor glow-green" style="top: 60%; left: 45%; font-size: 7rem; transform: rotate(10deg);"></i>
+            <i class="ph ph-magnet science-decor glow-blue" style="top: 40%; left: 55%; font-size: 6rem; transform: rotate(-15deg);"></i>
+            
+            <i class="ph ph-dna science-decor science-dna-2 glow-green"></i>
+            <i class="ph ph-telescope science-decor science-telescope-2 glow-blue"></i>
+            <i class="ph ph-microscope science-decor science-microscope-2 glow-blue"></i>
+            <i class="ph ph-meteor science-decor science-meteor-2 glow-blue"></i>
+        </div>
+
+        <div id="main-content" class="w-full max-w-7xl space-y-6 mx-auto px-4 py-12 sm:py-16 relative z-10">
+            
+            <header class="text-center space-y-2">
+                <p class="text-lg font-semibold text-white/80 festive-text">Happy Birthday!</p>
+                <h1 id="main-title" class="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent" 
+                    style="background-image: linear-gradient(90deg, #ccff00, #ffffff, #00f0ff);">
+                    The Element of You (1-118)
+                </h1>
+                <p class="text-sm opacity-60 max-w-sm mx-auto">Every element is a fundamental part of what makes you amazing.</p>
+            </header>
+    
+            <div class="periodic-grid" id="periodic-table">
+            </div>
+    
+            <div class="h-20 sm:h-24"></div> 
+    
+            <div class="text-center pt-4">
+                <p class="text-xs opacity-50">-- Happiest Birthday --</p>
+            </div>
+    
+        </div>
+
+    </div>
+
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-xl font-bold text-yellow-300"></h3>
+                <button id="close-modal" class="text-gray-400 close-button text-2xl leading-none">&times;</button>
+            </div>
+            <p id="modal-message" class="text-lg text-center font-medium my-4"></p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            var ALL_ELEMENTS = [
+                { number: 1, symbol: 'Ch', name: 'Charm', weight: '12.01', color: 'color-neon-blue', description: 'You have a charm that stays long after the moment passes.' },
+                { number: 2, symbol: 'Sm', name: 'Smile', weight: '16.08', color: 'color-neon-blue', description: 'Your smile carries a calm brightness.' },
+                { number: 3, symbol: 'Kn', name: 'Kindness', weight: '14.07', color: 'color-neon-green', description: 'You show kindness in ways that don’t need attention.' },
+                { number: 4, symbol: 'Bl', name: 'Brilliant', weight: '9.91', color: 'color-neon-green', description: 'Your mind connects ideas with surprising clarity.' },
+                { number: 5, symbol: 'La', name: 'Laugh', weight: '1.03', color: 'color-neon-green', description: 'Your laugh feels genuine and light.' },
+                { number: 6, symbol: 'Cr', name: 'Creativity', weight: '33.56', color: 'color-neon-green', description: 'You create possibilities in places.' },
+                { number: 7, symbol: 'Ly', name: 'Loyalty', weight: '58.7', color: 'color-neon-green', description: 'You hold your values firmly and quietly.' },
+                { number: 8, symbol: 'Eg', name: 'Energy', weight: '7.89', color: 'color-neon-green', description: 'Your energy moves with purpose.' },
+                { number: 9, symbol: 'St', name: 'Style', weight: '41.1', color: 'color-neon-green', description: 'Your style reflects who you are, not trends.' },
+                { number: 10, symbol: 'Sl', name: 'Silly', weight: '2.22', color: 'color-neon-blue', description: 'You bring a gentle fun into ordinary moments.' },
+                { number: 11, symbol: 'Fo', name: 'Focus', weight: '81.44', color: 'color-neon-green', description: 'You focus with a level of intent that’s rare.' },
+                { number: 12, symbol: 'Ha', name: 'Happy', weight: '8.88', color: 'color-neon-green', description: 'Your happiness feels steady and unforced.' },
+                { number: 13, symbol: 'Tr', name: 'Trust', weight: '55.3', color: 'color-neon-green', description: 'You build trust through consistency.' },
+                { number: 14, symbol: 'Wi', name: 'Witty', weight: '29.6', color: 'color-neon-green', description: 'Your wit appears at exactly the right moment.' },
+                { number: 15, symbol: 'Pa', name: 'Passion', weight: '101.9', color: 'color-neon-green', description: 'You turn your interests into direction.' },
+                { number: 16, symbol: 'Dr', name: 'Dreamy', weight: '4.17', color: 'color-neon-green', description: 'You think in ways that feel open and imaginative.' },
+                { number: 17, symbol: 'Ge', name: 'Generous', weight: '77.2', color: 'color-neon-green', description: 'You give with intention and sincerity.' },
+                { number: 18, symbol: 'He', name: 'Heart', weight: '10.0', color: 'color-neon-blue', description: 'You listen in a way that makes people feel understood.' },
+                { number: 19, symbol: 'Ca', name: 'Caring', weight: '99.9', color: 'color-neon-green', description: 'You notice details that many miss.' },
+                { number: 20, symbol: 'Cl', name: 'Classy', weight: '3.31', color: 'color-neon-green', description: 'Your class shows in how you handle situations.' },
+                { number: 21, symbol: 'Pu', name: 'Pure', weight: '1.00', color: 'color-neon-green', description: 'You speak with a sincerity that feels clean and honest.' },
+                { number: 22, symbol: 'Ho', name: 'Honest', weight: '45.0', color: 'color-neon-green', description: 'You express truth without harshness.' },
+                { number: 23, symbol: 'Fi', name: 'Fierce', weight: '50.9', color: 'color-neon-green', description: 'You stand strong for what matters to you.' },
+                { number: 24, symbol: 'Co', name: 'Cool', weight: '52.0', color: 'color-neon-green', description: 'You carry a calm confidence.' },
+                { number: 25, symbol: 'Ts', name: 'Tease', weight: '54.9', color: 'color-neon-green', description: 'You tease with warmth and respect.' },
+                { number: 26, symbol: 'Ju', name: 'Joyful', weight: '55.8', color: 'color-neon-green', description: 'You spread joy without trying.' },
+                { number: 27, symbol: 'Ta', name: 'Talented', weight: '58.9', color: 'color-neon-green', description: 'You learn skills with quiet consistency.' },
+                { number: 28, symbol: 'Ni', name: 'Nice', weight: '58.7', color: 'color-neon-green', description: 'You are genuinely good hearted.' },
+                { number: 29, symbol: 'Se', name: 'Sensitive', weight: '63.5', color: 'color-neon-green', description: 'You understand emotions with depth.' },
+                { number: 30, symbol: 'Zh', name: 'Zestful', weight: '65.4', color: 'color-neon-green', description: 'You add colour to dull moments effortlessly.' },
+                { number: 31, symbol: 'Ad', name: 'Admirable', weight: '69.7', color: 'color-neon-green', description: 'You inspire without intending to.' },
+                { number: 32, symbol: 'Gr', name: 'Graceful', weight: '72.6', color: 'color-neon-green', description: 'You move with a natural grace.' },
+                { number: 33, symbol: 'Ar', name: 'Artistic', weight: '74.9', color: 'color-neon-green', description: 'You see the world with your own artistic angle.' },
+                { number: 34, symbol: 'Ve', name: 'Vibrant', weight: '79.0', color: 'color-neon-green', description: 'You bring liveliness wherever you go.' },
+                { number: 35, symbol: 'Ba', name: 'Balanced', weight: '79.9', color: 'color-neon-green', description: 'You balance strength and softness beautifully.' },
+                { number: 36, symbol: 'Fr', name: 'Friendly', weight: '83.8', color: 'color-neon-blue', description: 'You make people feel comfortable quickly.' },
+                { number: 37, symbol: 'Op', name: 'Optimistic', weight: '85.5', color: 'color-neon-green', description: 'You choose optimism based on experience, not luck.' },
+                { number: 38, symbol: 'Stn', name: 'Strong', weight: '87.6', color: 'color-neon-green', description: 'You stay strong even when things get heavy.' },
+                { number: 39, symbol: 'El', name: 'Elegant', weight: '88.9', color: 'color-neon-green', description: 'You hold elegance in the way you pause and think.' },
+                { number: 40, symbol: 'Di', name: 'Driven', weight: '91.2', color: 'color-neon-green', description: 'You chase your goals with quiet determination.' },
+                { number: 41, symbol: 'De', name: 'Deep', weight: '92.9', color: 'color-neon-green', description: 'You think beyond the surface.' },
+                { number: 42, symbol: 'Ma', name: 'Mature', weight: '95.9', color: 'color-neon-green', description: 'You show maturity in how you handle life.' },
+                { number: 43, symbol: 'Be', name: 'Beautiful', weight: '98.0', color: 'color-neon-green', description: 'You carry your beauty with dignity.' },
+                { number: 44, symbol: 'Po', name: 'Polite', weight: '101.1', color: 'color-neon-green', description: 'You speak politely with ease.' },
+                { number: 45, symbol: 'Re', name: 'Reliable', weight: '102.9', color: 'color-neon-green', description: 'You show up consistently and reliably.' },
+                { number: 46, symbol: 'Pln', name: 'Playful', weight: '106.4', color: 'color-neon-green', description: 'You bring playful warmth into conversations.' },
+                { number: 47, symbol: 'Su', name: 'Sweet', weight: '107.9', color: 'color-neon-green', description: 'You express sweetness through your tone and actions.' },
+                { number: 48, symbol: 'Cal', name: 'Calm', weight: '112.4', color: 'color-neon-green', description: 'You calm situations simply by being present.' },
+                { number: 49, symbol: 'Pe', name: 'Perfect', weight: '114.8', color: 'color-neon-green', description: 'You bring your traits together in a rare harmony.' },
+                { number: 50, symbol: 'So', name: 'Soft', weight: '118.7', color: 'color-neon-green', description: 'You hold a softness that feels kind and steady.' },
+                { number: 51, symbol: 'We', name: 'Welcoming', weight: '121.8', color: 'color-neon-green', description: 'You create a welcoming atmosphere around you.' },
+                { number: 52, symbol: 'PaI', name: 'Patient', weight: '127.6', color: 'color-neon-green', description: 'You wait, listen, and understand with patience.' },
+                { number: 53, symbol: 'Ex', name: 'Excellent', weight: '126.9', color: 'color-neon-blue', description: 'You give your best in the things you choose.' },
+                { number: 54, symbol: 'Un', name: 'Unique', weight: '131.3', color: 'color-neon-blue', description: 'You stand out without trying to.' },
+                { number: 55, symbol: 'Vi', name: 'Visionary', weight: '132.9', color: 'color-neon-green', description: 'You see possibilities before they form.' },
+                { number: 56, symbol: 'Chr', name: 'Charming', weight: '137.3', color: 'color-neon-green', description: 'You grow more charming the more you speak.' },
+                { number: 57, symbol: 'Ex', name: 'Exciting', weight: '138.9', color: 'color-neon-green', description: 'You bring a spark that wakes up the moment.' },
+                { number: 58, symbol: 'Ra', name: 'Radiant', weight: '140.1', color: 'color-neon-green', description: 'You shine in a subtle, warm way.' },
+                { number: 59, symbol: 'Me', name: 'Memory', weight: '140.9', color: 'color-neon-green', description: 'You turn simple minutes into meaningful ones.' },
+                { number: 60, symbol: 'Ne', name: 'Neat', weight: '144.2', color: 'color-neon-green', description: 'You keep things organised in your own thoughtful style.' },
+                { number: 61, symbol: 'Dei', name: 'Delightful', weight: '145.0', color: 'color-neon-green', description: 'You surprise people with how refreshing you are.' },
+                { number: 62, symbol: 'Be2', name: 'Benevolent', weight: '150.4', color: 'color-neon-green', description: 'You act with a kind intent that’s easy to feel.' },
+                { number: 63, symbol: 'Fi2', name: 'Fiery', weight: '152.0', color: 'color-neon-green', description: 'You light up when you’re passionate about something.' },
+                { number: 64, symbol: 'In', name: 'Incredible', weight: '157.3', color: 'color-neon-green', description: 'You carry an incredible mix of qualities.' },
+                { number: 65, symbol: 'Ad2', name: 'Adventurous', weight: '158.9', color: 'color-neon-green', description: 'You explore new things with an open mind.' },
+                { number: 66, symbol: 'He2', name: 'Helpful', weight: '162.5', color: 'color-neon-green', description: 'You offer help without expecting anything back.' },
+                { number: 67, symbol: 'Ha2', name: 'Hardworking', weight: '164.9', color: 'color-neon-green', description: 'You work with a discipline that shows results.' },
+                { number: 68, symbol: 'Spi', name: 'Spirited', weight: '167.2', color: 'color-neon-green', description: 'You bring a spirited energy to whatever you do.' },
+                { number: 69, symbol: 'Hu', name: 'Humorous', weight: '168.9', color: 'color-neon-green', description: 'You make people laugh with real humour.' },
+                { number: 70, symbol: 'Yo', name: 'Youthful', weight: '173.0', color: 'color-neon-green', description: 'You keep your heart youthful in the best way.' },
+                { number: 71, symbol: 'Ca2', name: 'Captivating', weight: '175.0', color: 'color-neon-green', description: 'You draw attention through your presence, not your volume.' },
+                { number: 72, symbol: 'Gr2', name: 'Grateful', weight: '178.5', color: 'color-neon-green', description: 'You appreciate details others rush past.' },
+                { number: 73, symbol: 'Lo', name: 'Lovely', weight: '180.9', color: 'color-neon-green', description: 'You carry a lovely ease in your personality.' },
+                { number: 74, symbol: 'Wi2', name: 'Wise', weight: '183.8', color: 'color-neon-green', description: 'You offer wise thoughts without forcing them.' },
+                { number: 75, symbol: 'Da', name: 'Dazzling', weight: '186.2', color: 'color-neon-green', description: 'You shine with quiet confidence.' },
+                { number: 76, symbol: 'Wo', name: 'Wondrous', weight: '190.2', color: 'color-neon-green', description: 'You find wonder in ordinary moments.' },
+                { number: 77, symbol: 'Af', name: 'Affectionate', weight: '192.2', color: 'color-neon-green', description: 'You express warmth through simple gestures.' },
+                { number: 78, symbol: 'Tr2', name: 'True', weight: '195.1', color: 'color-neon-green', description: 'You stay true to who you are.' },
+                { number: 79, symbol: 'Au', name: 'Awesome', weight: '24K', color: 'color-neon-green', description: 'You bring something special wherever you go.' },
+                { number: 80, symbol: 'Wa', name: 'Warmth', weight: '200.6', color: 'color-neon-green', description: 'You radiate warmth naturally.' },
+                { number: 81, symbol: 'Fe', name: 'Feeling', weight: '204.4', color: 'color-neon-green', description: 'You speak with emotion that feels sincere.' },
+                { number: 82, symbol: 'Vi2', name: 'Vigilant', weight: '207.2', color: 'color-neon-green', description: 'You catch subtle details quickly.' },
+                { number: 83, symbol: 'En', name: 'Enchanting', weight: '209.0', color: 'color-neon-green', description: 'You have an aura that feels quietly magical.' },
+                { number: 84, symbol: 'Ch3', name: 'Chilled', weight: '209.0', color: 'color-neon-green', description: 'You bring a relaxing presence into busy spaces.' },
+                { number: 85, symbol: 'Ac', name: 'Accepting', weight: '210.0', color: 'color-neon-blue', description: 'You understand people without judging them.' },
+                { number: 86, symbol: 'Gl', name: 'Glow', weight: '222.0', color: 'color-neon-blue', description: 'You glow from a place of inner peace.' },
+                { number: 87, symbol: 'Go', name: 'Golden', weight: '223.0', color: 'color-neon-green', description: 'You carry golden qualities in your character.' },
+                { number: 88, symbol: 'Ra2', name: 'Radical', weight: '226.0', color: 'color-neon-green', description: 'You stand out with your authentic self.' },
+                { number: 89, symbol: 'As', name: 'Assertive', weight: '227.0', color: 'color-neon-green', description: 'You speak confidently and clearly.' },
+                { number: 90, symbol: 'Sp', name: 'Sparkle', weight: '232.0', color: 'color-neon-green', description: 'You hold a sparkle in your thoughts.' },
+                { number: 91, symbol: 'Pu2', name: 'Powerful', weight: '231.0', color: 'color-neon-green', description: 'You influence people through calm strength.' },
+                { number: 92, symbol: 'Un2', name: 'Unstoppable', weight: '238.0', color: 'color-neon-green', description: 'You keep moving forward, even silently.' },
+                { number: 93, symbol: 'My', name: 'Mystery', weight: '237.0', color: 'color-neon-green', description: 'You think in ways that leave people curious.' },
+                { number: 94, symbol: 'Fe2', name: 'Fearless', weight: '244.0', color: 'color-neon-green', description: 'You choose courage over comfort.' },
+                { number: 95, symbol: 'Pr', name: 'Precious', weight: '243.0', color: 'color-neon-green', description: 'You stay precious in your sincerity.' },
+                { number: 96, symbol: 'Cu', name: 'Curious', weight: '247.0', color: 'color-neon-green', description: 'You look at the world with curiosity.' },
+                { number: 97, symbol: 'Co2', name: 'Comforting', weight: '247.0', color: 'color-neon-green', description: 'You bring comfort through your presence alone.' },
+                { number: 98, symbol: 'We2', name: 'Wealthy', weight: '251.0', color: 'color-neon-green', description: 'You hold richness in your values.' },
+                { number: 99, symbol: 'Be3', name: 'Beloved', weight: '252.0', color: 'color-neon-green', description: 'You become cherished by people naturally.' },
+                { number: 100, symbol: 'Fa', name: 'Fabulous', weight: '257.0', color: 'color-neon-green', description: 'You express your individuality in every small choice.' },
+                { number: 101, symbol: 'Ho2', name: 'Hopeful', weight: '258.0', color: 'color-neon-green', description: 'You keep hope alive in difficult moments.' },
+                { number: 102, symbol: 'En2', name: 'Enlightened', weight: '259.0', color: 'color-neon-green', description: 'You learn deeply from your experiences.' },
+                { number: 103, symbol: 'Sm2', name: 'Smart', weight: '262.0', color: 'color-neon-green', description: 'You show intelligence through understanding, not showing off.' },
+                { number: 104, symbol: 'Ca3', name: 'Capable', weight: '261.0', color: 'color-neon-green', description: 'You handle challenges with capability.' },
+                { number: 105, symbol: 'Ta2', name: 'Tasteful', weight: '262.0', color: 'color-neon-green', description: 'You choose with refined judgment.' },
+                { number: 106, symbol: 'Fl2', name: 'Flexible', weight: '266.0', color: 'color-neon-green', description: 'You adapt without losing yourself.' },
+                { number: 107, symbol: 'Ge2', name: 'Genuine', weight: '264.0', color: 'color-neon-green', description: 'You remain genuine in every situation.' },
+                { number: 108, symbol: 'Di2', name: 'Dignified', weight: '277.0', color: 'color-neon-green', description: 'You move with a quiet dignity.' },
+                { number: 109, symbol: 'Co3', name: 'Courageous', weight: '268.0', color: 'color-neon-green', description: 'You face uncertainty with courage.' },
+                { number: 110, symbol: 'He3', name: 'Heroic', weight: '281.0', color: 'color-neon-green', description: 'You create impact through small actions.' },
+                { number: 111, symbol: 'Ra3', name: 'Rare', weight: '272.0', color: 'color-neon-green', description: 'You are rare in the best way.' },
+                { number: 112, symbol: 'Br3', name: 'Brave', weight: '285.0', color: 'color-neon-green', description: 'You hold bravery in your silence.' },
+                { number: 113, symbol: 'Pe2', name: 'Peaceful', weight: '286.0', color: 'color-neon-blue', description: 'You bring peace wherever you sit or stand.' },
+                { number: 114, symbol: 'Ha3', name: 'Harmonious', weight: '289.0', color: 'color-neon-blue', description: 'You stay in harmony with your thoughts and actions.' },
+                { number: 115, symbol: 'Lo2', name: 'Loved', weight: '290.0', color: 'color-neon-blue', description: 'You carry love in the way you treat the world.' },
+                { number: 116, symbol: 'Mi', name: 'Magical', weight: '293.0', color: 'color-neon-blue', description: 'You bring a touch of magic to simple things.' },
+                { number: 117, symbol: 'Be4', name: 'Best', weight: '294.0', color: 'color-neon-blue', description: 'You show the best version of yourself consistently.' },
+                { number: 118, symbol: 'Yo2', name: 'Yours', weight: '294.0', color: 'color-neon-blue', description: 'You complete 21 years with grace, strength, and a story that’s only getting brighter.' }
+            ];
+
+            var elementMap = {};
+            ALL_ELEMENTS.forEach(function(el) {
+                elementMap[el.number] = el;
+            });
+
+            var periodicTable = document.getElementById('periodic-table');
+            var mainTitle = document.getElementById('main-title'); 
+            var messageModal = document.getElementById('message-modal');
+            var modalTitle = document.getElementById('modal-title');
+            var modalMessage = document.getElementById('modal-message');
+            var closeModalButton = document.getElementById('close-modal');
+
+            var activeCardTimeout = null; 
+            var ORIGINAL_TITLE = "The Element of You (1-118)";
+
+            function createElementCard(data) {
+                var classes = "element-card " + data.color;
+                
+                return (
+                    '<div class="' + classes + '" data-full-description="' + data.description + '" data-element-name="' + data.name + '">' +
+                        '<div class="atomic-number">' + data.number + '</div>' +
+                        '<div class="symbol">' + data.symbol + '</div>' +
+                        '<div class="atomic-weight">' + data.weight + '</div>' +
+                        '<div class="name">' + data.name + '</div>' +
+                    '</div>'
+                );
+            }
+            
+            function populatePeriodicTable() {
+                var html = '';
+                for (var i = 1; i <= 118; i++) {
+                    var elementData = elementMap[i]; 
+                    if (elementData) {
+                        html += createElementCard(elementData);
+                    }
+                }
+                periodicTable.innerHTML = html;
+                
+                attachEventListeners();
+            }
+
+            function extractConciseMessage(fullDescription) {
+                var match = fullDescription.match(/\(([^)]+)\)/);
+                return match ? match[1].trim() : fullDescription;
+            }
+
+            function handleElementInteraction(e) {
+                var card = e.target.closest('.element-card');
+
+                if (!card) {
+                    return; 
+                }
+
+                var cardName = card.dataset.elementName; 
+                
+                if (mainTitle) {
+                    mainTitle.textContent = "Processing " + cardName + "...";
+                    setTimeout(function() {
+                        mainTitle.textContent = ORIGINAL_TITLE;
+                    }, 1000); 
+                }
+                
+                if (activeCardTimeout) {
+                    clearTimeout(activeCardTimeout);
+                }
+                document.querySelectorAll('.element-card').forEach(function(c) { c.classList.remove('element-active'); });
+
+                card.classList.add('element-active');
+
+                activeCardTimeout = setTimeout(function() {
+                    card.classList.remove('element-active');
+                }, 5000); 
+
+                var fullDescription = card.dataset.fullDescription; 
+                var conciseMessage = extractConciseMessage(fullDescription);
+                
+                if (modalTitle && modalMessage && messageModal) {
+                    modalTitle.textContent = cardName;
+                    modalMessage.textContent = conciseMessage;
+                    messageModal.classList.add('active');
+                }
+            }
+            
+            function closeModal() {
+                if (messageModal) {
+                    messageModal.classList.remove('active');
+                }
+            }
+
+            function attachEventListeners() {
+                periodicTable.addEventListener('click', handleElementInteraction);
+
+                closeModalButton.addEventListener('click', closeModal);
+                messageModal.addEventListener('click', function(e) {
+                    if (e.target === messageModal) {
+                        closeModal(); 
+                    }
+                });
+            }
+
+            populatePeriodicTable();
+
+
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            const desktopSidebar = document.getElementById('desktopSidebar');
+
+            let areNavsOpen = false;
+
+            function openAllNavs() {
+                topNav.classList.remove('-translate-y-full');
+                bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full');
+                rightNav.classList.remove('translate-x-full');
+                mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                mainContent.classList.remove('pt-28');
+                navToggleIcon.classList.add('hidden');
+                navToggleX.classList.remove('hidden');
+                
+                if (window.innerWidth >= 1024) {
+                    desktopSidebar.classList.remove('-translate-x-full');
+                    mainContent.classList.add('lg:pl-72');
+                }
+                
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                rightNav.classList.add('translate-x-full');
+                mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                mainContent.classList.add('pt-28');
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                
+                if (window.innerWidth >= 1024) {
+                    desktopSidebar.classList.add('-translate-x-full');
+                    mainContent.classList.remove('lg:pl-72');
+                }
+
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                toggleAllNavs();
+            });
+            
+            mainContent.addEventListener('click', () => {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                }
+            });
+            
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    var targetHref = e.currentTarget.getAttribute('href');
+                    
+                    if (targetHref.startsWith('#')) {
+                        e.preventDefault(); 
+                    }
+
+                    if (areNavsOpen) {
+                        closeAllNavs();
+                    }
+                });
+            });
+
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    document.body.classList.toggle('light-mode');
+                    
+                    if (document.body.classList.contains('light-mode')) {
+                        themeIcon.classList.remove('ph-sun');
+                        themeIcon.classList.add('ph-moon');
+                        themeToggleBtn.classList.remove('text-yellow-300');
+                        themeToggleBtn.classList.add('text-purple-600');
+                        themeToggleBtn.classList.replace('hover:text-yellow-100', 'hover:text-purple-800');
+                    } else {
+                        themeIcon.classList.remove('ph-moon');
+                        themeIcon.classList.add('ph-sun');
+                        themeToggleBtn.classList.add('text-yellow-300');
+                        themeToggleBtn.classList.remove('text-purple-600');
+                        themeToggleBtn.classList.replace('hover:text-purple-800', 'hover:text-yellow-100');
+                    }
+                });
+            }
+            
+        });
+    </script>
+</body>
+</html>

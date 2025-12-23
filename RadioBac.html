@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Radio Birthday</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Playfair+Display:ital,wght@1,500;900&family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    background: #050505;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+    user-select: none;
+}
+
+#radioWrapper {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.freq-readout {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7em;
+    color: #ff5555;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px #ff2222;
+}
+
+.hint-text {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5em; 
+    color: #ffecd1; 
+    margin-top: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px #ffae00, 0 0 20px #ff4400, 0 0 30px #ff2200;
+    animation: pulseHint 2s infinite ease-in-out;
+}
+
+@keyframes pulseHint {
+    0%, 100% { opacity: 0.5; } 
+    50% { opacity: 1; }
+}
+
+.nav-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(20, 5, 38, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.nav-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.nav-content {
+    width: 100%;
+    max-width: 1000px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.nav-overlay.active .nav-content {
+    transform: scale(1);
+}
+
+@media (min-width: 768px) {
+    .nav-content {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+    }
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #ff00ff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 12px;
+    border: 1px solid rgba(255, 0, 255, 0.2);
+    border-radius: 8px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    background: rgba(255, 0, 255, 0.05);
+    letter-spacing: 1px;
+}
+
+.nav-link:hover {
+    background-color: #ff00ff;
+    color: #000;
+    box-shadow: 0 0 15px #ff00ff;
+    transform: translateY(-2px);
+    border-color: #ff00ff;
+}
+
+.menu-toggle-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 110;
+    width: 50px; height: 50px;
+    background: rgba(20, 5, 38, 0.9);
+    border: 2px solid #ff00ff;
+    border-radius: 50%;
+    color: #ff00ff;
+    font-family: sans-serif;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+    transition: all 0.3s;
+    user-select: none;
+}
+.menu-toggle-btn:hover { background: #ff00ff; color: #000; transform: rotate(90deg); }
+.menu-active { background: #ff00ff; color: #000; transform: rotate(90deg); border-color: #fff; box-shadow: 0 0 20px #fff;}
+
+@media (max-width: 799px) {
+    .vintageRadio { display: none; }
+
+    /* Ensure the newspaper/photo modal never shows on mobile */
+    .news-modal-overlay {
+        display: none !important;
+    }
+    
+    .neonRadio {
+        width: 90%; 
+        max-width: 380px; 
+        height: 85vh;      
+        max-height: 800px;
+        
+        background: radial-gradient(circle at top right, #2a0a0a 0%, #000000 70%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 40px 20px;
+        box-sizing: border-box;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        
+        border: 12px solid #111; 
+        border-radius: 40px; 
+        outline: 2px solid #333; 
+        
+        box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    }
+
+    .neonRadio::before, .neonRadio::after {
+        content: "";
+        position: absolute;
+        left: 20px; right: 20px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #ff3333, transparent);
+        opacity: 0.5;
+    }
+    .neonRadio::before { top: 70px; }
+    .neonRadio::after { bottom: 100px; }
+    
+    .now-playing-text {
+        text-align: center;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.9rem;
+        color: #ff3333;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px #ff3333;
+        opacity: 0.8;
+    }
+
+    .stereo-indicator {
+        position: absolute;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        background: #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000;
+        opacity: 0; 
+        transition: opacity 0.3s;
+    }
+    .stereo-left { left: 30px; }
+    .stereo-right { right: 30px; }
+    .stereo-on {
+        opacity: 1;
+        animation: pulseStereo 1.5s infinite ease-in-out alternate;
+    }
+    @keyframes pulseStereo {
+        0% { transform: scale(0.8); opacity: 0.7; }
+        100% { transform: scale(1.2); opacity: 1; }
+    }
+
+    .mobile-main-display {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        z-index: 2;
+        position: relative; 
+    }
+
+    .waveform-bg {
+        position: absolute;
+        top: 20%;
+        left: 0;
+        width: 200%;
+        height: 60%;
+        background: repeating-linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 51, 51, 0.05) 2%,
+            transparent 4%
+        );
+        opacity: 0;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .waveform-on {
+        opacity: 1;
+        animation: moveWave 10s linear infinite;
+    }
+    @keyframes moveWave {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    .big-freq {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 5rem;
+        font-weight: 700;
+        letter-spacing: -2px;
+        color: #ffffff;
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.8),
+            0 0 20px rgba(255, 51, 51, 0.6),
+            0 0 40px rgba(255, 0, 0, 0.4);
+    }
+    .unit-text {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.5rem;
+        color: #ff3333;
+        font-weight: 600;
+        margin-left: 10px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px #ff3333;
+    }
+    
+    .mobile-msg-text {
+        margin-top: 30px;
+        font-size: 1.1rem;
+        color: #ccc;
+        min-height: 60px;
+        padding: 0 15px;
+        line-height: 1.5;
+        font-weight: 300;
+    }
+
+    .visualizer {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center; 
+        gap: 4px;
+        height: 40px;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
+    .viz-bar {
+        width: 6px;
+        background: #ff3333;
+        border-radius: 3px;
+        box-shadow: 0 0 10px #ff3333;
+        animation: bounce 0.5s infinite ease-in-out alternate;
+    }
+    .viz-bar:nth-child(1) { height: 20px; animation-delay: 0.1s; }
+    .viz-bar:nth-child(2) { height: 35px; animation-delay: 0.3s; }
+    .viz-bar:nth-child(3) { height: 25px; animation-delay: 0.2s; }
+    .viz-bar:nth-child(4) { height: 15px; animation-delay: 0.4s; }
+    .viz-bar:nth-child(5) { height: 30px; animation-delay: 0.1s; }
+
+    @keyframes bounce {
+        0% { transform: scaleY(0.5); }
+        100% { transform: scaleY(1.2); }
+    }
+
+    .mobile-tuner-container {
+        width: 100%;
+        height: 100px;
+        position: relative;
+        margin-bottom: 30px;
+        overflow: hidden;
+        cursor: grab;
+        background: linear-gradient(180deg, transparent, rgba(255, 51, 51, 0.05), transparent);
+    }
+    .mobile-tuner-container:active {
+        cursor: grabbing;
+    }
+
+    .mobile-ruler-scale {
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(to right, #fff 1px, transparent 1px), 
+            linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px);
+        background-size: 10% 25px, 2% 12px; 
+        background-position: center bottom 40px, center bottom 40px;
+        background-repeat: repeat-x;
+    }
+    
+    .mobile-ruler-nums {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 2%;
+        margin-top: 15px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+        color: #ff3333;
+        text-shadow: 0 0 5px #ff3333;
+    }
+
+    .mobile-pointer {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 60px;
+        background: #ff0000;
+        border-radius: 2px;
+        box-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000;
+        z-index: 10;
+    }
+
+    .mobile-controls-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 50px;
+        margin-bottom: 40px;
+    }
+
+    .control-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.1s;
+    }
+    .control-btn:active {
+        transform: scale(0.9);
+    }
+    
+    .btn-skip {
+        font-size: 2.5rem;
+        color: #fff;
+        opacity: 0.8;
+        text-shadow: 0 0 10px #ff3333;
+    }
+    
+    .btn-play {
+        width: 80px;
+        height: 80px;
+        background: #ff3333; 
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 30px rgba(255, 51, 51, 0.6);
+        border: 4px solid #aa0000;
+    }
+    .play-icon {
+        width: 0; 
+        height: 0; 
+        border-top: 14px solid transparent;
+        border-bottom: 14px solid transparent;
+        border-left: 24px solid #fff;
+        margin-left: 6px;
+    }
+    .pause-icon {
+        width: 20px;
+        height: 24px;
+        border-left: 6px solid #fff;
+        border-right: 6px solid #fff;
+    }
+    
+    .mobile-off-overlay {
+        opacity: 0.2;
+        pointer-events: none;
+        filter: blur(8px) grayscale(100%);
+    }
+    .mobile-off-overlay .visualizer,
+    .mobile-off-overlay .now-playing-text,
+    .mobile-off-overlay .waveform-bg {
+        display: none;
+    }
+}
+
+@media (min-width: 800px) {
+    .nav-overlay {
+        background-color: rgba(62, 39, 35, 0.98); 
+        backdrop-filter: blur(5px);
+    }
+    
+    .nav-link {
+        color: #e8e0d0; 
+        border-color: #8d6e63;
+        background: rgba(255, 255, 255, 0.05);
+        font-family: 'Playfair Display', serif; 
+        letter-spacing: 2px;
+    }
+
+    .nav-link:hover {
+        background-color: #8d6e63; 
+        color: #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        border-color: #a1887f;
+        transform: translateY(-2px);
+    }
+    
+    /* GLOwING RADIO BUTTON FOR BIG SCREEN ONLY */
+    .nav-link.glow-radio {
+        background-color: rgba(255, 215, 0, 0.15); /* Gold tint */
+        border-color: #ffd700;
+        color: #ffd700;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), inset 0 0 10px rgba(255, 215, 0, 0.1);
+        animation: radioGlow 2s infinite alternate;
+        font-weight: 900;
+    }
+
+    @keyframes radioGlow {
+        from { 
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3), inset 0 0 5px rgba(255, 215, 0, 0.1); 
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+        to { 
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.3); 
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+    }
+
+    .menu-toggle-btn {
+        background: #5d4037; 
+        border: 2px solid #a1887f;
+        color: #f0e4d4;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .menu-toggle-btn:hover {
+        background: #8d6e63;
+        color: #fff;
+        transform: rotate(90deg);
+    }
+    .menu-active {
+        background: #3e2723;
+        border-color: #f0e4d4;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    body {
+        background-color: #f0e4d4; 
+        background-image: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -2;
+        
+        background-color: #f4e4bc;
+        background-image: 
+            radial-gradient(circle at 100% 50%, transparent 20%, rgba(160, 130, 100, 0.05) 21%, rgba(160, 130, 100, 0.05) 34%, transparent 35%, transparent),
+            radial-gradient(circle at 0% 50%, transparent 20%, rgba(160, 130, 100, 0.05) 21%, rgba(160, 130, 100, 0.05) 34%, transparent 35%, transparent),
+            repeating-linear-gradient(90deg, rgba(160, 130, 100, 0.03) 0px, transparent 1px, transparent 40px),
+            radial-gradient(circle at center, transparent 30%, rgba(100, 70, 50, 0.1) 100%);
+        
+        background-size: 80px 80px, 80px 80px, 100% 100%, 100% 100%;
+    }
+
+    body::after {
+        content: "";
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 35vh; 
+        z-index: -1;
+        
+        background-color: #5d4037;
+        background-image: 
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, transparent 1px, transparent 10px),
+            linear-gradient(to bottom, #4e342e 0%, #3e2723 100%);
+            
+        border-top: 8px solid #3e2723;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    }
+
+    .neonRadio { display: none; }
+
+    .vintageRadio {
+        width: 720px;
+        height: 440px;
+        border-radius: 40px;
+        background-color: #5c3a21;
+        background-image: 
+            repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0px, transparent 2px, transparent 4px),
+            linear-gradient(to bottom right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%),
+            radial-gradient(ellipse at center, #7d512d 0%, #3e2612 100%),
+            url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="3" result="noise"/><feDiffuseLighting in="noise" lighting-color="#a07040" surfaceScale="2"><feDistantLight azimuth="45" elevation="60"/></feDiffuseLighting></filter><rect width="100" height="100" filter="url(#noise)" opacity="0.3"/></svg>');
+        background-size: auto, auto, auto, 200px 200px;
+        
+        border: 8px solid #2b1b0e;
+        border-bottom-width: 12px;
+        box-shadow: 
+            inset 0 0 40px #000,
+            0 30px 50px rgba(60, 40, 20, 0.4), 
+            0 5px 0 #1a1008,
+            0 0 0 10px #3e2612,
+            0 0 0 12px #5c3a21,
+            0 0 20px 12px rgba(0,0,0,0.5);
+        position: relative;
+        padding: 30px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: -100px; 
+    }
+
+    .desktop-decorations {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: -1; 
+    }
+    
+    .newspaper {
+        position: absolute;
+        bottom: -30px;
+        left: -120px;
+        width: 200px;
+        height: 140px;
+        background: #e3ddd3;
+        transform: rotate(-15deg);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        padding: 15px;
+        box-sizing: border-box;
+        border: 1px solid #c0b0a0;
+        z-index: 10;
+        cursor: pointer;
+        pointer-events: auto;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .newspaper:hover {
+        transform: rotate(-12deg) scale(1.05) translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+
+    .newspaper::before { 
+        content: "";
+        position: absolute;
+        top: 0; right: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, transparent 10%, transparent 90%, rgba(0,0,0,0.05) 100%);
+    }
+    .news-header {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 1.2rem;
+        border-bottom: 2px solid #333;
+        margin-bottom: 8px;
+        color: #222;
+        text-align: center;
+        letter-spacing: 1px;
+    }
+    .news-body {
+        display: flex; gap: 5px;
+    }
+    .news-col {
+        flex: 1;
+        display: flex; flex-direction: column; gap: 4px;
+    }
+    .news-line {
+        height: 3px;
+        background: #999;
+        width: 100%;
+    }
+
+    .news-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(5px);
+        z-index: 200;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .news-modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .expanded-paper {
+        width: 600px;
+        height: 80vh;
+        max-height: 800px;
+        background: #fdf5e6; 
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        transform: scale(0.8) rotate(-2deg);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow-y: auto;
+        font-family: 'Playfair Display', serif;
+        color: #2c1e12;
+        text-align: center;
+        border: 1px solid #c0b0a0;
+        position: relative;
+        background-image: radial-gradient(#d0c0a0 1px, transparent 0);
+        background-size: 20px 20px;
+    }
+    .news-modal-overlay.open .expanded-paper {
+        transform: scale(1) rotate(0deg);
+    }
+    .paper-close-btn {
+        position: absolute;
+        top: 10px; right: 20px;
+        font-size: 2.5rem;
+        cursor: pointer;
+        color: #5d4037;
+        line-height: 1;
+        transition: color 0.2s;
+        z-index: 5;
+    }
+    .paper-close-btn:hover {
+        color: #ff3333;
+    }
+    .news-header-large {
+        font-size: 3rem;
+        font-weight: 900;
+        border-bottom: 4px double #2c1e12;
+        margin-bottom: 5px;
+        line-height: 1;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    .news-date {
+        font-family: "Poppins", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #555;
+        padding-bottom: 10px;
+        letter-spacing: 1px;
+    }
+    .news-headline {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 20px 0;
+        line-height: 1.1;
+        color: #1a1a1a;
+    }
+    .news-image-placeholder {
+        width: 100%;
+        height: 350px;
+        background: #e8e0d0;
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 4px double #2c1e12;
+        position: relative;
+        overflow: hidden;
+    }
+    .news-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: sepia(0.3) contrast(1.1) grayscale(0.2); 
+        transition: transform 5s ease;
+    }
+    .news-image-placeholder:hover .news-photo {
+        transform: scale(1.05);
+    }
+    
+    .news-columns {
+        text-align: left;
+        column-count: 2;
+        column-gap: 30px;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    .news-columns p {
+        margin-bottom: 15px;
+    }
+    .news-columns p:first-child::first-letter {
+        font-size: 3.5rem;
+        float: left;
+        line-height: 0.8;
+        padding-right: 8px;
+        font-weight: bold;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .coffee-wrapper {
+        position: absolute;
+        bottom: -20px;
+        right: -100px;
+        width: 100px; height: 100px;
+        z-index: 10;
+        transform: scale(0.9);
+    }
+    .coffee-saucer {
+        width: 90px; height: 25px;
+        background: #fdfdfd;
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: absolute;
+        bottom: 0;
+        left: 50%; transform: translateX(-50%);
+        border: 1px solid #dcdcdc;
+    }
+    .coffee-cup {
+        width: 60px; height: 50px;
+        background: #fff;
+        border-radius: 0 0 30px 30px;
+        position: absolute;
+        bottom: 10px;
+        left: 50%; transform: translateX(-50%);
+        box-shadow: inset -5px 0 10px rgba(0,0,0,0.05);
+        border: 1px solid #dcdcdc;
+        z-index: 2;
+    }
+    .coffee-cup::after { 
+        content: "";
+        position: absolute;
+        top: 10px; right: -15px;
+        width: 20px; height: 25px;
+        border: 5px solid #fff;
+        border-radius: 0 15px 15px 0;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .coffee-liquid {
+        width: 50px; height: 12px;
+        background: #4b3621;
+        border-radius: 50%;
+        position: absolute;
+        top: -6px; left: 50%; transform: translateX(-50%);
+        border: 3px solid #fff;
+        z-index: 3;
+        box-sizing: border-box;
+    }
+    .steam {
+        position: absolute;
+        width: 8px; height: 20px;
+        background: #fff;
+        border-radius: 50%;
+        opacity: 0;
+        filter: blur(4px);
+        animation: rise 3s infinite;
+        bottom: 50px; left: 50%;
+        pointer-events: none;
+    }
+    .steam:nth-child(1) { animation-delay: 0s; transform: translateX(-10px); }
+    .steam:nth-child(2) { animation-delay: 1.2s; transform: translateX(0px); }
+    .steam:nth-child(3) { animation-delay: 2.4s; transform: translateX(10px); }
+    
+    @keyframes rise {
+        0% { opacity: 0; transform: translateY(0) scale(1); }
+        50% { opacity: 0.3; }
+        100% { opacity: 0; transform: translateY(-50px) scale(2.5); }
+    }
+
+    .vintageRadio::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 30px;
+        background: linear-gradient(120deg, rgba(255,255,255,0.1) 0%, transparent 40%);
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .feet {
+        position: absolute;
+        bottom: -15px;
+        width: 60px;
+        height: 20px;
+        background: #111;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 5px 5px rgba(0,0,0,0.5);
+    }
+    .feet.left { left: 80px; }
+    .feet.right { right: 80px; }
+
+    .speakerSection {
+        width: 40%;
+        height: 100%;
+        position: relative;
+        border: 4px solid #3e2612;
+        border-radius: 24px;
+        padding: 5px;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        box-sizing: border-box;
+    }
+
+    .grill {
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        background-color: #d4b585;
+        background-image: 
+            radial-gradient(#4a3826 15%, transparent 16%),
+            radial-gradient(#4a3826 15%, transparent 16%);
+        background-size: 8px 8px;
+        background-position: 0 0, 4px 4px;
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.7);
+        border: 4px solid #4a3018;
+        outline: 2px dashed #8b5a2b;
+        outline-offset: -8px;
+    }
+    
+    .logo-badge {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(to bottom, #f7d699, #cfa35d);
+        padding: 4px 15px;
+        border-radius: 4px;
+        font-family: 'Playfair Display', serif;
+        font-weight: bold;
+        font-size: 0.9rem;
+        color: #3e2612;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .interfaceSection {
+        width: 55%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .displayPanel {
+        background: #111;
+        border-radius: 12px;
+        padding: 10px;
+        height: 140px;
+        position: relative;
+        border: 4px solid #cfa35d;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        outline: 3px double #a07040;
+        outline-offset: 4px;
+    }
+
+    .displayLarge {
+        width: 100%;
+        height: 100%;
+        color: #ffdd99;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        font-size: 1.15rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        text-shadow: 0 0 8px #ffcc80, 0 0 15px #ffaa55;
+        line-height: 1.5;
+        position: relative;
+        z-index: 2;
+        transition: opacity 0.5s, filter 0.5s;
+        will-change: opacity, filter;
+    }
+    
+    .displayPanel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(110deg, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0) 31%);
+        z-index: 3;
+        pointer-events: none;
+    }
+
+    .tunerArea {
+        background: #1a1008;
+        border-radius: 8px;
+        height: 80px;
+        position: relative;
+        border-top: 2px solid #332211;
+        border-bottom: 2px solid #554433;
+        overflow: hidden;
+        box-shadow: inset 0 0 15px #000;
+        cursor: text; 
+        cursor: grab;
+    }
+    .tunerArea:active {
+        cursor: grabbing;
+    }
+
+    .tunerScale {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: repeating-linear-gradient(90deg, 
+            transparent 0, transparent 19px, 
+            rgba(255, 204, 128, 0.3) 20px
+        );
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    .freq-nums {
+        position: absolute;
+        width: 100%;
+        top: 45px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        font-family: sans-serif;
+        font-size: 10px;
+        color: #cfa35d;
+        box-sizing: border-box;
+        pointer-events: none;
+    }
+
+    .fmPointer {
+        position: absolute;
+        top: 10px;
+        height: 60px;
+        width: 4px;
+        background: #ff4444;
+        border-radius: 2px;
+        box-shadow: 0 0 15px #ff0000, 0 0 30px #ff3300, 0 0 45px #ff5500;
+        z-index: 10;
+        left: 5%; 
+        pointer-events: none; 
+    }
+
+    .controls {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 100px;
+    }
+
+    .knob-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: grab;
+    }
+    .knob-container:active {
+        cursor: grabbing;
+    }
+
+    .knob {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #5e4b35, #2b1b0e);
+        box-shadow: 
+            0 10px 20px rgba(0,0,0,0.6),
+            inset 0 0 0 2px #1a1008,
+            0 0 0 4px #3e2612,
+            0 0 5px 4px rgba(0,0,0,0.3);
+        position: relative;
+        transition: transform 0.3s ease;
+        will-change: transform;
+    }
+
+    .knob::before {
+        content: "";
+        position: absolute;
+        top: 5px; left: 5px; right: 5px; bottom: 5px;
+        border-radius: 50%;
+        background: repeating-conic-gradient(#3e2612 0% 2%, #4a3018 2% 4%);
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    }
+    
+    .knob::after {
+        content: "";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 6px;
+        height: 6px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(255,255,255,0.8);
+        transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .knob-label {
+        text-align: center;
+        color: #d8b078;
+        font-size: 0.8rem;
+        margin-top: 10px;
+        font-family: sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 2px #000;
+        user-select: none;
+    }
+}
+
+.fadeText {
+    animation: fade 0.8s ease;
+}
+@keyframes fade {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.off {
+    opacity: 0.1 !important;
+}
+</style>
+</head>
+<body>
+
+<div class="news-modal-overlay" id="newsModal" onclick="closeNews(event)">
+    <div class="expanded-paper" onclick="event.stopPropagation()">
+        <div class="paper-close-btn" onclick="closeNews(event)">&times;</div>
+        <div class="news-header-large">THE DAILY CELEBRATION</div>
+        <div class="news-date">Special Edition • Vol. 21</div>
+        <hr class="news-divider" style="border: 0; border-top: 1px solid #333; margin: 0 0 10px 0;">
+        <h1 class="news-headline">JUHI TURNS 21 TODAY</h1>
+        
+        <div class="news-image-placeholder">
+             <img src="News.png" alt="Portrait of Juhi" class="news-photo">
+        </div>
+
+        <div class="news-columns">
+             <p>Dateline: The Universe.</p>
+             <p>Reports are flooding in from all corners of the globe: it is officially the 21st birthday of Juhi. Scientists confirm that the world is approximately 100% brighter today.</p>
+             <p>"It's a phenomenon," says one astronomer. "Just like the moon reflects the sun, we all reflect the joy Juhi brings."</p>
+             <p>As the festivities commence, experts advise preparing for cake, laughter, and a year ahead filled with magic, growth, and endless possibilities.</p>
+             <p>Happy 21st Birthday, Juhi! The world is yours to explore.</p>
+        </div>
+    </div>
+</div>
+
+<div id="radioWrapper">
+
+    <div id="mainNavOverlay" class="nav-overlay">
+        <div class="nav-content">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="Cake.html" class="nav-link">Cake</a>
+            <a href="21_Wish.html" class="nav-link">21_Door</a>
+            <a href="chat.html" class="nav-link">Heaven</a>
+            <a href="Diary.html" class="nav-link">Diary</a>
+            <a href="anatomy.html" class="nav-link">Anatomy</a>
+            <a href="Box.html" class="nav-link">Box</a>
+            <a href="color.html" class="nav-link">Color</a>
+            <a href="Special.html" class="nav-link">Special</a>
+            <a href="you.html" class="nav-link">You</a>
+            <a href="Teacher.html" class="nav-link">Teacher</a>
+            <a href="Universe.html" class="nav-link">Universe</a>
+            <a href="The_River.html" class="nav-link">River</a>
+            <a href="Mountain.html" class="nav-link">Mountain</a>
+            <a href="Skill.html" class="nav-link">Skill</a>
+            <a href="Paper_Star.html" class="nav-link">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link">Cartoon</a>
+            <a href="Periodik_table.html" class="nav-link">Table</a>
+            <a href="Concept.html" class="nav-link">Concept</a>
+            <a href="Calender.html" class="nav-link">Calendar</a>
+            <a href="Perspective.html" class="nav-link">View</a>
+            <a href="Santa.html" class="nav-link">Santa</a>
+            <a href="Presence.html" class="nav-link">Presence</a>
+            <a href="Cloud.html" class="nav-link">Cloud</a>
+            <a href="Ink.html" class="nav-link">Paint</a>
+            <a href="Butterfly.html" class="nav-link">Butterfly</a>
+            <a href="Weather.html" class="nav-link">Weather</a>
+            <a href="Spotlight.html" class="nav-link">Spotlight</a>
+            <a href="Room.html" class="nav-link">Room</a>
+            <a href="Radio.html" class="nav-link glow-radio">Radio</a>
+            <a href="Food.html" class="nav-link">Food</a>
+            <a href="Music.html" class="nav-link">Music</a>
+            <a href="letter.html" class="nav-link">Letter</a>
+            <a href="Msg.html" class="nav-link">Message</a>
+        </div>
+    </div>
+
+    <div class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleNav()">&#9776;</div>
+
+
+    <div class="neonRadio" id="mobileRadio">
+        
+        <div class="stereo-indicator stereo-left" id="mobStereoLeft"></div>
+        <div class="stereo-indicator stereo-right" id="mobStereoRight"></div>
+
+        <div class="visualizer" id="mobVisualizer">
+            <div class="viz-bar"></div>
+            <div class="viz-bar"></div>
+            <div class="viz-bar"></div>
+            <div class="viz-bar"></div>
+            <div class="viz-bar"></div>
+        </div>
+
+        <div class="mobile-main-display" id="mobileScreen">
+            <div class="waveform-bg" id="mobWaveform"></div>
+            
+            <div class="now-playing-text" id="mobNowPlaying">Now Playing</div>
+
+            <div style="display:flex; align-items:baseline;">
+                <span class="big-freq" id="mobFreq">92.0</span>
+                <span class="unit-text">MHz</span>
+            </div>
+            <div class="mobile-msg-text fadeText" id="mobMsg">
+                Turn On...
+            </div>
+        </div>
+
+        <div class="mobile-tuner-container" id="mobTuner">
+            <div class="mobile-ruler-scale"></div>
+            <div class="mobile-ruler-nums">
+                <span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span>
+            </div>
+            <div class="mobile-pointer" id="mobPointer"></div>
+        </div>
+
+        <div class="mobile-controls-bar">
+            <button class="control-btn btn-skip" onclick="manualChange(-1)">&#8249;&#8249;</button>
+            <div class="control-btn btn-play" id="mobPowerBtn" onclick="togglePowerMobile()">
+                <div class="play-icon" id="mobPlayIcon"></div>
+            </div>
+            <button class="control-btn btn-skip" onclick="manualChange(1)">&#8250;&#8250;</button>
+        </div>
+    </div>
+
+    <div class="vintageRadio" id="desktopRadio">
+        <div class="desktop-decorations">
+            <div class="newspaper" onclick="openNews()">
+                <div class="news-header">DAILY NEWS</div>
+                <div class="news-body">
+                    <div class="news-col">
+                        <div class="news-line"></div>
+                        <div class="news-line" style="width: 80%"></div>
+                        <div class="news-line"></div>
+                        <div class="news-line" style="width: 60%"></div>
+                    </div>
+                    <div class="news-col">
+                        <div class="news-line"></div>
+                        <div class="news-line"></div>
+                        <div class="news-line" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="coffee-wrapper">
+                <div class="steam-container">
+                    <div class="steam"></div>
+                    <div class="steam"></div>
+                    <div class="steam"></div>
+                </div>
+                <div class="coffee-cup">
+                    <div class="coffee-liquid"></div>
+                </div>
+                <div class="coffee-saucer"></div>
+            </div>
+        </div>
+
+        <div class="feet left"></div>
+        <div class="feet right"></div>
+
+        <div class="speakerSection">
+            <div class="grill">
+                <div class="logo-badge">Classic FM</div>
+            </div>
+        </div>
+
+        <div class="interfaceSection">
+            <div class="displayPanel">
+                <div class="displayLarge fadeText" id="displayLarge">
+                    <span class="freq-readout">--- FM</span>
+                    Radio OFF
+                </div>
+            </div>
+
+            <div class="tunerArea" id="tunerArea">
+                <div class="tunerScale"></div>
+                <div class="freq-nums">
+                    <span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span>
+                </div>
+                <div class="fmPointer" id="fmPointer"></div>
+            </div>
+
+            <div class="controls">
+                
+                <div class="knob-container" id="volContainer">
+                    <div class="knob" id="volKnob"></div>
+                    <div class="knob-label">Power / Vol</div>
+                </div>
+
+                <div class="knob-container" id="tuneContainer">
+                    <div class="knob" id="tuneKnob"></div>
+                    <div class="knob-label">Tuning</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function openNews() {
+    const modal = document.getElementById('newsModal');
+    if(modal) modal.classList.add('open');
+}
+
+function closeNews(e) {
+    const modal = document.getElementById('newsModal');
+    if(modal) modal.classList.remove('open');
+}
+
+const lines = [
+"Many can say you look like the moon or you are a part of the moon. But no — the moon looks like you because the moon is a part of you.",
+"Many can say you shine like the stars or you are a part of the stars. But no — the stars shine like you because the stars are a part of you.",
+"Many can say you glow like sunrise or you are a part of the sunrise. But no — the sunrise glows like you because the sunrise is a part of you.",
+"Many can say you calm like the ocean or you are a part of the ocean. But no — the ocean calms like you because the ocean is a part of you.",
+"Many can say you feel like poetry or you are a part of poetry. But no — poetry feels like you because poetry is a part of you.",
+"Many can say you shine like gold or you are a part of gold. But no — gold shines like you because gold is a part of you.",
+"Many can say you rise like the sun or you are a part of the sun. But no — the sun rises like you because the sun is a part of you.",
+"Many can say you’re rare like diamonds or you are a part of diamonds. But no — diamonds shine like you because diamonds are a part of you.",
+"Many can say you’re peaceful like the sky or you are a part of the sky. But no — the sky feels like you because the sky is a part of you.",
+"Many can say you’re deep like the night or you are a part of the night. But no — the night feels like you because the night is a part of you.",
+"Many can say you’re bright like fire or you are a part of fire. But no — fire glows like you because fire is a part of you.",
+"Many can say you’re soft like clouds or you are a part of clouds. But no — clouds look like you because clouds are a part of you.",
+"Many can say you’re steady like mountains or you are a part of mountains. But no — mountains stand like you because mountains are a part of you.",
+"Many can say you’re clear like water or you are a part of water. But no — water reflects you because water is a part of you.",
+"Many can say you’re warm like summer or you are a part of summer. But no — summer feels like you because summer is a part of you.",
+"Many can say you’re calm like winter or you are a part of winter. But no — winter settles like you because winter is a part of you.",
+"Many can say you’re colorful like autumn or you are a part of autumn. But no — autumn looks like you because autumn is a part of you.",
+"Many can say you bloom like spring or you are a part of spring. But no — spring blooms like you because spring is a part of you.",
+"Many can say you shine like lanterns or you are a part of lanterns. But no — lanterns glow like you because lanterns are a part of you.",
+"Many can say you’re magical like rain or you are a part of rain. But no — rain feels like you because rain is a part of you.",
+"Many can say you guide like stars or you are a part of stars. But no — stars guide like you because stars are a part of you.",
+"Many can say you’re precious like pearls or you are a part of pearls. But no — pearls shine like you because pearls are a part of you.",
+"Many can say you sparkle like crystals or you are a part of crystals. But no — crystals sparkle like you because crystals are a part of you.",
+"Many can say you’re rare like meteors or you are a part of meteors. But no — meteors glow like you because meteors are a part of you.",
+"Many can say you’re bright like lightning or you are a part of lightning. But no — lightning shines like you because lightning is a part of you.",
+"Many can say you’re soothing like rivers or you are a part of rivers. But no — rivers flow like you because rivers are a part of you.",
+"Many can say you sound like music or you are a part of music. But no — music feels like you because music is a part of you.",
+"Many can say you’re vibrant like colors or you are a part of colors. But no — colors brighten like you because colors are a part of you.",
+"Many can say you’re rare like eclipses or you are a part of eclipses. But no — eclipses look like you because eclipses are a part of you.",
+"Many can say you’re graceful like feathers or you are a part of feathers. But no — feathers move like you because feathers are a part of you.",
+"Many can say you glow like lantern light or you are a part of lantern light. But no — lantern light glows like you because lantern light is a part of you.",
+"Many can say you feel like harmony or you are a part of harmony. But no — harmony sounds like you because harmony is a part of you.",
+"Many can say you’re sharp like lightning strikes or you are a part of lightning strikes. But no — lightning strikes like you because lightning is a part of you.",
+"Many can say you’re pure like snow or you are a part of snow. But no — snow reflects you because snow is a part of you.",
+"Many can say you’re refreshing like drizzle or you are a part of drizzle. But no — drizzle feels like you because drizzle is a part of you.",
+"Many can say you shine like city lights or you are a part of city lights. But no — city lights glow like you because city lights are a part of you.",
+"Many can say you’re timeless like monuments or you are a part of monuments. But no — monuments stand like you because monuments are a part of you.",
+"Many can say you’re serene like lakes or you are a part of lakes. But no — lakes reflect you because lakes are a part of you.",
+"Many can say you’re rare like art or you are a part of art. But no — art resembles you because art is a part of you.",
+"Many can say you’re bright like neon or you are a part of neon. But no — neon glows like you because neon is a part of you.",
+"Many can say you’re majestic like mountains or you are a part of mountains. But no — mountains rise like you because mountains are a part of you.",
+"Many can say you’re soft like stardust or you are a part of stardust. But no — stardust shines like you because stardust is a part of you.",
+"Many can say you’re calm like twilight or you are a part of twilight. But no — twilight settles like you because twilight is a part of you.",
+"Many can say you’re brilliant like constellations or you are a part of constellations. But no — constellations glow like you because constellations are a part of you.",
+"Many can say you’re unique like galaxies or you are a part of galaxies. But no — galaxies swirl like you because galaxies are a part of you.",
+"Many can say you shine like morning frost or you are a part of morning frost. But no — morning frost sparkles like you because morning frost is a part of you.",
+"Many can say you’re soothing like wind or you are a part of wind. But no — the wind moves like you because the wind is a part of you.",
+"Many can say you’re rare like comets or you are a part of comets. But no — comets glow like you because comets are a part of you.",
+"Many can say you’re bright like lantern fire or you are a part of lantern fire. But no — lantern fire burns like you because lantern fire is a part of you.",
+"Many can say you’re powerful like waves or you are a part of waves. But no — waves rise like you because waves are a part of you."
+];
+
+let currentIndex = 0;
+let isPowered = true;
+let tuneRotation = 0;
+let volRotation = 75;
+let isMenuOpen = false;
+
+const DEG_PER_STATION = 20;
+
+function toggleNav() {
+    isMenuOpen = !isMenuOpen;
+    const overlay = document.getElementById('mainNavOverlay');
+    const btn = document.getElementById('menuToggleBtn');
+
+    if (isMenuOpen) {
+        overlay.classList.add('active');
+        btn.classList.add('menu-active');
+        btn.innerHTML = "&#10005;"; 
+    } else {
+        overlay.classList.remove('active');
+        btn.classList.remove('menu-active');
+        btn.innerHTML = "&#9776;"; 
+    }
+}
+
+function updateDisplay(opacity = null, blur = null) {
+    const txtLarge = document.getElementById("displayLarge");
+    const pointer = document.getElementById("fmPointer");
+    
+    const volKnob = document.getElementById("volKnob");
+    if (volKnob) volKnob.className = "knob"; 
+
+    const mobFreq = document.getElementById("mobFreq");
+    const mobMsg = document.getElementById("mobMsg");
+    const mobScreen = document.getElementById("mobileScreen");
+    const mobPointer = document.getElementById("mobPointer");
+    const mobPlayIcon = document.getElementById("mobPlayIcon");
+    const mobVisualizer = document.getElementById("mobVisualizer");
+    const mobStereoLeft = document.getElementById("mobStereoLeft");
+    const mobStereoRight = document.getElementById("mobStereoRight");
+    const mobWaveform = document.getElementById("mobWaveform");
+
+    const text = lines[currentIndex];
+    let freqVal = (88 + (currentIndex / (lines.length - 1)) * (108 - 88)).toFixed(1);
+    let freqHTML = `<span class="freq-readout">${freqVal} FM</span>`;
+
+    if (mobScreen) {
+        if (!isPowered) {
+            mobScreen.classList.add("mobile-off-overlay");
+            if(mobMsg) mobMsg.innerText = "OFF";
+            if(mobPlayIcon) mobPlayIcon.className = "play-icon"; 
+            if(mobVisualizer) mobVisualizer.style.opacity = 0;
+            if(mobStereoLeft) mobStereoLeft.classList.remove("stereo-on");
+            if(mobStereoRight) mobStereoRight.classList.remove("stereo-on");
+            if(mobWaveform) mobWaveform.classList.remove("waveform-on");
+        } else {
+            mobScreen.classList.remove("mobile-off-overlay");
+            if(mobFreq) mobFreq.innerText = freqVal;
+            if(mobMsg && mobMsg.innerText !== text) {
+                mobMsg.innerText = text;
+                triggerFade(mobMsg);
+            }
+            if(mobPlayIcon) mobPlayIcon.className = "pause-icon"; 
+            if(mobVisualizer) mobVisualizer.style.opacity = 0.8;
+            if(mobStereoLeft) mobStereoLeft.classList.add("stereo-on");
+            if(mobStereoRight) mobStereoRight.classList.add("stereo-on");
+            if(mobWaveform) mobWaveform.classList.add("waveform-on");
+        }
+    }
+    
+    if (mobPointer) {
+        const percent = (currentIndex / lines.length) * 100;
+        const safePercent = 5 + (percent * 0.9);
+        mobPointer.style.left = `${safePercent}%`;
+    }
+
+    if (txtLarge) {
+        if (!isPowered) {
+            txtLarge.innerHTML = '<span class="freq-readout">--- FM</span>OFF<div class="hint-text">ROTATE POWER KNOB TO TURN ON</div>';
+            txtLarge.classList.add("off");
+            txtLarge.style.opacity = "";
+            txtLarge.style.filter = "";
+        } else {
+            txtLarge.classList.remove("off");
+            let fullContent = freqHTML + text;
+            if (!txtLarge.innerHTML.includes(text)) {
+                txtLarge.innerHTML = fullContent;
+            }
+            let volFactor = Math.min(volRotation, 300) / 300;
+            volFactor = Math.max(0.3, volFactor);
+            if (opacity !== null && blur !== null) {
+                txtLarge.style.opacity = opacity * volFactor;
+                txtLarge.style.filter = `blur(${blur}px)`;
+            } else {
+                txtLarge.style.opacity = 1 * volFactor;
+                txtLarge.style.filter = "blur(0px)";
+            }
+        }
+    }
+
+    if (pointer) {
+        const percent = (currentIndex / lines.length) * 100;
+        const safePercent = 5 + (percent * 0.9);
+        pointer.style.left = `${safePercent}%`;
+    }
+}
+
+function triggerFade(el) {
+    el.classList.remove("fadeText");
+    void el.offsetWidth; 
+    el.classList.add("fadeText");
+}
+
+function manualChange(direction) {
+    if (!isPowered) return;
+    currentIndex = (currentIndex + direction + lines.length) % lines.length;
+    tuneRotation += (direction * DEG_PER_STATION);
+    
+    const knob = document.getElementById("tuneKnob");
+    if(knob) knob.style.transform = `rotate(${tuneRotation}deg)`;
+
+    updateDisplay();
+}
+
+function togglePowerMobile() {
+    isPowered = !isPowered;
+    if (isPowered) {
+        volRotation = 75; 
+    } else {
+        volRotation = 0; 
+    }
+    const volKnob = document.getElementById("volKnob");
+    if(volKnob) volKnob.style.transform = `rotate(${volRotation}deg)`;
+    updateDisplay();
+}
+
+const tuneContainer = document.getElementById("tuneContainer");
+const tuneKnob = document.getElementById("tuneKnob");
+const volContainer = document.getElementById("volContainer");
+const volKnob = document.getElementById("volKnob");
+const displayLarge = document.getElementById("displayLarge");
+const fmPointer = document.getElementById("fmPointer");
+const tunerArea = document.getElementById("tunerArea");
+const mobTuner = document.getElementById("mobTuner");
+
+let isDragging = false;
+let dragSource = ''; 
+let knobCenter = { x: 0, y: 0 };
+let lastAngle = 0;
+let currentRotation = 0;
+let startX = 0;
+let startY = 0;
+
+if(volKnob) volKnob.style.transform = `rotate(${volRotation}deg)`;
+updateDisplay();
+
+
+if (tuneContainer) {
+    tuneContainer.addEventListener('mousedown', (e) => {
+        if (!isPowered) return;
+        isDragging = true;
+        dragSource = 'knob';
+        startKnobDrag(e, tuneKnob);
+    });
+}
+
+if (volContainer) {
+    volContainer.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragSource = 'vol';
+        startX = e.clientX;
+        startY = e.clientY;
+        startKnobDrag(e, volKnob);
+    });
+}
+
+if (tunerArea) {
+    tunerArea.addEventListener('mousedown', (e) => {
+        if (!isPowered) return;
+        isDragging = true;
+        dragSource = 'tuner';
+        document.body.style.cursor = 'grabbing';
+        handleTunerDrag(e.clientX, tunerArea);
+        e.preventDefault();
+        requestAnimationFrame(dragLoop);
+    });
+}
+
+if (mobTuner) {
+    mobTuner.addEventListener('mousedown', (e) => {
+        if (!isPowered) return;
+        isDragging = true;
+        dragSource = 'mobTuner'; 
+        document.body.style.cursor = 'grabbing';
+        handleTunerDrag(e.clientX, mobTuner);
+        e.preventDefault();
+        requestAnimationFrame(dragLoop);
+    });
+    
+    mobTuner.addEventListener('touchstart', (e) => {
+        if (!isPowered) return;
+        isDragging = true;
+        dragSource = 'mobTuner';
+        handleTunerDrag(e.touches[0].clientX, mobTuner);
+        e.preventDefault(); 
+        requestAnimationFrame(dragLoop);
+    }, {passive: false});
+}
+
+function startKnobDrag(e, element) {
+    const rect = element.getBoundingClientRect();
+    knobCenter = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+    };
+    lastAngle = Math.atan2(e.clientY - knobCenter.y, e.clientX - knobCenter.x);
+    document.body.style.cursor = 'grabbing';
+    
+    if(tuneKnob) tuneKnob.style.transition = 'none';
+    if(volKnob) volKnob.style.transition = 'none';
+    if(displayLarge) displayLarge.style.transition = 'none';
+
+    e.preventDefault();
+    requestAnimationFrame(dragLoop);
+}
+
+function handleTunerDrag(clientX, element) {
+    const rect = element.getBoundingClientRect();
+    let rawPercent = (clientX - rect.left) / rect.width;
+    rawPercent = Math.max(0, Math.min(1, rawPercent));
+    
+    let visualPercent = rawPercent * 100;
+    let logicalPercent = (visualPercent - 5) / 90; 
+    logicalPercent = Math.max(0, Math.min(1, logicalPercent));
+    
+    let targetRotation = logicalPercent * (lines.length * DEG_PER_STATION);
+    tuneRotation = targetRotation;
+    currentRotation = tuneRotation;
+    lastAngle = 0; 
+}
+
+
+function dragLoop() {
+    if (!isDragging) return;
+
+    if (dragSource === 'vol') {
+        if(volKnob) volKnob.style.transform = `rotate(${volRotation}deg)`;
+        
+        if (volRotation < 10) {
+            if (isPowered) {
+                isPowered = false;
+                updateDisplay();
+            }
+        } else {
+            if (!isPowered) {
+                isPowered = true;
+                updateDisplay(); 
+            }
+        }
+    }
+
+    if(tuneKnob) tuneKnob.style.transform = `rotate(${tuneRotation}deg)`;
+
+    let rawIndex = Math.round(tuneRotation / DEG_PER_STATION);
+    let perfectRotation = rawIndex * DEG_PER_STATION;
+    let deviation = Math.abs(tuneRotation - perfectRotation);
+    let maxDeviation = DEG_PER_STATION / 2;
+    let signalStrength = 1 - Math.min(deviation / maxDeviation, 1); 
+    let safeIndex = ((rawIndex % lines.length) + lines.length) % lines.length;
+
+    if (fmPointer) {
+        let exactIndex = tuneRotation / DEG_PER_STATION;
+        let wrappedExactIndex = ((exactIndex % lines.length) + lines.length) % lines.length;
+        const percent = (wrappedExactIndex / lines.length) * 100;
+        const safePercent = 5 + (percent * 0.9);
+        fmPointer.style.left = `${safePercent}%`;
+        
+        const mobPointer = document.getElementById("mobPointer");
+        if (mobPointer) mobPointer.style.left = `${safePercent}%`;
+    }
+    
+    if (safeIndex !== currentIndex) {
+        currentIndex = safeIndex;
+    }
+
+    if (isPowered) {
+        let opacity = 0.2 + (0.8 * signalStrength);
+        let blur = (1 - signalStrength) * 3; 
+        updateDisplay(opacity, blur);
+    } else {
+        updateDisplay();
+    }
+
+    requestAnimationFrame(dragLoop);
+}
+
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    if (dragSource === 'knob' || dragSource === 'vol') {
+        const currentAngle = Math.atan2(e.clientY - knobCenter.y, e.clientX - knobCenter.x);
+        let delta = currentAngle - lastAngle;
+        if (delta > Math.PI) delta -= 2 * Math.PI;
+        if (delta < -Math.PI) delta += 2 * Math.PI;
+        
+        const degDelta = delta * (180 / Math.PI);
+        
+        if (dragSource === 'knob') {
+            tuneRotation += degDelta;
+        } else if (dragSource === 'vol') {
+            volRotation += degDelta;
+            volRotation = Math.max(0, Math.min(300, volRotation));
+        }
+        lastAngle = currentAngle;
+    } 
+    else if (dragSource === 'tuner') {
+        handleTunerDrag(e.clientX, tunerArea);
+    }
+    else if (dragSource === 'mobTuner') {
+        handleTunerDrag(e.clientX, mobTuner);
+    }
+});
+
+window.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    if (dragSource === 'mobTuner') {
+        handleTunerDrag(e.touches[0].clientX, mobTuner);
+    }
+}, {passive: false});
+
+window.addEventListener('mouseup', endDrag);
+window.addEventListener('touchend', endDrag);
+
+function endDrag() {
+    if (isDragging) {
+        isDragging = false;
+        dragSource = '';
+        
+        if(tuneKnob) tuneKnob.style.transition = 'transform 0.3s ease';
+        if(volKnob) volKnob.style.transition = 'transform 0.1s ease';
+        if(displayLarge) {
+            displayLarge.style.transition = 'opacity 0.5s, filter 0.5s';
+        }
+    }
+}
+</script>
+
+</body>
+</html>

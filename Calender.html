@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Juhi Constellation</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg-deep: #ffe6ea; 
+        --gold-lux: #d4a017; 
+        --gold-pale: #b06d72; 
+        --text-primary: #590d22; 
+        --text-secondary: #800f2f; 
+        
+        --glass: rgba(255, 255, 255, 0.98); 
+        --glass-border: rgba(255, 255, 255, 1);
+        --shadow: rgba(164, 19, 60, 0.15);
+        
+        --nav-bg: #4e342e; 
+        --nav-text: #ffecb3; 
+        --nav-font: 'Patrick Hand', cursive;
+        
+        --btn-icon-color: #fdd835; 
+        --btn-border-color: rgba(255, 255, 255, 0.9);
+        
+        --rose-petal: #ffb6c1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background-color: var(--bg-deep);
+        color: var(--text-primary);
+        font-family: 'Cormorant Garamond', serif;
+        overflow-x: hidden;
+        background-image: 
+            radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 70%),
+            radial-gradient(circle at 10% 20%, rgba(255, 179, 193, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 90% 80%, rgba(255, 143, 163, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.4) 0%, transparent 50%);
+        background-size: 100% 100%;
+        background-attachment: fixed;
+    }
+
+    /* --- Petals & Particles --- */
+    #petal-container {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: -1; overflow: hidden;
+    }
+    .petal {
+        position: absolute; top: -10%; width: 18px; height: 18px;
+        background-color: var(--rose-petal);
+        border-radius: 20px 2px 20px 2px;
+        opacity: 0.8; animation: fall linear infinite;
+        box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    }
+    @keyframes fall {
+        0% { top: -10%; transform: translateX(0px) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.8; }
+        50% { transform: translateX(50px) rotate(180deg); }
+        100% { top: 110%; transform: translateX(-50px) rotate(360deg); opacity: 0; }
+    }
+
+    #dust-canvas {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 9999;
+    }
+
+    /* --- Navigation Common Styles --- */
+    .nav-toggle-btn {
+        position: fixed; top: 25px; left: 25px; 
+        z-index: 5000; 
+        width: 50px; height: 50px; border-radius: 50%;
+        background-color: rgba(78, 52, 46, 0.9); 
+        color: var(--btn-icon-color); 
+        border: 2px solid var(--gold-lux); 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: transform 0.3s ease, background-color 0.3s;
+    }
+    .nav-toggle-btn:hover { transform: scale(1.1); background-color: var(--nav-bg); }
+    .nav-toggle-btn svg { width: 28px; height: 28px; stroke-width: 2.5px; }
+
+    .nav-link {
+        color: var(--nav-text); 
+        text-decoration: none;
+        font-family: var(--nav-font);
+        transition: all 0.2s ease;
+        text-transform: capitalize;
+    }
+    .nav-link:hover { 
+        color: #fff; 
+        transform: scale(1.1);
+        text-shadow: 0 0 5px rgba(255,255,255,0.5); 
+    }
+
+    /* --- Desktop Sidebar (Laptop View) --- */
+    #sidebar {
+        position: fixed; top: 0; left: 0; bottom: 0;
+        width: 400px; max-width: 90vw;
+        background-color: var(--nav-bg);
+        box-shadow: 5px 0 25px rgba(0,0,0,0.4); 
+        z-index: 4000;
+        transform: translateX(-100%);
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto;
+        padding: 100px 30px 40px 30px;
+        border-right: 1px solid var(--gold-lux);
+    }
+    .nav-open #sidebar { transform: translateX(0); }
+    
+    .desktop-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px 20px;
+    }
+    .desktop-grid .nav-link {
+        font-size: 1.2rem; letter-spacing: 1px; padding: 8px 12px;
+        border-radius: 8px; background: rgba(255,255,255,0.03);
+        display: flex; align-items: center;
+    }
+    .desktop-grid .nav-link:hover {
+        background: rgba(255,255,255,0.1);
+        transform: translateX(5px) scale(1);
+        border-left: 3px solid var(--gold-lux);
+    }
+    
+    /* --- Special Glowing Calendar Button (Desktop Only) --- */
+    .calendar-highlight {
+        background: rgba(212, 160, 23, 0.15) !important;
+        border: 1px solid var(--gold-lux) !important;
+        color: #fff !important;
+        box-shadow: 0 0 10px rgba(212, 160, 23, 0.3);
+        animation: softPulse 2s infinite ease-in-out;
+        font-weight: bold;
+    }
+    
+    @keyframes softPulse {
+        0% { box-shadow: 0 0 5px rgba(212, 160, 23, 0.2); }
+        50% { box-shadow: 0 0 20px rgba(212, 160, 23, 0.6), inset 0 0 10px rgba(212, 160, 23, 0.1); }
+        100% { box-shadow: 0 0 5px rgba(212, 160, 23, 0.2); }
+    }
+
+    .nav-section-title {
+        grid-column: 1 / -1;
+        font-family: 'Cinzel', serif; color: var(--gold-lux); font-size: 0.9rem;
+        margin-top: 20px; margin-bottom: 5px;
+        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; opacity: 0.7;
+    }
+    #sidebar::-webkit-scrollbar { width: 6px; } 
+    #sidebar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    #sidebar::-webkit-scrollbar-thumb { background: var(--gold-pale); border-radius: 3px; }
+
+    /* --- Mobile 4-Panel Navigation (Hidden on Desktop) --- */
+    .mobile-nav-panel {
+        position: fixed; z-index: 3000;
+        background-color: var(--nav-bg);
+        box-shadow: 0 0 15px rgba(0,0,0,0.4);
+        display: none; /* Hidden by default */
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* --- Media Query for Mobile/Tablet (< 768px) --- */
+    @media (max-width: 768px) {
+        /* Hide Desktop Sidebar */
+        #sidebar { display: none !important; }
+
+        /* Mobile Button Adjustment */
+        .nav-toggle-btn { top: 15px; left: 15px; width: 45px; height: 45px; }
+
+        /* Show 4-Panel Nav */
+        .mobile-nav-panel { display: flex; }
+
+        /* Panel Positioning */
+        #topNav, #bottomNav { left: 0; right: 0; height: 60px; justify-content: center; align-items: center; gap: 20px; }
+        #topNav { top: 0; transform: translateY(-100%); }
+        #bottomNav { bottom: 0; transform: translateY(100%); }
+
+        #leftNav, #rightNav { top: 0; bottom: 0; width: 85px; flex-direction: column; align-items: center; padding: 80px 5px; gap: 15px; overflow-y: auto; z-index: 3001; }
+        #leftNav { left: 0; transform: translateX(-100%); }
+        #rightNav { right: 0; transform: translateX(100%); }
+
+        /* Open States for Mobile */
+        .nav-open #topNav { transform: translateY(0); }
+        .nav-open #bottomNav { transform: translateY(0); }
+        .nav-open #leftNav { transform: translateX(0); }
+        .nav-open #rightNav { transform: translateX(0); }
+
+        /* Mobile Link Styling */
+        .mobile-nav-panel .nav-link { 
+            font-size: 0.95rem; padding: 5px; 
+            white-space: nowrap; 
+        }
+        
+        /* Hide Scrollbars */
+        .mobile-nav-panel::-webkit-scrollbar { width: 0px; }
+
+        /* Universe Adjustments */
+        #universe { padding: 80px 20px 100px 20px; }
+        nav.original-nav { padding-left: 70px; }
+        
+        /* Card Tweaks for Mobile */
+        .grid-stage { display: flex; flex-direction: column; gap: 50px; }
+        .star-card { width: calc(100% - 60px); margin-left: 45px; height: 380px; }
+        .star-card::after {
+            content: ''; position: absolute; left: -47px; top: 40px;
+            width: 14px; height: 14px; background: var(--bg-deep); border: 2px solid var(--gold-lux);
+            border-radius: 50%; box-shadow: 0 0 8px var(--gold-lux); z-index: 10;
+        }
+        #universe::before {
+            content: ''; position: absolute; left: 25px; top: 80px; bottom: 100px; width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--gold-lux), transparent);
+        }
+    }
+
+    /* --- Intro & Main Content --- */
+    #intro {
+        position: fixed; inset: 0; z-index: 3500; background: #fff0f3;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        transition: opacity 1.5s ease; pointer-events: all; 
+    }
+    #intro.hidden { display: none !important; pointer-events: none; }
+    .intro-text {
+        font-family: 'Cinzel', serif; color: var(--text-primary);
+        font-size: 1.5rem; letter-spacing: 4px; animation: fadeUp 2s ease forwards; opacity: 0;
+    }
+    .intro-sub {
+        margin-top: 15px; font-size: 0.9rem; color: var(--gold-pale); font-style: italic;
+        animation: fadeUp 2s ease 0.5s forwards; opacity: 0;
+    }
+
+    nav.original-nav {
+        position: fixed; top: 0; width: 100%; z-index: 100;
+        padding: 20px 40px 20px 100px;
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255, 240, 243, 0.85); backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.5);
+    }
+    .brand { font-family: 'Cinzel', serif; color: var(--text-primary); font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; }
+    .progress-line { height: 3px; background: var(--gold-lux); width: 0%; transition: width 0.3s; position: absolute; bottom: 0; left: 0; }
+
+    #universe { padding: 120px 20px 100px; max-width: 1400px; margin: 0 auto; }
+    
+    .grid-stage {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 40px; perspective: 2000px;
+    }
+
+    .star-card {
+        height: 420px; position: relative; cursor: pointer;
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d; 
+        transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        will-change: transform;
+    }
+    .star-card.flipped { transform: rotateY(180deg) !important; }
+
+    .face {
+        position: absolute; inset: 0; 
+        -webkit-backface-visibility: hidden; 
+        backface-visibility: hidden;
+        border-radius: 12px; overflow: hidden;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        padding: 30px; text-align: center;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 15px 35px rgba(164, 19, 60, 0.1), inset 0 0 20px rgba(255,255,255,0.8);
+        transform: translateZ(1px); 
+    }
+
+    .face::before {
+        content: ""; position: absolute; inset: 8px;
+        border: 1px solid rgba(212, 160, 23, 0.5);
+        border-radius: 8px; pointer-events: none;
+    }
+
+    .month-no { 
+        font-family: 'Cinzel', serif; font-size: 6rem; 
+        color: rgba(255,255,255,0.7); 
+        position: absolute; top: -10px; right: 10px; 
+        pointer-events: none; text-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .card-title { 
+        font-family: 'Cinzel', serif; font-size: 1.8rem; 
+        color: var(--text-primary); margin-bottom: 5px; 
+        line-height: 1.1; position: relative; z-index: 2;
+    }
+    .card-subtitle { 
+        font-size: 0.85rem; text-transform: uppercase; 
+        letter-spacing: 4px; color: var(--gold-pale); 
+        position: relative; z-index: 2; font-weight: 700; margin-top: 5px;
+        background: rgba(255,255,255,0.5);
+        padding: 4px 12px; border-radius: 20px;
+    }
+    .icon-deco { 
+        font-size: 2.2rem; margin-bottom: 20px; 
+        color: var(--gold-lux); position: relative; z-index: 2;
+        filter: drop-shadow(0 2px 4px rgba(212, 160, 23, 0.3));
+    }
+
+    .back {
+        transform: rotateY(180deg) translateZ(1px); 
+        background: #fff; 
+        border: 2px solid var(--gold-lux);
+        z-index: 2; 
+    }
+    .back .month-no { display: none; }
+    .back::before { border: 1px double rgba(89, 13, 34, 0.15); }
+    
+    .trait-desc { 
+        font-size: 1.1rem; line-height: 1.7; 
+        color: var(--text-secondary); font-style: italic; 
+        position: relative; z-index: 2;
+    }
+    .highlight { 
+        color: var(--text-primary); font-style: normal; 
+        font-weight: 700; border-bottom: 2px solid rgba(212, 160, 23, 0.3); 
+    }
+
+    #final-modal {
+        position: fixed; inset: 0; background: rgba(255, 240, 245, 0.95); z-index: 2000;
+        display: none; justify-content: center; align-items: center;
+        opacity: 0; transition: opacity 1s;
+    }
+    .modal-content {
+        max-width: 500px; width: 85%; text-align: center;
+        border: 2px solid var(--gold-lux); padding: 40px; position: relative;
+        background: #fff; box-shadow: 0 20px 50px rgba(89, 13, 34, 0.15); border-radius: 12px;
+    }
+    .modal-content::after {
+        content: '♛'; position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+        background: #fff; padding: 0 15px; color: var(--gold-lux); font-size: 30px;
+        border-radius: 50%; border: 2px solid var(--gold-lux);
+    }
+    .family-tribute {
+        margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(89, 13, 34, 0.1);
+        font-size: 0.9rem; color: var(--gold-pale);
+    }
+
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(20px); } }
+    .hidden { display: none !important; }
+    .visible { display: flex !important; opacity: 1 !important; }
+
+</style>
+</head>
+<body>
+
+<div id="intro">
+    <div class="intro-text">The 12 Elements of Her</div>
+    <div class="intro-sub">Entering the Gallery...</div>
+</div>
+
+<canvas id="dust-canvas"></canvas>
+
+<!-- Navigation Toggle Button -->
+<button id="navToggle" class="nav-toggle-btn" aria-label="Open Navigation">
+    <svg id="navIconMenu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-8 6h8"></path>
+    </svg>
+    <svg id="navIconClose" style="display:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+</button>
+
+<!-- Desktop Sidebar (Visible on Laptop > 768px) -->
+<nav id="sidebar">
+    <div style="font-family:'Cinzel'; font-size:1.5rem; color:var(--gold-lux); text-align:center; margin-bottom:30px; letter-spacing:3px;">
+        Juhi's World
+    </div>
+    
+    <div class="desktop-grid">
+        <!-- Main Links -->
+        <div class="nav-section-title">Core</div>
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="Cake.html" class="nav-link">Cake</a>
+        <a href="21_Wish.html" class="nav-link">21_Door</a>
+        <a href="chat.html" class="nav-link">Heaven</a>
+        <div class="nav-section-title">Elements</div>
+        <a href="Diary.html" class="nav-link">Diary</a>
+        <a href="anatomy.html" class="nav-link">Anatomy</a>
+        <a href="Box.html" class="nav-link">Box</a>
+        <a href="Special.html" class="nav-link">Special</a>
+        <a href="color.html" class="nav-link">Color</a>
+        <a href="you.html" class="nav-link">You</a>
+        <a href="Teacher.html" class="nav-link">Teacher</a>
+        <a href="Universe.html" class="nav-link">Universe</a>
+        <a href="The_River.html" class="nav-link">River</a>
+        <a href="Mountain.html" class="nav-link">Mountain</a>
+        <a href="Skill.html" class="nav-link">Skill</a>
+        <a href="Paper_Star.html" class="nav-link">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link">Cartoon</a>
+        <div class="nav-section-title">Essence</div>
+        <a href="Periodik_table.html" class="nav-link">Table</a>
+        <a href="Concept.html" class="nav-link">Concept</a>
+        <!-- Added calendar-highlight class here for desktop only -->
+        <a href="Calender.html" class="nav-link calendar-highlight">Calendar</a>
+        <a href="Perspective.html" class="nav-link">View</a>
+        <a href="Santa.html" class="nav-link">Santa</a>
+        <a href="Presence.html" class="nav-link">Presence</a>
+        <a href="Cloud.html" class="nav-link">Cloud</a>
+        <a href="Ink.html" class="nav-link">Paint</a>
+        <a href="Butterfly.html" class="nav-link">Butterfly</a>
+        <a href="Weather.html" class="nav-link">Weather</a>
+        <a href="Spotlight.html" class="nav-link">Spotlight</a>
+        <a href="Room.html" class="nav-link">Room</a>
+        <a href="Radio.html" class="nav-link">Radio</a>
+        <a href="Food.html" class="nav-link">Food</a>
+        <a href="Music.html" class="nav-link">Music</a>
+        <a href="letter.html" class="nav-link">Letter</a>
+        <a href="Msg.html" class="nav-link">Message</a>
+    </div>
+</nav>
+
+<!-- Mobile 4-Panel Navigation (Visible on Mobile < 768px) -->
+<nav id="topNav" class="mobile-nav-panel space-x-2">
+    <a href="Msg.html" class="nav-link">Message</a>
+    <a href="letter.html" class="nav-link">Letter</a>
+    <a href="Music.html" class="nav-link">Music</a>
+</nav>
+
+<nav id="bottomNav" class="mobile-nav-panel space-x-2">
+    <a href="Skill.html" class="nav-link">Skill</a>
+    <a href="Paper_Star.html" class="nav-link">Paper Star</a>
+    <a href="Carttoon.html" class="nav-link">Cartoon</a>
+</nav>
+
+<nav id="leftNav" class="mobile-nav-panel space-x-2">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="Cake.html" class="nav-link">Cake</a>
+    <a href="21_Wish.html" class="nav-link">21_Door</a>
+    <a href="chat.html" class="nav-link">Heaven</a>
+    <a href="Diary.html" class="nav-link">Diary</a>
+    <a href="anatomy.html" class="nav-link">Anatomy</a>
+    <a href="Box.html" class="nav-link">Box</a>
+    <a href="Special.html" class="nav-link">Special</a>
+    <a href="color.html" class="nav-link">Color</a>
+    <a href="you.html" class="nav-link">You</a>
+    <a href="Teacher.html" class="nav-link">Teacher</a>
+    <a href="Universe.html" class="nav-link">Universe</a>
+    <a href="The_River.html" class="nav-link">River</a>
+    <a href="Mountain.html" class="nav-link">Mountain</a>
+</nav>
+
+<nav id="rightNav" class="mobile-nav-panel space-x-2">
+    <a href="Periodik_table.html" class="nav-link">Table</a>
+    <a href="Concept.html" class="nav-link">Concept</a>
+    <a href="Calender.html" class="nav-link">Calendar</a>
+    <a href="Perspective.html" class="nav-link">View</a>
+    <a href="Santa.html" class="nav-link">Santa</a>
+    <a href="Presence.html" class="nav-link">Presence</a>
+    <a href="Cloud.html" class="nav-link">Cloud</a>
+    <a href="Ink.html" class="nav-link">Paint</a>
+    <a href="Butterfly.html" class="nav-link">Butterfly</a>
+    <a href="Weather.html" class="nav-link">Weather</a>
+    <a href="Spotlight.html" class="nav-link">Spotlight</a>
+    <a href="Room.html" class="nav-link">Room</a>
+    <a href="Radio.html" class="nav-link">Radio</a>
+    <a href="Food.html" class="nav-link">Food</a>
+</nav>
+
+<nav class="original-nav">
+    <div class="brand">Jass</div>
+    <div style="font-size: 0.8rem; color: var(--text-secondary); opacity: 0.8;">Tap cards to reveal</div>
+    <div class="progress-line" id="progressBar"></div>
+</nav>
+
+<div id="petal-container"></div>
+
+<div id="universe">
+    <div class="grid-stage">
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">January</div>
+                <div class="month-no">01</div>
+                <div class="icon-deco">✦</div>
+                <div class="card-title">The First Glance Impact</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Juhi, you’re the kind of person who makes someone pause without warning. Your presence has this <span class="highlight">“ wait… who’s that?”</span> vibe that doesn’t need effort. And the best part? You move through a moment like you’re unaware of the effect you’re creating.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">February</div>
+                <div class="month-no">02</div>
+                <div class="icon-deco">✾</div>
+                <div class="card-title"> Natural Charm in Motion</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Your charm isn’t loud—it just appears in your timing, reactions, and expressions. Even your annoyed look has its own style. You don’t try to stand out, Jass... <span class="highlight">Juhi</span> you just do.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">March</div>
+                <div class="month-no">03</div>
+                <div class="icon-deco">∞</div>
+                <div class="card-title">The Conversation Magnet</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Juhi, you make even simple topics feel alive. Your mind connects ideas in a fun, easy flow, and people want to keep talking. That <span class="highlight">“serious-to-funny”</span> switch you do. That’s pure talent.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">April</div>
+                <div class="month-no">04</div>
+                <div class="icon-deco">⚡</div>
+                <div class="card-title">The Low-Key Funny Genius</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Your humour is dangerous in the best way—subtle and perfectly timed. One expression from you can say more than five jokes. And half the time you’re not even aiming for funny, Juhi… it just happens. You are the <span class="highlight">low-key genius</span> of comedy.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">May</div>
+                <div class="month-no">05</div>
+                <div class="icon-deco">≋</div>
+                <div class="card-title">The Energy That Matches Perfectly</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    You blend into every mood effortlessly—calm, playful, focused. You don’t force the vibe, you understand it. People feel <span class="highlight">connected</span> to you before they even realise it.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">June</div>
+                <div class="month-no">06</div>
+                <div class="icon-deco">⚔</div>
+                <div class="card-title">The Spine</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Quiet confidence. When the world wavers, you stand firm. Your decision-making isn't about changing, it's about <span class="highlight">resolution</span>. A strength that doesn't need to shout.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">July</div>
+                <div class="month-no">07</div>
+                <div class="icon-deco">☀</div>
+                <div class="card-title">The Cute Distraction</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Sometimes you say something simple, and it becomes the highlight of the day. Your smallest reactions—the eyebrow lift, the half smile—they stay in people’s heads. You’re unintentionally distracting in the nicest way. You are the <span class="highlight">highlight</span> of the day, often without even realizing it.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">August</div>
+                <div class="month-no">08</div>
+                <div class="icon-deco">♛</div>
+                <div class="card-title">The Not Easily Forgotten One</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Juhi, certain things about you stick—a line you said, a look you gave, a moment you created. You leave a quiet echo in minds. You leave a <span class="highlight">mark</span> on the timeline of everyone & everything you meet.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">September</div>
+                <div class="month-no">09</div>
+                <div class="icon-deco">◈</div>
+                <div class="card-title">The Natural Aesthetic</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    Visual poetry. You don't pose, you simply exist, and that is enough. Your expressions, your gestures, your way of speaking… everything falls into place visually. Every movement, every glance falls into a perfect <span class="highlight">harmony</span>.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">October</div>
+                <div class="month-no">10</div>
+                <div class="icon-deco">☾</div>
+                <div class="card-title">The Depth</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    A book with infinite chapters. Just when one thinks they know her, you reveal a new chapter. You’re just genuinely interesting. Every conversation reveals a new angle, a new thought, a new side of you. You’re the kind of person who makes someone want the next chapter. You are the <span class="highlight">mystery</span> everyone wants to solve.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">November</div>
+                <div class="month-no">11</div>
+                <div class="icon-deco">⚖</div>
+                <div class="card-title">The Logic</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    A steady hand in a chaotic world. Your logic is sharp, your reactions thoughtful, and you read situations better than most. You navigate life with a sharp intuition and a grounded soul. A pillar of <span class="highlight">reason</span> that others lean on.
+                </div>
+            </div>
+        </div>
+
+        <div class="star-card" onclick="flip(this)">
+            <div class="face front">
+                <div class="card-subtitle">December</div>
+                <div class="month-no">12</div>
+                <div class="icon-deco">★</div>
+                <div class="card-title">The Finale Highlight</div>
+            </div>
+            <div class="face back">
+                <div class="trait-desc">
+                    You wrap up moments with a presence that stays. Not loudly, not dramatically—just in a way people remember. You don’t chase attention, Juhi… but you end up becoming the highlight anyway. A <span class="highlight">protagonist</span> in your own story, and a blessing in ours.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="final-modal">
+    <div class="modal-content">
+        <h2 style="font-family:'Cinzel'; color:var(--text-primary); margin-top:0;">The Origin</h2>
+        <p style="color:var(--text-secondary); line-height:1.6; font-size:1.1rem;">
+            A masterpiece does not create itself.
+            <br><br>
+            Behind the grace, the wit, and the strength of Juhi, there is a foundation.
+        </p>
+        
+        <div class="family-tribute">
+            <p>To the <strong>Parents</strong> who raised a Queen,<br>and the <strong>Sister</strong> who stood beside her.</p>
+            <p style="font-size:0.8rem; margin-top:15px; color:var(--gold-pale);">The world thanks you for sharing her with us.</p>
+        </div>
+
+        <button onclick="closeModal()" style="margin-top:20px; background:transparent; border:1px solid #777; color:var(--text-secondary); padding:8px 20px; cursor:pointer; font-family:'Cinzel';">Close</button>
+    </div>
+</div>
+
+<script>
+    function createPetals() {
+        const container = document.getElementById('petal-container');
+        const petalCount = 50; 
+
+        for (let i = 0; i < petalCount; i++) {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            
+            const left = Math.random() * 100;
+            const duration = 6 + Math.random() * 10; 
+            const delay = Math.random() * -15; 
+            const scale = 0.5 + Math.random() * 1; 
+            
+            petal.style.left = `${left}%`;
+            petal.style.animationDuration = `${duration}s`;
+            petal.style.animationDelay = `${delay}s`;
+            petal.style.transform = `scale(${scale}) rotate(${Math.random() * 360}deg)`;
+            
+            container.appendChild(petal);
+        }
+    }
+
+    const canvas = document.getElementById('dust-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.random() * 3;
+            this.speedX = Math.random() * 2 - 1;
+            this.speedY = Math.random() * 2 - 1;
+            this.color = `rgba(212, 160, 23, ${Math.random()})`; 
+            this.life = 100; 
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life--;
+            if (this.life < 20) this.size *= 0.9;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function handleParticles() {
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            if (particles[i].life <= 0) {
+                particles.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function animateDust() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        handleParticles();
+        requestAnimationFrame(animateDust);
+    }
+    animateDust();
+
+    window.addEventListener('mousemove', (e) => {
+        particles.push(new Particle(e.x, e.y));
+        particles.push(new Particle(e.x, e.y));
+    });
+    
+    window.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        particles.push(new Particle(touch.clientX, touch.clientY));
+        particles.push(new Particle(touch.clientX, touch.clientY));
+    });
+
+
+    window.onload = () => {
+        createPetals();
+        setTimeout(() => {
+            const intro = document.getElementById('intro');
+            intro.style.opacity = 0;
+            setTimeout(() => { intro.classList.add('hidden'); }, 1500);
+        }, 2500);
+    };
+
+    const navToggle = document.getElementById('navToggle');
+    const menuIcon = document.getElementById('navIconMenu');
+    const closeIcon = document.getElementById('navIconClose');
+    const sidebar = document.getElementById('sidebar');
+    let isNavOpen = false;
+
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isNavOpen = !isNavOpen;
+        if (isNavOpen) {
+            document.body.classList.add('nav-open');
+            menuIcon.style.display = 'none';
+            closeIcon.style.display = 'block';
+            navToggle.setAttribute('aria-label', 'Close Navigation');
+        } else {
+            closeNav();
+        }
+    });
+
+    function closeNav() {
+        isNavOpen = false;
+        document.body.classList.remove('nav-open');
+        menuIcon.style.display = 'block';
+        closeIcon.style.display = 'none';
+        navToggle.setAttribute('aria-label', 'Open Navigation');
+    }
+
+    // Close Nav on Outside Click (Handles both Desktop Sidebar and Mobile Navs)
+    document.addEventListener('click', (e) => {
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isClickInsideMobileNav = e.target.closest('.mobile-nav-panel');
+        const isClickToggle = navToggle.contains(e.target);
+        
+        if (isNavOpen && !isClickInsideSidebar && !isClickInsideMobileNav && !isClickToggle) {
+            closeNav();
+        }
+    });
+
+    let flippedCount = 0;
+    const totalCards = 12;
+
+    function flip(card) {
+        card.style.transform = ''; 
+
+        if(card.classList.contains('flipped')) {
+            card.classList.remove('flipped');
+            flippedCount--;
+        } else {
+            card.classList.add('flipped');
+            flippedCount++;
+        }
+
+        const percentage = (flippedCount / totalCards) * 100;
+        document.getElementById('progressBar').style.width = percentage + '%';
+
+        if(flippedCount === totalCards) {
+            setTimeout(() => {
+                const modal = document.getElementById('final-modal');
+                modal.classList.add('visible');
+            }, 1000);
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('final-modal').classList.remove('visible');
+    }
+
+    const cards = document.querySelectorAll('.star-card');
+    
+    document.addEventListener('mousemove', (e) => {
+        if(window.innerWidth < 768) return; 
+        
+        const x = (e.clientX / window.innerWidth) - 0.5;
+        const y = (e.clientY / window.innerHeight) - 0.5;
+
+        cards.forEach(card => {
+            if(!card.classList.contains('flipped')) {
+                card.style.transform = `perspective(2000px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

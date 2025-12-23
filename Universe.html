@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>When the Universe Spoke About Juhi</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Gochi+Hand&family=Pacifico&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+h1, h2, h3 { font-family: 'Pacifico', cursive; }
+.festive-text { font-family: 'Gochi Hand', cursive; }
+:root{--txt:#eef1ff;--gold:#ffdca8;}
+
+body{margin:0;background:#05070e;color:var(--txt);font-family:"Inter",system-ui,sans-serif;overflow:hidden;}
+canvas#stars,canvas#fireflies{position:fixed;inset:0;z-index:-3;pointer-events:none}
+
+.nav-link { transition: all 0.2s ease; white-space: nowrap; text-align: center; }
+#navToggleIcon, #navToggleX { transition: all 0.3s ease-in-out; }
+
+#cursor-dot, #cursor-outline { display: none; pointer-events: none; position: fixed; top: 0; left: 0; z-index: 9999; border-radius: 50%; }
+#cursor-dot { width: 8px; height: 8px; background-color: #ffdca8; box-shadow: 0 0 10px #ffdca8; transform: translate(-50%, -50%); }
+#cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(255, 220, 168, 0.5); transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background-color 0.2s; }
+body.hovering #cursor-outline { width: 60px; height: 60px; background-color: rgba(255, 220, 168, 0.1); border-color: rgba(255, 220, 168, 0.8); }
+
+.nav-bar { position: fixed; background-color: #0f172a; color: #fef3c7; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 60; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; }
+#topNav { top: 0; left: 0; right: 0; height: 4rem; transform: translateY(-100%); }
+#mainNavContainer.is-open #topNav { transform: translateY(0); }
+#bottomNav { bottom: 0; left: 0; right: 0; height: 4rem; transform: translateY(100%); }
+#mainNavContainer.is-open #bottomNav { transform: translateY(0); }
+#leftNav { top: 0; bottom: 0; left: 0; width: 5rem; flex-direction: column; padding: 5rem 0; overflow-y: auto; transform: translateX(-100%); justify-content: space-between; }
+#mainNavContainer.is-open #leftNav { transform: translateX(0); }
+#rightNav { top: 0; bottom: 0; right: 0; width: 5rem; flex-direction: column; padding: 5rem 0; overflow-y: auto; transform: translateX(100%); justify-content: space-between; }
+#mainNavContainer.is-open #rightNav { transform: translateX(0); }
+
+@media (min-width: 1024px) {
+    body, a, button, .overlay { cursor: none; }
+    #cursor-dot, #cursor-outline { display: block; }
+
+    #mainNavContainer { position: fixed; top: 0; bottom: 0; left: 0; width: 360px; background-color: #0f172a; z-index: 60; padding: 6rem 1.5rem 2rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 0.75rem; overflow-y: auto; box-shadow: 4px 0 25px rgba(0,0,0,0.5); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    #mainNavContainer.is-open { transform: translateX(0); }
+
+    .nav-bar { position: static; background: transparent; box-shadow: none; width: auto; height: auto; padding: 0; transform: none !important; display: contents; }
+    #topNav a[href="Music.html"] { order: 1; }
+    #topNav a[href="letter.html"] { order: 2; }
+    #topNav a[href="Msg.html"] { order: 3; }
+
+    .nav-link { display: flex; align-items: center; justify-content: center; padding: 0.75rem 0.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; text-align: center; border: 1px solid transparent; cursor: none; }
+    .nav-link:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(253, 224, 71, 0.3); transform: translateY(-2px); }
+
+    .universe-glow { box-shadow: 0 0 15px rgba(255, 220, 168, 0.6), inset 0 0 10px rgba(255, 220, 168, 0.2); border-color: rgba(255, 220, 168, 0.9); color: #fff; text-shadow: 0 0 8px rgba(255, 220, 168, 0.8); background: rgba(255, 220, 168, 0.15) !important; animation: pulse-glow 2s infinite alternate; }
+    @keyframes pulse-glow { from { box-shadow: 0 0 10px rgba(255, 220, 168, 0.4), inset 0 0 5px rgba(255, 220, 168, 0.1); } to { box-shadow: 0 0 25px rgba(255, 220, 168, 0.7), inset 0 0 12px rgba(255, 220, 168, 0.3); } }
+    
+    #mainNavContainer::-webkit-scrollbar { width: 6px; }
+    #mainNavContainer::-webkit-scrollbar-track { background: #0f172a; }
+    #mainNavContainer::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+}
+
+.overlay{ position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.8);color:white; font-family: 'Great Vibes', cursive; font-size: 3rem; z-index:10;transition:opacity .6s ease; text-shadow: 0 0 15px rgba(255, 220, 168, 0.4); text-align: center; padding: 1rem; }
+.overlay.hidden{opacity:0;visibility:hidden}
+
+.stage{position:fixed;inset:0;display:grid;place-items:center;perspective:1000px; transition: all 0.3s ease-in-out;} 
+.scene{position:absolute;inset:0;display:grid;place-items:center;opacity:0;transform:scale(.97);transition:opacity .8s ease,transform 1s ease}
+.scene.active{opacity:1;transform:scale(1)}
+
+.caption{z-index:2;max-width:900px;text-align:center;padding:0 1rem}
+.line { opacity:0; transform:translateY(15px); transition:opacity .8s ease,transform .9s cubic-bezier(0.2, 0.8, 0.2, 1); font-family: 'Dancing Script', cursive; font-size: 1.5rem; font-weight: 700; color: #fff8e7; margin: 0.4rem 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 220, 168, 0.2); }
+.line.show{opacity:1;transform:none}
+
+.planet{position:absolute;width:min(70vmin,500px);height:min(70vmin,500px);border-radius:50%;z-index:1}
+.sun{background:radial-gradient(circle at 40% 30%,#ffb144,#8b3000 90%)}
+.sun .planet{background:radial-gradient(circle at 30% 30%,#ffd08a 0%,#ff9f3b 35%,#bf4e00 70%,#5a2200 100%)}
+.mars{background:radial-gradient(circle at 40% 30%,#d14a21,#140202 90%)}
+.mars .planet{background:radial-gradient(circle at 35% 30%,#ff7a4f 0%,#d14a21 40%,#7b1f11 75%,#320905 100%)}
+.jupiter{background:linear-gradient(180deg,#0c0906,#2b2016,#0a0705)}
+.jupiter .planet{background:conic-gradient(from 180deg,#cfa788,#f3e0cc,#b98e6b,#e9d4bd,#ac7d5b,#e0c9b2,#cfa788)}
+.saturn{background:linear-gradient(180deg,#0a0905,#302715,#0b0a06)}
+.saturn .planet{background:radial-gradient(circle at 40% 30%,#ffe49a,#7b5e30 80%,#33270f)}
+.rings{position:absolute;left:50%;top:50%;width:min(88vmin,680px);height:min(24vmin,180px);transform:translate(-50%,-50%) rotate(-18deg);border-radius:50%;box-shadow:0 0 0 14px rgba(255,255,255,.06)}
+.neptune{background:linear-gradient(180deg,#051018,#10324b,#061018)}
+.neptune .planet{background:radial-gradient(circle at 35% 30%,#78c6ff 0%,#2e77b8 40%,#10406a 80%,#072136 100%)}
+.earth{background:linear-gradient(180deg,#0f1f2f,#041923,#081d29)}
+.earth .planet{background:url('https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg') center/cover no-repeat;border-radius:50%;box-shadow:0 0 30px rgba(150,220,200,.4);}
+
+.finale{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,#160a21,#261238,#10091a);animation:aurora 30s ease-in-out infinite alternate}
+@keyframes aurora{0%{filter:hue-rotate(0deg);}50%{filter:hue-rotate(40deg);}100%{filter:hue-rotate(80deg);}}
+.endwrap{display:grid;place-items:center;gap:20px;z-index:2; text-align: center; position: relative;}
+.endwrap img{width:min(78vw,520px);aspect-ratio:4/5;object-fit:cover;border-radius:20px;box-shadow:0 0 40px 10px rgba(255,200,220,.5);opacity:0;transition:1s ease;}
+.endwrap h2{font-family:'Great Vibes',cursive;font-size:clamp(2rem,6vw,3rem);color:#ffe9f4;opacity:0;transition:1.2s ease;text-shadow:0 0 25px rgba(255,220,240,.6),0 0 60px rgba(255,200,210,.4); text-align: center;}
+.endwrap.show img,.endwrap.show h2{opacity:1}
+
+#solar-system-container { display: none; }
+
+@media (min-width: 1024px) {
+    .scene { display: block; }
+    .planet { left: 55%; top: 50%; transform: translateY(-50%); width: 450px; height: 450px; margin: 0; }
+    .rings { left: calc(55% + 225px); top: 50%; width: 650px; height: 160px; }
+    .caption { position: absolute; top: 50%; left: 8%; transform: translateY(-50%); width: 45%; text-align: left; padding: 0; max-width: none; }
+    .line { font-size: 2.2rem; margin: 0.6rem 0; line-height: 1.4; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+    .finale { display: grid; }
+    
+    .nav-active .stage { transform: scale(0.9) translateX(180px); }
+
+    .finale {
+        background: #000 !important;
+        animation: none;
+    }
+
+    #solar-system-container { 
+        display: block; 
+        position: absolute; 
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: all;
+    }
+
+    .endwrap {
+        grid-template-columns: 1fr;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        justify-content: center;
+        align-content: start; 
+        padding-top: 5vh; 
+        padding-left: 0;
+        max-width: none;
+    }
+
+    .endwrap img { display: none; }
+
+    .endwrap h2 { 
+        font-size: 8rem; 
+        text-align: center; 
+        width: 100%;
+        text-shadow: 0 0 40px rgba(255, 200, 100, 0.6), 0 0 80px rgba(255, 100, 50, 0.4);
+    }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div id="cursor-outline"></div>
+
+<button id="navToggle" class="fixed top-6 left-6 z-[70] p-3 bg-slate-900 text-yellow-100 rounded-full shadow-lg hover:bg-slate-700 hover:text-white transition-all focus:outline-none ring-1 ring-white/10" style="cursor: none;">
+    <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+    <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+</button>
+
+<div id="mainNavContainer" class="">
+    
+    <nav id="leftNav" class="nav-bar space-x-2">
+        <a href="index.html" class="nav-link festive-text text-lg">Home</a>
+        <a href="Cake.html" class="nav-link festive-text">Cake</a>
+        <a href="21_Wish.html" class="nav-link festive-text">21_Door</a>
+        <a href="chat.html" class="nav-link festive-text text-lg">Heaven</a>
+        <a href="Diary.html" class="nav-link festive-text">Diary</a>
+        <a href="anatomy.html" class="nav-link festive-text">Anatomy</a>
+        <a href="Box.html" class="nav-link festive-text">Box</a>
+        <a href="Special.html" class="nav-link festive-text text-lg">Special</a>
+        <a href="color.html" class="nav-link festive-text">Color</a>
+        <a href="you.html" class="nav-link festive-text text-lg">You</a>
+        <a href="Teacher.html" class="nav-link festive-text">Teacher</a>
+        <a href="Universe.html" class="nav-link festive-text universe-glow">Universe</a>
+        <a href="The_River.html" class="nav-link festive-text">River</a>
+        <a href="Mountain.html" class="nav-link festive-text">Mountain</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-bar space-x-2">
+        <a href="Skill.html" class="nav-link festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="rightNav" class="nav-bar space-x-2">
+        <a href="Periodik_table.html" class="nav-link festive-text">Periodic</a>
+        <a href="Concept.html" class="nav-link festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link festive-text">Calendar</a>
+        <a href="Perspective.html" class="nav-link festive-text">Perspective</a>
+        <a href="Santa.html" class="nav-link festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link festive-text">Butterfly</a>
+        <a href="Weather.html" class="nav-link festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link festive-text">Room</a>
+        <a href="Radio.html" class="nav-link festive-text">Radio</a>
+        <a href="Food.html" class="nav-link festive-text">Food</a>
+    </nav>
+
+    <nav id="topNav" class="nav-bar space-x-2">
+        <a href="Msg.html" class="nav-link festive-text">Message</a>
+        <a href="letter.html" class="nav-link festive-text text-lg">Letter</a>
+        <a href="Music.html" class="nav-link festive-text text-lg">Music</a>
+    </nav>
+    
+</div>
+
+<canvas id="stars"></canvas>
+<div class="overlay" id="overlay">Tap to Begin the Journey</div>
+<main class="stage" id="stage"></main>
+<canvas id="fireflies"></canvas>
+<audio id="bgm" preload="auto" loop><source src="432hz.mp3" type="audio/mp3"></audio>
+
+<script>
+const cursorDot = document.getElementById('cursor-dot');
+const cursorOutline = document.getElementById('cursor-outline');
+
+let mouseX = 0, mouseY = 0;
+let outlineX = 0, outlineY = 0;
+
+window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (cursorDot) {
+        cursorDot.style.left = `${mouseX}px`;
+        cursorDot.style.top = `${mouseY}px`;
+    }
+});
+
+function animateCursor() {
+    outlineX += (mouseX - outlineX) * 0.15;
+    outlineY += (mouseY - outlineY) * 0.15;
+    if (cursorOutline) {
+        cursorOutline.style.left = `${outlineX}px`;
+        cursorOutline.style.top = `${outlineY}px`;
+    }
+    requestAnimationFrame(animateCursor);
+}
+
+const interactiveElements = document.querySelectorAll('a, button, .overlay');
+interactiveElements.forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+});
+
+if (window.matchMedia("(min-width: 1024px)").matches) {
+    animateCursor();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navContainer = document.getElementById('mainNavContainer');
+    const navToggle = document.getElementById('navToggle');
+    const navToggleIcon = document.getElementById('navToggleIcon');
+    const navToggleX = document.getElementById('navToggleX');
+
+    function toggleNav(forceState) {
+        const isOpen = navContainer.classList.contains('is-open');
+        const newState = forceState !== undefined ? forceState : !isOpen;
+
+        if (newState) {
+            navContainer.classList.add('is-open');
+            document.body.classList.add('nav-active');
+            navToggleIcon.classList.add('hidden');
+            navToggleX.classList.remove('hidden');
+        } else {
+            navContainer.classList.remove('is-open');
+            document.body.classList.remove('nav-active');
+            navToggleIcon.classList.remove('hidden');
+            navToggleX.classList.add('hidden');
+        }
+    }
+
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleNav();
+    });
+
+    document.addEventListener('click', (e) => {
+        const isOpen = navContainer.classList.contains('is-open');
+        if (isOpen && !navContainer.contains(e.target) && !navToggle.contains(e.target)) {
+            toggleNav(false);
+        }
+    });
+});
+
+const scenes = [
+  {
+    key: 'sun',
+    lines: [
+      'I created light so fierce it could birth worlds.',
+      'Yet none could warm hearts the way you do.',
+      'Even the Sun, proud and eternal, bows before your smile.',
+      'Its fire burns, yours heals.',
+      'And for the first time, I saw brilliance learn humility.',
+      'Even dawn itself blushed to rise after you.'
+    ],
+    dur: 13000
+  },
+  {
+    key: 'mars',
+    lines: [
+      'I painted Mars red, the hue of passion.',
+      'But your presence turns desire into devotion.',
+      'Its dust storms roar, yet your silence speaks louder.',
+      'Mars burns from within, you glow with grace.',
+      'Even its lonely surface envies your warmth.',
+      'You taught the planet of war the meaning of peace.'
+    ],
+    dur: 13000
+  },
+  {
+    key: 'jupiter',
+    lines: [
+      'I made Jupiter vast, storms spinning like thoughts unspoken.',
+      'But your calm gaze stills even my tempests.',
+      'Its size is grand, yet your heart holds more gravity.',
+      'The thunder it carries, you soften with a glance.',
+      'And so the giant learns gentleness.',
+      'Even the great red storm turns pale before your patience.'
+    ],
+    dur: 13000
+  },
+  {
+    key: 'saturn',
+    lines: [
+      'I adorned Saturn with rings, perfect circles of beauty.',
+      'Yet you wear no jewels, and still outshine the stars.',
+      'Each ring reflects elegance, you embody it.',
+      'I spun gold in space, you spin kindness in hearts.',
+      'Even my masterpiece envies your simplicity.',
+      'I realized grace is not in form, but in your soul.'
+    ],
+    dur: 13000
+  },
+  {
+    key: 'neptune',
+    lines: [
+      'I shaped Neptune with oceans of mystery and depth.',
+      'But your thoughts swim deeper than I ever dared.',
+      'Its waves whisper secrets, you understand them all.',
+      'My bluest world feels small beside your serenity.',
+      'You are where peace and wonder meet.',
+      'Even eternity feels shallow next to your mind.'
+    ],
+    dur: 13000
+  },
+  {
+    key: 'earth',
+    lines: [
+      'I crafted Earth, hoping to mirror you, and failed gloriously.',
+      'The snow in Greenland is pure, but not as kind as your heart.',
+      'The spices of India are rich, but not as vibrant as your soul.',
+      'The cherry blossoms of Japan are delicate, yet not as fleeting as your smile.',
+      'The deserts of Arabia are vast, yet not as deep as your silence.',
+      'The forests of the Amazon are alive, yet not as nurturing as your soul.',
+      'And so I stopped creating… because beauty had already taken form in you.'
+    ],
+    dur: 20000
+  },
+  {
+    key: 'finale',
+    lines: [],
+    dur: 10000
+  }
+];
+
+const stage = document.getElementById('stage');
+const overlay = document.getElementById('overlay');
+const bgm = document.getElementById('bgm');
+
+let renderer, scene, camera, solarAnimationId;
+let isSolarSystemInitialized = false;
+
+function initSolarSystem(container) {
+    if (!container || isSolarSystemInitialized) return;
+
+    container.innerHTML = '';
+    
+    scene = new THREE.Scene();
+    
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 30, 90);
+    camera.lookAt(0, 0, 0);
+
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0x333333);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.PointLight(0xffffff, 2, 300);
+    sunLight.position.set(0, 0, 0);
+    scene.add(sunLight);
+
+    const createPlanet = (radius, color, distance, speed) => {
+        const mesh = new THREE.Mesh(
+            new THREE.SphereGeometry(radius, 32, 32),
+            new THREE.MeshPhongMaterial({ color: color })
+        );
+        const obj = new THREE.Object3D(); 
+        obj.add(mesh);
+        mesh.position.x = distance;
+        scene.add(obj);
+        
+        const orbitCurve = new THREE.EllipseCurve(0, 0, distance, distance, 0, 2 * Math.PI, false, 0);
+        const points = orbitCurve.getPoints(64);
+        const orbitGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const orbitMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
+        const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+        orbitLine.rotation.x = Math.PI / 2;
+        scene.add(orbitLine);
+
+        return { mesh, obj, speed, distance };
+    };
+
+    const sunGeometry = new THREE.SphereGeometry(10, 64, 64);
+    const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffddaa });
+    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    
+    const getGlowTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32; canvas.height = 32;
+        const context = canvas.getContext('2d');
+        const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(0.5, 'rgba(255,255,255,0.5)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 32, 32);
+        return new THREE.CanvasTexture(canvas);
+    };
+    const glowTexture = getGlowTexture();
+
+    const spriteMaterial1 = new THREE.SpriteMaterial({ 
+        map: glowTexture, 
+        color: 0xffaa00, 
+        transparent: true, 
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending
+    });
+    const sprite1 = new THREE.Sprite(spriteMaterial1);
+    sprite1.scale.set(25, 25, 1.0); 
+    sun.add(sprite1);
+
+    const spriteMaterial2 = new THREE.SpriteMaterial({ 
+        map: glowTexture,
+        color: 0xff4400, 
+        transparent: true, 
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending
+    });
+    const sprite2 = new THREE.Sprite(spriteMaterial2);
+    sprite2.scale.set(40, 40, 1.0); 
+    sun.add(sprite2);
+    
+    const spriteMaterial3 = new THREE.SpriteMaterial({ 
+        map: glowTexture,
+        color: 0xcc2200, 
+        transparent: true, 
+        opacity: 0.2,
+        blending: THREE.AdditiveBlending
+    });
+    const sprite3 = new THREE.Sprite(spriteMaterial3);
+    sprite3.scale.set(55, 55, 1.0); 
+    sun.add(sprite3);
+
+    scene.add(sun);
+
+    const planets = [
+        createPlanet(2, 0xaaaaaa, 20, 0.02),
+        createPlanet(3, 0xffcc66, 30, 0.015),
+    ];
+
+    const earthDist = 45;
+    const earthSpeed = 0.01;
+    
+    const earthObj = new THREE.Object3D();
+    scene.add(earthObj);
+
+    const earthGeo = new THREE.SphereGeometry(3.5, 32, 32);
+    const earthMat = new THREE.MeshPhongMaterial({ 
+        color: 0x2233ff,
+        emissive: 0x112244,
+        specular: 0x111111,
+        shininess: 10
+    });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthMesh.position.x = earthDist;
+    earthObj.add(earthMesh);
+
+    const cloudGeo = new THREE.SphereGeometry(3.6, 32, 32);
+    const cloudMat = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.DoubleSide
+    });
+    const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+    earthMesh.add(cloudMesh);
+
+    const moonPivot = new THREE.Object3D();
+    earthMesh.add(moonPivot);
+    const moonGeo = new THREE.SphereGeometry(1, 16, 16);
+    const moonMat = new THREE.MeshPhongMaterial({ color: 0x888888 });
+    const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+    moonMesh.position.x = 6;
+    moonPivot.add(moonMesh);
+
+    const earthOrbitCurve = new THREE.EllipseCurve(0, 0, earthDist, earthDist, 0, 2 * Math.PI, false, 0);
+    const earthOrbitPoints = earthOrbitCurve.getPoints(64);
+    const earthOrbitGeo = new THREE.BufferGeometry().setFromPoints(earthOrbitPoints);
+    const earthOrbitMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
+    const earthOrbitLine = new THREE.Line(earthOrbitGeo, earthOrbitMat);
+    earthOrbitLine.rotation.x = Math.PI / 2;
+    scene.add(earthOrbitLine);
+
+    planets.push({ mesh: earthMesh, obj: earthObj, speed: earthSpeed, isEarth: true, moonPivot: moonPivot });
+
+    planets.push(createPlanet(2.5, 0xff4422, 60, 0.008));
+    planets.push(createPlanet(7, 0xbcafb2, 90, 0.004));
+
+    const saturnData = createPlanet(6, 0xeedd99, 120, 0.003);
+    const ringGeo = new THREE.RingGeometry(8, 12, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xaa9966, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.rotation.y = Math.PI / 8; 
+    saturnData.mesh.add(ring);
+    planets.push(saturnData);
+
+    planets.push(createPlanet(4, 0x66ccff, 150, 0.002)); 
+    planets.push(createPlanet(4, 0x3366ff, 180, 0.001)); 
+
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 1000;
+    const posArray = new Float32Array(starCount * 3);
+    for(let i=0; i<starCount*3; i++) {
+        posArray[i] = (Math.random() - 0.5) * 400;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const starMat = new THREE.PointsMaterial({size: 0.5, color: 0xffffff});
+    const starMesh = new THREE.Points(starGeo, starMat);
+    scene.add(starMesh);
+
+    const animate = () => {
+        solarAnimationId = requestAnimationFrame(animate);
+        
+        const time = Date.now() * 0.001;
+        const scalePulse = 1 + Math.sin(time * 2) * 0.05;
+        sprite1.scale.set(25 * scalePulse, 25 * scalePulse, 1.0);
+        sprite2.scale.set(40 * (1 + Math.sin(time * 1.5) * 0.05), 40 * (1 + Math.sin(time * 1.5) * 0.05), 1.0);
+
+        planets.forEach(p => {
+            p.obj.rotation.y += p.speed;
+            p.mesh.rotation.y += 0.01;
+            if (p.isEarth) {
+                p.moonPivot.rotation.y += 0.02; 
+            }
+        });
+
+        camera.position.x += (mouseX - window.innerWidth/2) * 0.0001;
+        camera.position.y += -(mouseY - window.innerHeight/2) * 0.0001;
+        camera.lookAt(0,0,0);
+
+        renderer.render(scene, camera);
+    };
+
+    animate();
+    isSolarSystemInitialized = true;
+
+    window.addEventListener('resize', onWindowResize, false);
+}
+
+function onWindowResize() {
+    if(camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+}
+
+window.addEventListener('resize', () => {
+    const finaleScene = document.querySelector('.scene.finale.active');
+    if (finaleScene && window.innerWidth >= 1024 && !isSolarSystemInitialized) {
+        const container = finaleScene.querySelector('#solar-system-container');
+        if (container) initSolarSystem(container);
+    }
+});
+
+function makeScene(s) {
+    const el = document.createElement('section');
+    el.className = `scene ${s.key}`;
+    
+    if (s.key === 'finale') {
+        el.innerHTML = `
+            <div class='finale'></div>
+            <div id='solar-system-container'></div>
+            <div class='endwrap'>
+                <img src='River side.png' alt="Riverside">
+                <h2>Happy Birthday, My Universe</h2>
+            </div>`;
+    } else {
+        const planet = document.createElement('div');
+        planet.className = 'planet';
+        el.appendChild(planet);
+        if (s.key === 'saturn') {
+            const r = document.createElement('div');
+            r.className = 'rings';
+            el.appendChild(r);
+        }
+        const cap = document.createElement('div');
+        cap.className = 'caption';
+        s.lines.forEach(t => {
+            const l = document.createElement('div');
+            l.className = 'line';
+            l.textContent = t;
+            cap.appendChild(l);
+        });
+        el.appendChild(cap);
+    }
+    return el;
+}
+
+const elements = scenes.map(makeScene);
+let i = 0, timers = [];
+
+function enterScene(idx) {
+    const el = elements[idx];
+    stage.appendChild(el);
+    setTimeout(() => el.classList.add('active'), 50);
+    
+    setTimeout(() => {
+        if (scenes[idx].key === 'finale') {
+            el.querySelector('.endwrap').classList.add('show');
+            startFireflies();
+            
+            if (window.matchMedia("(min-width: 1024px)").matches) {
+                const container = el.querySelector('#solar-system-container');
+                if (container) initSolarSystem(container);
+            }
+            return;
+        }
+        
+        const lines = el.querySelectorAll('.line');
+        const per = Math.max(900, Math.floor(scenes[idx].dur / (lines.length + 0.5)));
+        lines.forEach((ln, j) => timers.push(setTimeout(() => ln.classList.add('show'), j * per)));
+    }, 800);
+}
+
+function exitScene(idx) {
+    const el = elements[idx];
+    if (!el) return;
+    el.classList.remove('active');
+    setTimeout(() => el.remove(), 800);
+}
+
+function clearTimers() {
+    timers.forEach(clearTimeout);
+    timers = [];
+}
+
+function scheduleNext() {
+    clearTimers();
+    if (i >= scenes.length - 1) return; 
+    const dur = scenes[i].dur;
+    setTimeout(() => {
+        exitScene(i);
+        i++;
+        if (i < scenes.length) {
+            enterScene(i);
+            scheduleNext();
+        }
+    }, dur);
+}
+
+function begin() {
+    overlay.classList.add('hidden');
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+        bgm.volume = 0.8;
+        bgm.play();
+    }
+    enterScene(0);
+    scheduleNext();
+}
+
+overlay.onclick = begin;
+
+function startFireflies() {
+    const cvs = document.getElementById('fireflies');
+    const ctx = cvs.getContext('2d');
+    function size() { cvs.width = innerWidth; cvs.height = innerHeight; }
+    size();
+    addEventListener('resize', size);
+    const bugs = Array.from({ length: 25 }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, a: Math.random() * Math.PI * 2, r: 1 + Math.random() * 2, speed: 0.4 + Math.random() * 0.3, hue: 50 + Math.random() * 60 }));
+    (function loop() {
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        for (const b of bugs) {
+            b.a += (Math.random() - .5) * 0.2;
+            b.x += Math.cos(b.a) * b.speed;
+            b.y += Math.sin(b.a) * b.speed;
+            if (b.x < 0) b.x = cvs.width;
+            if (b.x > cvs.width) b.x = 0;
+            if (b.y < 0) b.y = cvs.height;
+            if (b.y > cvs.height) b.y = 0;
+            const grd = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 6);
+            grd.addColorStop(0, `hsla(${b.hue},100%,70%,0.9)`);
+            grd.addColorStop(1, 'transparent');
+            ctx.fillStyle = grd;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        requestAnimationFrame(loop);
+    })();
+}
+
+const starCanvas = document.getElementById('stars'), sctx = starCanvas.getContext('2d');
+function sizeStars() { starCanvas.width = innerWidth; starCanvas.height = innerHeight; }
+sizeStars();
+addEventListener('resize', sizeStars);
+const stars = Array.from({ length: 220 }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.1 + .4, s: Math.random() * .6 + .2, t: Math.random() * Math.PI * 2 }));
+(function drawStars() {
+    sctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const st of stars) {
+        st.t += 0.02;
+        st.y += st.s * 0.04;
+        if (st.y > innerHeight + 5) st.y = -5;
+        const g = 0.5 + Math.sin(st.t) * 0.5;
+        sctx.beginPath();
+        sctx.arc(st.x, st.y, st.r + g * .7, 0, Math.PI * 2);
+        const grd = sctx.createRadialGradient(st.x, st.y, 0, st.x, st.y, st.r * 4);
+        grd.addColorStop(0, 'rgba(255,255,255,.95)');
+        grd.addColorStop(1, 'rgba(255,255,255,0)');
+        sctx.fillStyle = grd;
+        sctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+})();
+</script>
+</body>
+</html>

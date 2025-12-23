@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Birthday Soundtrack: The Vinyl Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Outfit:wght@300;400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <style>
+        #mainNav, #topNav, #bottomNav, #leftNav, #rightNav, #mainContent, #navToggleIcon, #navToggleX, #navOverlay {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-panel::-webkit-scrollbar {
+            width: 2px;
+        }
+        .nav-panel::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+        }
+        .nav-panel::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        .festive-text { font-family: 'Gochi Hand', cursive; }
+        .heading-text { font-family: 'Pacifico', cursive; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0f0c29; 
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.6;
+            animation: float 20s infinite;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #ff6b81; animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #7bed9f; animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: #70a1ff; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(10deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .vinyl-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+        }
+
+        .vinyl-disk {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: repeating-radial-gradient(#111 0, #111 2px, #222 3px, #222 4px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .vinyl-label {
+            width: 35%;
+            height: 35%;
+            border-radius: 50%;
+            background: url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80') center/cover;
+            position: relative;
+            border: 4px solid rgba(255,255,255,0.2);
+        }
+        
+        .vinyl-shine {
+            position: absolute; inset: 0; border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+            pointer-events: none;
+        }
+
+        .tone-arm {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 120px;
+            height: 300px;
+            z-index: 20;
+            transform-origin: 90px 40px;
+            transform: rotate(-35deg);
+            transition: transform 1s ease-in-out;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .tone-arm {
+                transform: rotate(-35deg) scale(0.7);
+                right: -30px;
+                top: -30px;
+            }
+            .tone-arm.playing {
+                transform: rotate(15deg) scale(0.7);
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .tone-arm.playing { transform: rotate(15deg); }
+        }
+
+        .arm-body { width: 10px; height: 220px; background: #d1d5db; position: absolute; top: 40px; left: 85px; transform: rotate(15deg); border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .arm-head { width: 25px; height: 40px; background: #4b5563; position: absolute; bottom: 20px; left: 45px; transform: rotate(25deg); border-radius: 4px; }
+        .arm-pivot { width: 60px; height: 60px; background: #374151; border-radius: 50%; position: absolute; top: 10px; right: 10px; border: 4px solid #1f2937; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .is-spinning { animation: spin 6s linear infinite; }
+        .is-paused { animation-play-state: paused; }
+
+        .visualizer { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-bottom: 0; }
+        .bar { width: 6px; background: #ff6b81; border-radius: 4px; animation: bounce 0.5s infinite ease-in-out; animation-play-state: paused; }
+        .bar:nth-child(even) { background: #70a1ff; }
+        .playing .bar { animation-play-state: running; }
+        
+        @keyframes bounce {
+            0%, 100% { height: 10%; }
+            50% { height: 100%; }
+        }
+        .bar:nth-child(1) { animation-duration: 0.6s; }
+        .bar:nth-child(2) { animation-duration: 0.8s; }
+        .bar:nth-child(3) { animation-duration: 0.5s; }
+        .bar:nth-child(4) { animation-duration: 0.7s; }
+        .bar:nth-child(5) { animation-duration: 0.6s; }
+        .bar:nth-child(6) { animation-duration: 0.9s; }
+
+        .track-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .track-item:hover { background: rgba(255,255,255,0.1); }
+        
+        .track-item.active { 
+            background: linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(0,0,0,0.2) 100%);
+            border-color: rgba(244, 63, 94, 0.4);
+            border-left: 4px solid #ff6b81;
+        }
+        
+        .track-description {
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1), opacity 0.4s ease;
+        }
+        
+        .track-item.active .track-description {
+            max-height: 200px;
+            opacity: 1;
+            transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in 0.1s;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: block;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .nav-panel .nav-link {
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+        }
+
+        .nav-panel .nav-link:hover {
+            background: transparent;
+            transform: none;
+        }
+        
+        .nav-panel .nav-link::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            background: #ff6b81; transform: scaleX(0); transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+        .nav-panel .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+
+        #mainNav .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+    </style>
+</head>
+<body class="overflow-hidden selection:bg-rose-500 selection:text-white">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <button id="navToggle" class="fixed top-4 left-4 md:top-6 md:left-6 z-[70] group cursor-pointer">
+        <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full shadow-lg group-hover:bg-rose-500 transition-all duration-300">
+            <svg id="navToggleIcon" class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            <svg id="navToggleX" class="w-5 h-5 md:w-6 md:h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+    </button>
+
+    <div id="navOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-500 hidden md:block"></div>
+
+    <nav id="topNav" class="nav-panel fixed top-0 inset-x-0 z-[62] h-20 bg-black/80 backdrop-blur-xl border-b border-white/10 flex items-center justify-center space-x-6 -translate-y-full md:hidden">
+        <a href="index.html" class="nav-link relative text-white/90 font-medium festive-text text-lg tracking-wide">Home</a>
+        <a href="Special.html" class="nav-link relative text-white/90 font-medium festive-text text-lg tracking-wide">Special</a>
+        <a href="letter.html" class="nav-link relative text-white/90 font-medium festive-text text-lg tracking-wide">Letter</a>
+    </nav>
+
+    <nav id="bottomNav" class="nav-panel fixed bottom-0 inset-x-0 z-[62] h-20 bg-black/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-center space-x-6 translate-y-full md:hidden">
+        <a href="anatomy.html" class="nav-link relative text-white/90 font-medium festive-text text-lg tracking-wide">Anatomy</a>
+        <a href="chat.html" class="nav-link relative text-white/90 font-medium festive-text text-lg tracking-wide">Heaven</a>
+        <a href="you.html" class="nav-link relative text-white/90 font-medium festive-text text-lg tracking-wide">You</a>
+    </nav>
+
+    <nav id="leftNav" class="nav-panel fixed left-0 top-28 bottom-28 z-[61] w-1/2 bg-black/90 backdrop-blur-xl border-r border-white/10 flex flex-col items-center justify-start py-6 space-y-3 overflow-y-auto -translate-x-full rounded-r-xl md:hidden">
+        <a href="Diary.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Diary</a>
+        <a href="Universe.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Universe</a>
+        <a href="Box.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Box</a>
+        <a href="color.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Color</a>
+        <a href="Teacher.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Teacher</a>
+        <a href="The_River.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">River</a>
+        <a href="Mountain.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Mountain</a>
+        <a href="Paper_Star.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Cartoon</a>
+        <a href="Santa.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Santa</a>
+        <a href="Cloud.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Cloud</a>
+        <a href="Ink.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Paint</a>
+        <a href="Butterfly.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Butterfly</a>
+        <a href="Weather.html" class="nav-link relative text-cyan-400 font-medium festive-text text-base">Weather</a>
+    </nav>
+
+    <nav id="rightNav" class="nav-panel fixed right-0 top-28 bottom-28 z-[61] w-1/2 bg-black/90 backdrop-blur-xl border-l border-white/10 flex flex-col items-center justify-start py-6 space-y-3 overflow-y-auto translate-x-full rounded-l-xl md:hidden">
+        <a href="Skill.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Skill</a>
+        <a href="Msg.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Message</a>
+        <a href="21_Wish.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">21 Door</a>
+        <a href="Cake.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Cake</a>
+        <a href="Periodik_table.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Table</a>
+        <a href="Presence.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Presence</a>
+        <a href="Concept.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Concept</a>
+        <a href="Calender.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Calender</a>
+        <a href="Perspective.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Perspective</a>
+        <a href="Spotlight.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Spotlight</a>
+        <a href="Room.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Room</a>
+        <a href="Radio.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Radio</a>
+        <a href="Food.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Food</a>
+        <a href="Music.html" class="nav-link relative text-rose-400 font-medium festive-text text-base">Music</a>
+    </nav>
+
+    <nav id="mainNav" class="fixed inset-y-0 left-0 z-[61] w-[500px] bg-[#0f0c29]/95 backdrop-blur-2xl border-r border-white/10 transform -translate-x-full flex-col shadow-2xl hidden md:flex">
+        <div class="p-8 pt-24 pb-4 flex-shrink-0">
+            <h2 class="text-3xl font-bold text-white mb-2 heading-text tracking-wide">Explore</h2>
+            <div class="h-1 w-16 bg-rose-500 rounded-full"></div>
+            <p class="text-white/40 text-sm mt-2">Where would you like to go?</p>
+        </div>
+        
+        <div class="flex-grow overflow-y-auto custom-scrollbar px-6 pb-8">
+            <div class="grid grid-cols-2 gap-3">
+                <a href="index.html" class="nav-link text-white/90 font-medium festive-text text-lg">Home</a>
+                <a href="Cake.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Cake</a>
+                <a href="21_Wish.html" class="nav-link text-rose-400 font-medium festive-text text-lg">21 Door</a>
+                <a href="chat.html" class="nav-link text-white/90 font-medium festive-text text-lg">Heaven</a>
+                <a href="Diary.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Diary</a>
+                <a href="anatomy.html" class="nav-link text-white/90 font-medium festive-text text-lg">Anatomy</a>
+                <a href="Box.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Box</a>
+                <a href="Special.html" class="nav-link text-white/90 font-medium festive-text text-lg">Special</a>
+                <a href="color.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Color</a>
+                <a href="you.html" class="nav-link text-white/90 font-medium festive-text text-lg">You</a>
+                <a href="Teacher.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Teacher</a>
+                <a href="Universe.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Universe</a>
+                <a href="The_River.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">River</a>
+                <a href="Mountain.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Mountain</a>
+                <a href="Skill.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Skill</a>
+                <a href="Paper_Star.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Paper Star</a>
+                <a href="Carttoon.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Cartoon</a>
+                <a href="Periodik_table.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Table</a>
+                <a href="Concept.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Concept</a>
+                <a href="Calender.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Calender</a>
+                <a href="Perspective.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Perspective</a>
+                <a href="Santa.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Santa</a>
+                <a href="Presence.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Presence</a>
+                <a href="Cloud.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Cloud</a>
+                <a href="Ink.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Paint</a>
+                <a href="Butterfly.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Butterfly</a>
+                <a href="Weather.html" class="nav-link text-cyan-400 font-medium festive-text text-lg">Weather</a>
+                <a href="Spotlight.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Spotlight</a>
+                <a href="Room.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Room</a>
+                <a href="Radio.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Radio</a>
+                <a href="Food.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Food</a>
+                <a href="Music.html" class="nav-link text-rose-400 font-medium festive-text text-lg bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Music</a>
+                <a href="letter.html" class="nav-link text-white/90 font-medium festive-text text-lg">Letter</a>
+                <a href="Msg.html" class="nav-link text-rose-400 font-medium festive-text text-lg">Message</a>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                <p class="text-white/30 text-xs font-['Outfit'] uppercase tracking-widest">Designed for You</p>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mainContent" class="relative w-full h-[100dvh] flex items-center justify-center p-2 md:p-8 z-10">
+
+        <div id="main-container" class="glass-panel w-full max-w-5xl h-full md:h-auto md:max-h-[85vh] rounded-xl md:rounded-3xl transition-all duration-700 transform flex flex-col md:flex-row overflow-hidden">
+            
+            <div class="w-full md:w-1/2 bg-white/5 p-4 pt-12 md:p-12 flex-shrink-0 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-white/10 relative">
+                <div id="vinyl-section" class="vinyl-wrapper w-48 md:w-full md:max-w-[320px] opacity-100 transition-opacity duration-500">
+                    <div id="tone-arm" class="tone-arm">
+                        <div class="arm-pivot"></div>
+                        <div class="arm-body"></div>
+                        <div class="arm-head"></div>
+                    </div>
+                    <div id="vinyl" class="vinyl-disk">
+                        <div class="vinyl-label"></div>
+                        <div class="vinyl-shine"></div>
+                    </div>
+                </div>
+                <div id="now-playing-title" class="mt-4 md:mt-8 text-center opacity-0 transition-opacity duration-500">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-tight text-white">Happy Birthday</h2>
+                    <p class="text-rose-400 text-xs md:text-sm font-medium tracking-widest uppercase mt-1">Original Mix</p>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 p-4 md:p-10 flex flex-col flex-grow relative overflow-y-auto custom-scrollbar">
+                <div class="flex justify-between items-center mb-4 md:mb-6 flex-shrink-0">
+                    <div>
+                        <h1 class="heading-text text-2xl md:text-3xl text-rose-400">Soundtrack</h1>
+                        <p class="text-white/50 text-[10px] md:text-xs uppercase tracking-widest">Birthday. 21 • Juhi Edition</p>
+                    </div>
+                    <div id="visualizer" class="visualizer scale-75 md:scale-100 origin-right">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                </div>
+
+                <div id="initial-state" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm z-20 transition-opacity duration-500">
+                    <button id="play-button" class="group relative px-8 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-full font-bold text-lg shadow-[0_0_30px_rgba(244,63,94,0.4)] transition-all transform hover:scale-105">
+                        <span class="relative z-10 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            START
+                        </span>
+                    </button>
+                </div>
+
+                <div id="reveal-state" class="flex-grow flex flex-col opacity-0 transition-opacity duration-1000">
+                    
+                    <div class="flex-grow overflow-y-auto pr-1 md:pr-2 mb-4 custom-scrollbar space-y-2">
+                        
+                        <div data-audio-id="violin" class="track-item rounded-xl cursor-pointer group">
+                            <div class="p-3 md:p-4 flex items-center">
+                                <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs mr-3 md:mr-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">01</div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-white text-sm group-hover:text-emerald-300 transition-colors">Violin Rhapsody</h3>
+                                    <p class="text-xs text-white/40">Elegance & Emotion</p>
+                                </div>
+                                <div class="playing-indicator text-emerald-500"></div>
+                            </div>
+                            <div class="track-description bg-black/20">
+                                <p class="p-4 text-sm text-emerald-200/90 italic leading-relaxed border-t border-white/5"></p>
+                            </div>
+                        </div>
+
+                        <div data-audio-id="drum" class="track-item rounded-xl cursor-pointer group">
+                            <div class="p-3 md:p-4 flex items-center">
+                                <div class="w-8 h-8 rounded bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs mr-3 md:mr-4 group-hover:bg-purple-500 group-hover:text-white transition-colors">02</div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-white text-sm group-hover:text-purple-300 transition-colors">Drumline</h3>
+                                    <p class="text-xs text-white/40">Momentum & Drive</p>
+                                </div>
+                                <div class="playing-indicator text-purple-500"></div>
+                            </div>
+                            <div class="track-description bg-black/20">
+                                <p class="p-4 text-sm text-purple-200/90 italic leading-relaxed border-t border-white/5"></p>
+                            </div>
+                        </div>
+
+                        <div data-audio-id="harmonica" class="track-item rounded-xl cursor-pointer group">
+                            <div class="p-3 md:p-4 flex items-center">
+                                <div class="w-8 h-8 rounded bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs mr-3 md:mr-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">03</div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-white text-sm group-hover:text-amber-300 transition-colors">Harmonica Soul</h3>
+                                    <p class="text-xs text-white/40">Simple Pleasures</p>
+                                </div>
+                                <div class="playing-indicator text-amber-500"></div>
+                            </div>
+                            <div class="track-description bg-black/20">
+                                <p class="p-4 text-sm text-amber-200/90 italic leading-relaxed border-t border-white/5"></p>
+                            </div>
+                        </div>
+                        
+                        <div data-audio-id="flute" class="track-item rounded-xl cursor-pointer group">
+                            <div class="p-3 md:p-4 flex items-center">
+                                <div class="w-8 h-8 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs mr-3 md:mr-4 group-hover:bg-cyan-500 group-hover:text-white transition-colors">04</div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">Flute Melody</h3>
+                                    <p class="text-xs text-white/40">Airy & Joyful</p>
+                                </div>
+                                <div class="playing-indicator text-cyan-500"></div>
+                            </div>
+                            <div class="track-description bg-black/20">
+                                <p class="p-4 text-sm text-cyan-200/90 italic leading-relaxed border-t border-white/5"></p>
+                            </div>
+                        </div>
+
+                        <div data-audio-id="guitar" class="track-item rounded-xl cursor-pointer group">
+                            <div class="p-3 md:p-4 flex items-center">
+                                <div class="w-8 h-8 rounded bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs mr-3 md:mr-4 group-hover:bg-rose-500 group-hover:text-white transition-colors">05</div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-white text-sm group-hover:text-rose-300 transition-colors">Guitar Riff</h3>
+                                    <p class="text-xs text-white/40">Foundation & Strength</p>
+                                </div>
+                                <div class="playing-indicator text-rose-500"></div>
+                            </div>
+                            <div class="track-description bg-black/20">
+                                <p class="p-4 text-sm text-rose-200/90 italic leading-relaxed border-t border-white/5"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-3 md:pt-4 border-t border-white/10 flex justify-between items-center text-white/50 text-[10px] md:text-xs flex-shrink-0">
+                        <span>0:00</span>
+                        <div class="w-1/2 h-1 bg-white/10 rounded-full mx-4 relative overflow-hidden">
+                            <div id="progress-bar" class="absolute top-0 left-0 h-full bg-rose-500 w-0 transition-all duration-1000"></div>
+                        </div>
+                        <span>♾️</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="audio-container hidden">
+        <audio id="audio-flute" src="Fluet.mp3"></audio>
+        <audio id="audio-harmonica" src="Harmonica (Yea dosti).mp3"></audio>
+        <audio id="audio-drum" src="Drum.mp3"></audio>
+        <audio id="audio-violin" src="Violin.mp3"></audio>
+        <audio id="audio-guitar" src="Guitar.mp3"></audio>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const panels = {
+                top: document.getElementById('topNav'),
+                bottom: document.getElementById('bottomNav'),
+                left: document.getElementById('leftNav'),
+                right: document.getElementById('rightNav'),
+                main: document.getElementById('mainNav')
+            };
+            
+            const mainContent = document.getElementById('mainContent');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            const navOverlay = document.getElementById('navOverlay');
+            
+            let isNavOpen = false;
+
+            function isDesktop() {
+                return window.innerWidth >= 768; 
+            }
+
+            function toggleNav() {
+                isNavOpen = !isNavOpen;
+                const method = isNavOpen ? 'remove' : 'add';
+                const inverseMethod = isNavOpen ? 'add' : 'remove';
+
+                if(isNavOpen) {
+                    navToggleIcon.classList.add('hidden');
+                    navToggleX.classList.remove('hidden');
+                } else {
+                    navToggleIcon.classList.remove('hidden');
+                    navToggleX.classList.add('hidden');
+                }
+
+                if (isDesktop()) {
+                    panels.main.classList[method]('-translate-x-full');
+                    navOverlay.classList[method]('opacity-0', 'pointer-events-none');
+                    
+                    if(isNavOpen) {
+                        mainContent.style.transform = 'scale(0.95) translateX(50px)';
+                        mainContent.style.opacity = '0.5';
+                        mainContent.style.filter = 'blur(2px)';
+                        mainContent.style.pointerEvents = 'none';
+                    } else {
+                        mainContent.style.transform = 'scale(1) translateX(0)';
+                        mainContent.style.opacity = '1';
+                        mainContent.style.filter = 'blur(0px)';
+                        mainContent.style.pointerEvents = 'auto';
+                    }
+                } else {
+                    // Mobile Nav Logic
+                    // All panels start with a class that hides them (e.g., -translate-y-full)
+                    // We simply need to remove that class to show them
+                    panels.top.classList[method]('-translate-y-full');
+                    panels.bottom.classList[method]('translate-y-full');
+                    panels.left.classList[method]('-translate-x-full');
+                    panels.right.classList[method]('translate-x-full');
+                    
+                    if(isNavOpen) {
+                        mainContent.style.transform = 'scale(0.92)';
+                        mainContent.style.opacity = '0.4';
+                        mainContent.style.pointerEvents = 'none';
+                    } else {
+                        mainContent.style.transform = 'scale(1)';
+                        mainContent.style.opacity = '1';
+                        mainContent.style.pointerEvents = 'auto';
+                    }
+                }
+            }
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleNav();
+            });
+
+            navOverlay.addEventListener('click', () => {
+                if(isNavOpen && isDesktop()) toggleNav();
+            });
+
+            document.body.addEventListener('click', (e) => { 
+                if (!isDesktop() && isNavOpen && !e.target.closest('.nav-panel') && !e.target.closest('#navToggle')) {
+                    toggleNav(); 
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'Escape' && isNavOpen) toggleNav();
+            });
+            
+            window.addEventListener('resize', () => {
+                if(isNavOpen) toggleNav();
+            });
+
+            const playButton = document.getElementById('play-button');
+            const initialState = document.getElementById('initial-state');
+            const revealState = document.getElementById('reveal-state');
+            const vinyl = document.getElementById('vinyl');
+            const toneArm = document.getElementById('tone-arm');
+            const visualizer = document.getElementById('visualizer');
+            const nowPlayingTitle = document.getElementById('now-playing-title');
+            const progressBar = document.getElementById('progress-bar');
+            
+            const audioElements = document.querySelectorAll('audio');
+            const trackItems = document.querySelectorAll('.track-item');
+
+            const data = {
+                guitar: { 
+                    msg: "Even the guitar becomes shy around you, like it’s thinking, “Bro, behave. She’s watching.” You somehow make an instrument look nervous… and prettier 🎸",
+                    title: "Guitar Riff (Original Mix)"
+                },
+                flute: { 
+                    msg: "The flute would probably behave like it’s honoured to be in your hands if he gets a chance. Even without playing a note, you’d still make the whole moment look sweet and effortless. 🌬️",
+                    title: "Flute Melody (Airy Cut)"
+                },
+                harmonica: { 
+                    msg: "You’d probably make the harmonica feel important just by touching it, the same way your presence quietly brightens any moment you’re in. 🤠",
+                    title: "Harmonica Blues"
+                },
+                drum: { 
+                    msg: "The heartbeat of the A drum carries rhythm, but you carry presence , the kind that makes a moment feel balanced and bright. You’d make the whole scene feel naturally warm. 🥁",
+                    title: "Drumline Percussion"
+                },
+                violin: { 
+                    msg: "If you ever held a violin, it would look like it was made to match your softness. There’s a quiet elegance in you that fits beautifully with anything delicate.🎻",
+                    title: "Violin Concerto No. 5"
+                }
+            };
+
+            playButton.addEventListener('click', () => {
+                initialState.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    initialState.classList.add('hidden');
+                    revealState.classList.remove('opacity-0');
+                    nowPlayingTitle.classList.remove('opacity-0');
+                }, 500);
+            });
+
+            function stopAll() {
+                 vinyl.classList.add('is-paused');
+                 vinyl.classList.remove('is-spinning');
+                 toneArm.classList.remove('playing');
+                 visualizer.classList.remove('playing');
+                 trackItems.forEach(t => {
+                    t.classList.remove('active');
+                    t.querySelector('.playing-indicator').innerHTML = '';
+                 });
+                 progressBar.style.width = '0%';
+            }
+
+            function playTrack(trackId, element) {
+                audioElements.forEach(a => { a.pause(); a.currentTime = 0; });
+                trackItems.forEach(t => {
+                    if (t !== element) {
+                        t.classList.remove('active');
+                        t.querySelector('.playing-indicator').innerHTML = '';
+                    }
+                });
+
+                element.classList.add('active');
+                
+                const descBox = element.querySelector('.track-description p');
+                if(data[trackId] && descBox) {
+                    descBox.innerHTML = data[trackId].msg;
+                }
+
+                element.querySelector('.playing-indicator').innerHTML = `
+                    <div class="flex space-x-0.5 h-3 items-end">
+                        <div class="w-0.5 bg-current animate-[bounce_1s_infinite]"></div>
+                        <div class="w-0.5 bg-current animate-[bounce_1.2s_infinite]"></div>
+                        <div class="w-0.5 bg-current animate-[bounce_0.8s_infinite]"></div>
+                    </div>
+                `;
+
+                vinyl.classList.add('is-spinning');
+                vinyl.classList.remove('is-paused');
+                toneArm.classList.add('playing');
+                visualizer.classList.add('playing');
+                progressBar.style.width = '10%';
+
+                if(data[trackId]) {
+                    nowPlayingTitle.style.opacity = 0;
+                    setTimeout(() => {
+                        nowPlayingTitle.querySelector('h2').textContent = data[trackId].title;
+                        nowPlayingTitle.style.opacity = 1;
+                    }, 300);
+                }
+                
+                setTimeout(() => { progressBar.style.width = '40%'; }, 300);
+
+                const audio = document.getElementById(`audio-${trackId}`);
+                if(audio) {
+                    const playPromise = audio.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(_ => {
+                            console.log("Playing: " + trackId);
+                        })
+                        .catch(error => {
+                            console.log("Playback failed (likely missing file): " + error);
+                            setTimeout(() => {
+                                console.warn("Audio file missing. Stopping animation.");
+                                stopAll();
+                                alert(`Music file for ${trackId} not found. Please ensure the MP3 file is in the same folder.`);
+                            }, 500);
+                        });
+                    }
+                    
+                    audio.onended = () => {
+                        stopAll();
+                        progressBar.style.width = '100%';
+                        setTimeout(() => { progressBar.style.width = '0%'; }, 500);
+                    };
+                }
+            }
+
+            trackItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = item.getAttribute('data-audio-id');
+                    playTrack(id, item);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

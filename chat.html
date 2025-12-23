@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heaven Talks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('unnamed.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 0.5s ease-in-out, color 0.5s ease;
+        }
+        
+        .festive-text { font-family: 'Gochi Hand', cursive; }
+        h1, h2, h3 { font-family: 'Pacifico', cursive; }
+
+        @keyframes chatFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX { transition: all 0.3s ease-in-out; }
+        #mainContent, .nav-panel { -ms-overflow-style: none; scrollbar-width: none; }
+        #mainContent::-webkit-scrollbar, .nav-panel::-webkit-scrollbar { display: none; }
+        
+        .chat-bubble, #revealButton, #revealCard, #revealButtonDesktop, #revealCardDesktop { 
+            opacity: 0; 
+            animation-fill-mode: forwards; 
+        }
+
+        .desktop-scroll::-webkit-scrollbar { width: 6px; }
+        .desktop-scroll::-webkit-scrollbar-track { background: transparent; }
+        .desktop-scroll::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 20px; }
+
+        .img-fallback {
+            display: flex; align-items: center; justify-content: center;
+            background-color: #f3f4f6; color: #6b7280; font-size: 0.75rem;
+            text-align: center; line-height: 1.2; border: 2px dashed #f9a8d4;
+        }
+
+        .insta-bubble {
+            border-radius: 22px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #4b5563;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Desktop Sidebar Transitions */
+        #desktopSidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        #desktopOverlay { transition: opacity 0.3s ease-in-out; }
+
+        .sidebar-item-active { background-color: #f3f4f6; } /* gray-100 */
+
+        /* Dark Mode Overrides */
+        body.dark-mode {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('unnamed.jpg');
+            color: #e5e7eb;
+        }
+        .dark-mode .nav-panel { background-color: #1f2937; color: #e5e7eb; }
+        .dark-mode .nav-link:hover { background-color: #374151; color: #f9a8d4; }
+        .dark-mode .bg-white { background-color: #1f2937; border-color: #374151; color: #e5e7eb; }
+        .dark-mode .bg-gray-100 { background-color: #374151; border-color: #4b5563; }
+        .dark-mode .text-gray-900, .dark-mode .text-gray-800 { color: #e5e7eb; }
+        .dark-mode .text-gray-500, .dark-mode .text-gray-600 { color: #9ca3af; }
+        .dark-mode .border-gray-200, .dark-mode .border-gray-100 { border-color: #374151; }
+        .dark-mode .bg-rose-50 { background-color: #374151; color: #fbcfe8; }
+        .dark-mode #desktopSidebar { background-color: rgba(31, 41, 55, 0.98); border-right-color: #374151; }
+        .dark-mode footer { background-color: rgba(31, 41, 55, 0.95); border-top-color: #374151; }
+        .dark-mode .sidebar-item-active { background-color: #374151; }
+
+        /* Dark Mode Chat Bubbles Fix */
+        .dark-mode .chat-bubble .bg-white\/80 {
+            background-color: rgba(55, 65, 81, 0.9); /* gray-700 */
+            color: #e5e7eb; /* gray-200 */
+        }
+        .dark-mode .chat-bubble .text-gray-800 {
+            color: #e5e7eb !important;
+        }
+        
+        /* Specific color fixes for dark mode bubbles */
+        .dark-mode .bg-blue-50 { background-color: rgba(30, 58, 138, 0.4); border-color: #1e40af; color: #bfdbfe; }
+        .dark-mode .bg-green-50 { background-color: rgba(20, 83, 45, 0.4); border-color: #166534; color: #bbf7d0; }
+        .dark-mode .bg-purple-50 { background-color: rgba(88, 28, 135, 0.4); border-color: #6b21a8; color: #e9d5ff; }
+        .dark-mode .bg-yellow-50 { background-color: rgba(113, 63, 18, 0.4); border-color: #854d0e; color: #fef08a; }
+        .dark-mode .bg-pink-50 { background-color: rgba(131, 24, 67, 0.4); border-color: #9d174d; color: #fbcfe8; }
+        .dark-mode .bg-gray-50 { background-color: rgba(55, 65, 81, 0.4); border-color: #4b5563; color: #e5e7eb; }
+        .dark-mode .bg-teal-50 { background-color: rgba(19, 78, 74, 0.4); border-color: #115e59; color: #99f6e4; }
+        .dark-mode .bg-orange-50 { background-color: rgba(124, 45, 18, 0.4); border-color: #9a3412; color: #fed7aa; }
+        .dark-mode .bg-red-50 { background-color: rgba(127, 29, 29, 0.4); border-color: #991b1b; color: #fecaca; }
+        .dark-mode .bg-indigo-50 { background-color: rgba(49, 46, 129, 0.4); border-color: #3730a3; color: #c7d2fe; }
+        .dark-mode .bg-slate-50 { background-color: rgba(30, 41, 59, 0.4); border-color: #334155; color: #cbd5e1; }
+
+        /* Override text colors inside specific bubbles in dark mode */
+        .dark-mode .bg-blue-50 .text-gray-800,
+        .dark-mode .bg-green-50 .text-gray-800,
+        .dark-mode .bg-purple-50 .text-gray-800,
+        .dark-mode .bg-yellow-50 .text-gray-800,
+        .dark-mode .bg-pink-50 .text-gray-800,
+        .dark-mode .bg-gray-50 .text-gray-800,
+        .dark-mode .bg-teal-50 .text-gray-800,
+        .dark-mode .bg-orange-50 .text-gray-800,
+        .dark-mode .bg-red-50 .text-gray-800,
+        .dark-mode .bg-indigo-50 .text-gray-800,
+        .dark-mode .bg-slate-50 .text-gray-800 {
+            color: inherit !important;
+        }
+        
+    </style>
+</head>
+<body class="antialiased text-gray-800 overflow-hidden h-screen w-screen">
+
+    <div id="infoToast" class="toast-notification shadow-2xl">
+        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>This is the point of view of god from heaven</span>
+    </div>
+
+    <button id="themeToggle" class="fixed top-6 right-6 z-[70] p-2 bg-white/90 text-purple-600 rounded-full shadow-lg hover:bg-yellow-100 transition-all duration-300 ring-1 ring-purple-100">
+        <svg id="moonIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        <svg id="sunIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+    </button>
+    
+    <!-- MOBILE VIEW (md:hidden) -->
+    <div class="block md:hidden h-full w-full relative overflow-hidden bg-pink-50/80 transition-colors duration-500">
+        
+        <button id="navToggle" class="fixed top-6 left-6 z-[70] p-2 bg-yellow-100 text-purple-600 rounded-full shadow-lg hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+            <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+            <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-yellow-100 text-purple-600 shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Massege</a>
+            <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Music</a>
+        </nav>
+        
+        <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-yellow-100 text-purple-600 shadow-md flex items-center justify-center space-x-2 translate-y-full">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-yellow-100 text-purple-800 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">You</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Universe</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Teacher</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-22 bg-yellow-100 text-purple-800 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-yellow-200 transition-colors duration-200 festive-text">Food</a>
+        </nav>
+
+        <main id="mainContent" class="absolute inset-0 pt-28 overflow-y-auto pb-20">
+            <div class="container mx-auto p-4 md:p-8 max-w-2xl">
+                <div class="bg-white rounded-xl shadow-xl overflow-hidden flex flex-col h-[600px] md:h-[650px] relative">
+                    <!-- Insta Style Header -->
+                    <div class="bg-white p-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
+                        <div class="flex items-center space-x-3">
+                            <button class="text-gray-800">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            </button>
+                            <div class="flex items-center space-x-2">
+                                <div class="relative">
+                                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 p-[2px]">
+                                        <div class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                                            <span class="text-xs font-bold text-gray-600">✨</span>
+                                        </div>
+                                    </div>
+                                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-900 leading-none">Heaven ✨</span>
+                                    <span class="text-[10px] text-gray-500">Active now</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 text-gray-800">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div id="chatContainerMobile" class="flex-1 p-4 space-y-4 overflow-y-auto bg-white">
+                        <div id="mobileMessagesList" class="space-y-4"></div>
+                        
+                        <div id="revealButton" class="text-center py-4 mt-2">
+                            <button class="bg-rose-500 text-white font-bold py-2.5 px-5 rounded-full shadow-lg hover:bg-rose-600 transition-all transform hover:scale-105 text-sm">
+                                Thanks a ton for being in the Universe.
+                            </button>
+                        </div>
+
+                        <div id="revealCard" class="hidden mt-4 mx-4 bg-gray-50 border border-gray-100 rounded-2xl p-4 text-center">
+                            <h3 class="text-xl font-bold text-rose-600 mb-2 font-pacific">It's You!</h3>
+                            <p class="text-sm text-gray-600 mb-4">Happy Birthday to the one who has it all!</p>
+                            <img src="Heaven.png" alt="The Birthday Star!" class="w-full h-auto rounded-lg shadow-sm object-cover" onerror="this.onerror=null; this.outerHTML='<div class=\'w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs\'>It\'s You!</div>';">
+                        </div>
+                    </div>
+
+                    <!-- Insta Style Input Footer -->
+                    <div class="p-3 bg-white border-t border-gray-100 flex items-center space-x-3">
+                        <div class="bg-blue-600 p-1.5 rounded-full text-white">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <div class="flex-1 bg-gray-100 rounded-full h-10 px-4 flex items-center justify-between">
+                            <span class="text-gray-400 text-sm">Message...</span>
+                            <div class="flex items-center space-x-2 text-gray-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="text-gray-800">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="text-center py-6 mt-16 bg-white/80 backdrop-blur-md border-t border-gray-200">
+                <p class="text-gray-600">Made with ❤️ just for you.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- DESKTOP VIEW (hidden md:flex) - Updated Navigation -->
+    <div class="hidden md:flex h-screen w-full bg-cover bg-center overflow-hidden relative" style="background-image: url('unnamed.jpg');">
+        
+        <!-- Toggle Button for Desktop Nav -->
+        <button id="desktopNavToggle" class="absolute top-6 left-6 z-[60] p-3 bg-white/90 text-rose-600 rounded-full shadow-lg hover:bg-rose-50 transition-all duration-300 ring-1 ring-rose-200 group">
+            <svg class="w-6 h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+
+        <!-- Overlay Backdrop -->
+        <div id="desktopOverlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-[55] hidden opacity-0 cursor-pointer"></div>
+
+        <!-- Sliding Sidebar Nav -->
+        <div id="desktopSidebar" class="fixed top-0 left-0 bottom-0 w-[450px] bg-white/95 backdrop-blur-xl border-r border-white/50 z-[60] transform -translate-x-full shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-rose-100 bg-rose-50/50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl text-rose-600 font-pacific"> Reasons</h2>
+                    <p class="text-sm text-gray-500 mt-1">Explore your special universe</p>
+                </div>
+                <button id="desktopNavClose" class="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto desktop-scroll p-6">
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- 34 Navigation Links -->
+                    <a href="index.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700">Home</a>
+                    <a href="Cake.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700">Cake</a>
+                    <a href="21_Wish.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-yellow-700">21 Door</a>
+                    <a href="chat.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Heaven Chat</a>
+                    <a href="Diary.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-blue-700">Diary</a>
+                    <a href="anatomy.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700">Anatomy</a>
+                    <a href="Box.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-blue-700">Box</a>
+                    <a href="Special.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700">Special</a>
+                    <a href="color.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-purple-700">Color</a>
+                    <a href="you.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700">You</a>
+                    <a href="Teacher.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-blue-700">Teacher</a>
+                    <a href="Universe.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-blue-700">Universe</a>
+                    <a href="The_River.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-teal-700">River</a>
+                    <a href="Mountain.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-gray-700">Mountain</a>
+                    <a href="Skill.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-orange-700">Skill</a>
+                    <a href="Paper_Star.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-yellow-700">Paper Star</a>
+                    <a href="Carttoon.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-pink-700">Cartoon</a>
+                    <a href="Periodik_table.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-green-300 hover:bg-green-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-green-700">Periodic Table</a>
+                    <a href="Concept.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-indigo-700">Concept</a>
+                    <a href="Calender.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-300 hover:bg-red-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-red-700">Calendar</a>
+                    <a href="Perspective.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-teal-700">Perspective</a>
+                    <a href="Santa.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-300 hover:bg-red-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-red-700">Santa</a>
+                    <a href="Presence.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-purple-700">Presence</a>
+                    <a href="Cloud.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-sky-300 hover:bg-sky-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-sky-700">Cloud</a>
+                    <a href="Ink.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-indigo-700">Paint</a>
+                    <a href="Butterfly.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-pink-700">Butterfly</a>
+                    <a href="Weather.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-blue-700">Weather</a>
+                    <a href="Spotlight.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-yellow-700">Spotlight</a>
+                    <a href="Room.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-gray-700">Room</a>
+                    <a href="Radio.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-orange-700">Radio</a>
+                    <a href="Food.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-green-300 hover:bg-green-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-green-700">Food</a>
+                    <a href="Music.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-purple-700">Music</a>
+                    <a href="letter.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-rose-700">Letter</a>
+                    <a href="Msg.html" class="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-green-300 hover:bg-green-50 transition-all duration-200 flex items-center justify-center text-center text-sm font-semibold text-gray-700 hover:text-green-700">Message</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="absolute inset-0 bg-white/30 backdrop-blur-sm z-0"></div>
+
+        <main class="relative z-10 flex-1 flex flex-col h-full overflow-hidden p-8 pt-20">
+            <div class="flex-1 flex gap-8 max-w-7xl mx-auto w-full h-full">
+                
+                <div class="flex-1 bg-white rounded-xl shadow-2xl flex overflow-hidden border border-gray-200 max-w-5xl mx-auto w-full">
+                    
+                    <!-- LEFT SIDEBAR (Chats List) -->
+                    <div class="w-80 border-r border-gray-200 flex-col hidden md:flex bg-white">
+                        <!-- Sidebar Header -->
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                            <span class="font-bold text-lg text-gray-800 flex items-center gap-1">
+                               asuka katsu <svg class="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </span>
+                            <svg class="w-6 h-6 text-gray-800 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </div>
+                        <!-- Overflow List -->
+                        <div id="desktopSidebarList" class="flex-1 overflow-y-auto desktop-scroll">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- RIGHT CHAT AREA -->
+                    <div class="flex-1 flex flex-col h-full relative bg-white">
+                        
+                        <div class="bg-white p-3 border-b border-gray-100 flex items-center justify-between z-10">
+                            <div class="flex items-center space-x-3">
+                                <button class="text-gray-800 lg:hidden">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                                </button>
+                                <div class="flex items-center space-x-2" id="chatHeaderInfo">
+                                    <!-- Dynamic Header Content -->
+                                    <div class="relative">
+                                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 p-[2px]">
+                                            <div class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                                                <span class="text-xs font-bold text-gray-600">✨</span>
+                                            </div>
+                                        </div>
+                                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-gray-900 leading-none">Heaven ✨</span>
+                                        <span class="text-[10px] text-gray-500">Active now</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 text-gray-800">
+                                <svg class="w-6 h-6 hover:text-gray-600 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <svg class="w-6 h-6 hover:text-gray-600 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div id="chatInfoBtn" class="p-2 text-gray-800 rounded-full hover:bg-gray-100 cursor-pointer transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chatContainerDesktop" class="flex-1 p-6 overflow-y-auto desktop-scroll space-y-4 bg-white">
+                            <div id="desktopMessagesList" class="space-y-4"></div>
+                            
+                            <div id="revealButtonDesktop" class="text-center py-4 mt-2 hidden">
+                                <button class="bg-rose-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-rose-600 transition-all transform hover:scale-105 text-sm">
+                                    Thanks a ton for being in the Universe.
+                                </button>
+                            </div>
+
+                            <div id="revealCardDesktop" class="hidden mt-4 mx-12 bg-gray-50 border border-gray-100 rounded-2xl p-6 text-center max-w-md mx-auto">
+                                <h3 class="text-2xl font-bold text-rose-600 mb-2 font-pacific">It's You!</h3>
+                                <p class="text-base text-gray-600 mb-4">Happy Birthday to the one who has it all</p>
+                                <img src="Heaven.png" alt="The Birthday Star!" class="w-full h-auto rounded-lg shadow-sm object-cover" onerror="this.onerror=null; this.outerHTML='<div class=\'w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400\'>It\'s You!</div>';">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-white border-t border-gray-200">
+                            <div class="flex items-center space-x-3 bg-white p-1">
+                                 <div class="bg-blue-600 p-2 rounded-full text-white cursor-pointer hover:bg-blue-700 transition">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                 </div>
+                                 <div class="flex-1 bg-gray-100 rounded-full h-12 px-5 flex items-center justify-between">
+                                    <span class="text-gray-400 text-sm">Message...</span>
+                                    <div class="flex items-center space-x-3 text-gray-500">
+                                        <svg class="w-6 h-6 hover:text-gray-700 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                                        <svg class="w-6 h-6 hover:text-gray-700 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <svg class="w-6 h-6 hover:text-gray-700 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                 </div>
+                                 <div class="text-gray-800 p-2 hover:bg-gray-100 rounded-full cursor-pointer transition">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const chatMessages = [
+            { role: "Bhagwan Brahma", color: "blue", text: "Arre, aaj maine prithvi par ek kamaal ki rachna dekhi. Ek ladki hai, naam hai Juhi. Usko banate waqt, maine usme gyan aur kala ki gazab samajh daali hai. Pakka woh apni buddhi se duniya mein bahut naam kamaegi" },
+            { role: "Bhagwan Vishnu", color: "green", text: "Bilkul sahi kaha. Maine uske karmon ki rekha dekhi hai. Uske dil mein dharam aur apni duty poori karne ki gazab ki taakat hai." },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Hmmm. Us ladki ki aatma mein ek alag hi aag hai. Yeh aag mehnat ki hai, badlaav ki hai. Jab bhi koi mushkil aayegi, uski yahi taakat use aur nikhaar degi. Woh strong banegi." },
+            { role: "Mata Parvati", color: "yellow", text: "Aapne bilkul sahi kaha, Mahadev. Usme taakat bhi hai aur dil ki narmi bhi. Par uska dil ekdum phool jaisa narm hai. Usme ek maa, ek behen, aur ek beti, sabka roop dikhta hai. Aur pata hai? Aaj prithvi par uska birthday hai. Is mauke par, main use dher saara aashirvaad dena chahti hoon. 🔥" },
+            { role: "Devi Radha", color: "pink", text: "Uska birthday. Kitna pyaara din hai! Uske pyaar mein toh ek alag hi jaadu hai, sab pareshaniya mita deta hai. Aaj uske birthday par, hum sabki taraf se yeh message us tak zaroor jaana chahiye." },
+            { role: "Devi Radha", color: "pink", isPoem: true, text: `✨ Happy Birthday Juhi ✨\n\nTumhari Kanti ki roshni,\nDe Shanti ka sukoon.\nShraddha aur Buddhi tumhari,\nJeet ka har kaaran ho yun.\n\nSmriti meethi yaadon ki,\nVritti hamesha sahi.\nShakti aur Chetana,\nTumhe banaye anmol wahi.\n\nDayā  komal hriday ki,\nKsanti sabr ki pehchan.\nLajja tumhari sajawat,\nHar pal ka shringar pradhan.\n\nLakshmi ka ho saath sada,\nTusti bane muskaan.\nTrishna sahi disha de,\nSapno ka ho udaan.\n\nKsudha ho vikas ki,\nNidra ho chain bhari.\nChhaya rakhe surakshit,\nMatr ke pyaar si pyaari.\n\nJati tumhari pratibha,\nBhranti kabhi roke nahi.\nVishnumaya bhi haar maan,\nTumhari chamak ke aage kahin.\n\nHar pal rahe khushiyo se bhara,\nDil me rahe utsav ka pyaar.\nHappy Birthday, o pyaari si roshni,\nTum ho hum sabka sansar ✨🎂💐` },
+            { role: "Bhagwan Brahma", color: "blue", text: "Waah waah Bahut khoob, Devi Radha! Yeh blessings uski life ko successful bana degi." },
+            { role: "Bhagwan Vishnu", color: "green", text: "Mera aashirvaad hai ki Juhi hamesha sach aur achhai ke raaste par chale. Aur uski life mein hamesha santosh (satisfaction) bana rahe." },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Tathastu. Use kisi cheez ka darr na ho aur uski aatma aur bhi jaagruk ho." },
+            { role: "Mata Parvati", color: "yellow", text: "Mera aashirvaad hamesha uske saath hai. Woh shakti ban kar sabka bhala kare." },
+            { role: "Bhagwan Brahma", color: "blue", text: "Aur uski muskaan Maine toh phoolon ko bhi uski muskaan dekh kar khilte hue dekha hai. Kitni pyaari hai!" },
+            { role: "Bhagwan Vishnu", color: "green", text: "Satya hai. Aur uski aankhein... uski aankhon mein ek aisi chamak hai jo sabke dil ko sukoon deti hai. Bahut nirmal." },
+            { role: "Devi Radha", color: "pink", text: "Hahaha, Narayan Aap bhi uske fan ho gaye! Sach kahoon toh, uski har baat hi niraali hai. Woh jab hasti hai, toh lagta hai poora Devlok roshan ho gaya 🥰" },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Hmmm. Uske jaisa anmol ratna... maine bhi kam hi dekha hai. Uska hona hi ek blessing hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Sach hai Uska dil itna saaf hai ki woh doosron ke dukh ko bhi apna samajh leti hai. Aisi dayālu aatma ko dekh kar mujhe garv hota hai. ❤️" },
+            { role: "Bhagwan Vishnu", color: "green", text: "Aur uski vajah se kitne chehron par muskaan aati hai... woh jahan jaati hai, khushiyan phailati hai. Yeh toh sakshat Lakshmi ka roop hai." },
+            { role: "Devi Radha", color: "pink", text: "Aha Aur uski adaa... Uski har chhoti chhoti baat mein itna charm hai ki koi bhi uspe fida ho jaaye Us jaisi toh koi doosri hai hi nahi 😉" },
+            { role: "Bhagwan Brahma", color: "blue", text: "Maine bahut si rachnayein ki hain, par Juhi ko banakar mujhe jo santosh mila hai, woh alag hai. She is... truly one of my best works. 🌟" },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Aur uski shaanti... Badi se badi toofan mein bhi, uske andar ek thehraav hai. Yahi uski asli shakti hai. Bahut durlabh hai yeh." },
+            { role: "Mata Parvati", color: "yellow", text: "Log uske paas aakar hi apni saari chinta bhool jaate hain. Uska saath... ek sukoon bhara ehsaas hai. Bilkul ek maa ke aanchal jaisa. 💖" },
+            { role: "Bhagwan Vishnu", color: "green", text: "Uska hona hi kaafi hai. Poori srishti ka balance bana rehta hai jab woh khush rehti hai. Uska wajood hi ek varadaan hai." },
+            { role: "Devi Radha", color: "pink", text: "Dekha Hum sab uske deewane hain! Sach mein, Juhi jaisi special roshni poore brahmaand mein nahi hai. Kaash woh dekh paati ki woh kitni amazing hai ✨" },
+            { role: "Bhagwan Brahma", color: "blue", text: "Uski creativity bhi toh dekho. Har cheez ko ek naye nazariye se dekhti hai. Uska dimaag bahut alag chalta hai." },
+            { role: "Bhagwan Vishnu", color: "green", text: "Aur kitni kind hai Chhote bade, sabse ek jaisa pyaar se pesh aati hai. Yahi toh uski khaasiyat hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Aur apne logon ke liye... unke liye toh woh kuch bhi kar sakti hai. Ekdum protective shield ban jaati hai." },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Uske andar ek aisi gehraai hai jo bahut kam logon mein hoti hai. Uska gyaan sirf kitaabi nahi, anubhav ka hai." },
+            { role: "Devi Radha", color: "pink", text: "Aur uski hansi 😂 Sunte hi dil khush ho jaata hai. Aisa lagta hai jaise sangeet baj raha ho" },
+            { role: "Bhagwan Brahma", color: "blue", text: "Uski awaaz mein bhi ek sukoon hai. Woh bolti hai toh mann shaant ho jaata hai." },
+            { role: "Bhagwan Vishnu", color: "green", text: "Aur uska dil... kitna bada hai. Hamesha doosron ko dene ke liye taiyaar rehti hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Bahut nurturing hai. Sabka khayaal aise rakhti hai jaise woh unki apni ho. ❤️" },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Aur jab woh kisi kaam ko karne ki thaan leti hai, toh uska focus... adbhut hai. Usse koi hila nahi sakta." },
+            { role: "Devi Radha", color: "pink", text: "Maine toh pehle hi kaha tha, uski aankhon mein sparkle hai. Aisa lagta hai jaise taarein timtima rahe hon. Koi bhi kho jaaye unmein. 😉" },
+            { role: "Bhagwan Brahma", color: "blue", text: "Naye ideas ko jaise woh life deti hai... kamaal hai. Sahi mein, meri masterpiece hai" },
+            { role: "Bhagwan Vishnu", color: "green", text: "Apne logon ke prati uski loyalty... misaal hai. Woh kabhi kisi ka saath nahi chhodti. Yeh uski sabse badi poonji hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Bilkul Sherni ki tarah protect karti hai apne parivaar aur doston ko. Usse takraana aasaan nahi" },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Uske saath baithkar jo shaanti milti hai... wahi asli meditation hai." },
+            { role: "Devi Radha", color: "pink", text: "Woh pyaar karna jaanti hai. Bina kisi shart ke, poore dil se. Aisa prem har kisi ke naseeb mein nahi hota. 💕" },
+            { role: "Bhagwan Brahma", color: "blue", text: "Aur seekhne ki kitni ichha hai usme! Hamesha kuch naya jaanne ke liye curious rehti hai." },
+            { role: "Bhagwan Vishnu", color: "green", text: "Uski neeyat hamesha saaf rehti hai. Woh kabhi kisi ka bura nahi soch sakti. Ekdum pure soul hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Woh doosron ko itna inspire karti hai! Log usse milkar behtar insaan banna chahte hain." },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Chhoti chhoti cheezon mein khushi dhoond leti hai... yahi uske sukoon ka raaz hai." },
+            { role: "Devi Radha", color: "pink", text: "Aur woh jaisi hai, waisi hi rehti hai. Bilkul real, koi dikhawa nahi. Yahi adaa toh sabse pyaari hai uski 🥰" },
+            { role: "Bhagwan Brahma", color: "blue", text: "Uski har kamzori bhi uski khoobsurati hai. Woh jaisi bhi hai, perfect hai." },
+            { role: "Bhagwan Vishnu", color: "green", text: "Uski smile... kisi bhi gusse ko shaant kar sakti hai. Usme ek jaadu hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Har jeev ke liye uske dil mein daya hai. Aisi aatma ko toh devta bhi pranaam karte hain." },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Uska sixth sense... uska intuition... hamesha sahi hota hai. Use pehle hi pata chal jaata hai." },
+            { role: "Devi Radha", color: "pink", text: "Sahi mein... woh toh poore brahmaand ki likhi hui ek khoobsurat kavita hai. 💖" },
+            { role: "Bhagwan Vishnu", color: "green", text: "Humein garv hai ki aisi aatma prithvi par hai." },
+            { role: "Mata Parvati", color: "yellow", text: "Hum sab usse bahut pyaar karte hain" },
+            { role: "Mata Parvati", color: "yellow", text: "Sach kahoon, Mahadev... uski presence hi itni divine hai. Aisa lagta hai jaise swayam Devi Saraswati aur Lakshmi ne uspar vishesh kripa ki hai. Koi usse mil le toh bas dekhta hi reh jaaye." },
+            { role: "Bhagwan Vishnu", color: "green", text: "(Muskurate hue) Aur uski adaa... jab woh thoda sharmaati hai, toh uski masoomiyat par poore Vaikunth ko pyaar aa jaata hai." },
+            { role: "Devi Radha", color: "pink", text: "Haan Aur jab woh gusse mein hoti hai... toh bhi kitni cute lagti hai 😂 Uska har roop... har bhaav... bas mann moh leta hai. Uske jaisa captivating koi nahi" },
+            { role: "Bhagwan Maheshwar", color: "purple", text: "Hmmm. Uska astitva hi ek jashn hai. She is a celebration." },
+            { role: "Sabhi Ek Saath", color: "gray", text: "Juhi ki life bahut khushaal ho ✨", bg: "bg-gray-200 text-gray-800" }
+        ];
+
+        // Conversations Data for Desktop Sidebar
+        const conversations = {
+            'heaven': {
+                id: 'heaven',
+                name: 'Heaven ✨',
+                status: 'Active now',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 p-[2px]"><div class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden"><span class="text-lg font-bold text-gray-600">✨</span></div></div><div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>`,
+                lastMsg: 'Sabhi Ek Saath: Juhi ki life...',
+                time: 'now',
+                unread: false,
+                messages: chatMessages, // Use existing array
+                isGroup: true
+            },
+            'mom': {
+                id: 'mom',
+                name: 'Mom ❤️',
+                status: 'Active 10m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-xl">👩‍👧</div>`,
+                lastMsg: 'Made your favorite kheer! 🥣',
+                time: '10m',
+                unread: true,
+                messages: [
+                    { role: 'Mom', color: 'pink', text: "Happy Birthday my precious child! ❤️" },
+                    { role: 'Mom', color: 'pink', text: "I remember the day you were born like it was yesterday." },
+                    { role: 'Mom', color: 'pink', text: "You bring so much joy to our lives." },
+                    { role: 'Mom', color: 'pink', text: "Made your favorite kheer! Come home soon. 🥣" }
+                ]
+            },
+            'dad': {
+                id: 'dad',
+                name: 'Dad 🦁',
+                status: 'Active 15m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl">👨‍👧</div>`,
+                lastMsg: 'Proud of you, beta.',
+                time: '15m',
+                unread: true,
+                messages: [
+                    { role: 'Dad', color: 'blue', text: "Happy Birthday, beta!" },
+                    { role: 'Dad', color: 'blue', text: "You are growing up to be such a strong person." },
+                    { role: 'Dad', color: 'blue', text: "Always remember, I've got your back." },
+                    { role: 'Dad', color: 'blue', text: "Proud of you. Keep shining. 🌟" }
+                ]
+            },
+            'sister': {
+                id: 'sister',
+                name: 'Sister 👯‍♀️',
+                status: 'Active 5m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-xl">👒</div>`,
+                lastMsg: 'Where is the party?? 🎉',
+                time: '5m',
+                unread: true,
+                messages: [
+                    { role: 'Sister', color: 'purple', text: "Happy Birthday!! 🎂" },
+                    { role: 'Sister', color: 'purple', text: "You're getting old now :P" },
+                    { role: 'Sister', color: 'purple', text: "But seriously, love you loads." },
+                    { role: 'Sister', color: 'purple', text: "Where is the party?? 🎉" }
+                ]
+            },
+            'ganesh': {
+                id: 'ganesh',
+                name: 'Ganesh 🐘',
+                status: 'Active 1m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-xl">🐘</div>`,
+                lastMsg: 'Shubh Labh on your birthday!',
+                time: '1m',
+                unread: true,
+                messages: [
+                    { role: 'Ganesh', color: 'red', text: "Vakratunda Mahakaya..." },
+                    { role: 'Ganesh', color: 'red', text: "Happy Birthday!" },
+                    { role: 'Ganesh', color: 'red', text: "I have removed all obstacles from your path for the coming year." },
+                    { role: 'Ganesh', color: 'red', text: "Start your new year with a sweet modak! 🥟" }
+                ]
+            },
+            'shiva': {
+                id: 'shiva',
+                name: 'Mahadev 🕉️',
+                status: 'Meditating',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl">🕉️</div>`,
+                lastMsg: 'Peace be with you.',
+                time: '4m',
+                unread: true,
+                messages: [
+                    { role: 'Mahadev', color: 'blue', text: "My divine blessings are with you." },
+                    { role: 'Mahadev', color: 'blue', text: "On this day, I bless you with inner strength." },
+                    { role: 'Mahadev', color: 'blue', text: "May you dance through life's challenges like Nataraja." },
+                    { role: 'Mahadev', color: 'blue', text: "Happy Birthday. Find the stillness within." }
+                ]
+            },
+            'krishna': {
+                id: 'krishna',
+                name: 'Krishna 🪈',
+                status: 'Playing Flute',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-xl">🪈</div>`,
+                lastMsg: 'Life is a celebration!',
+                time: '2m',
+                unread: true,
+                messages: [
+                    { role: 'Krishna', color: 'yellow', text: "Radhe Radhe! ✨" },
+                    { role: 'Krishna', color: 'yellow', text: "Remember, you have a right to your actions, but never to your actions' fruits." },
+                    { role: 'Krishna', color: 'yellow', text: "So just enjoy your birthday party without worry!" },
+                    { role: 'Krishna', color: 'yellow', text: "May your life be as sweet as butter and as melodious as my flute." }
+                ]
+            },
+            'vishnu_chat': {
+                id: 'vishnu_chat',
+                name: 'Lord Vishnu 🐚',
+                status: 'Active 5m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-xl">🐚</div>`,
+                lastMsg: 'Preserving your smile.',
+                time: '5m',
+                unread: true,
+                messages: [
+                    { role: 'Vishnu', color: 'blue', text: "Hari Om." },
+                    { role: 'Vishnu', color: 'blue', text: "As the preserver, I promise to preserve your innocence and joy." },
+                    { role: 'Vishnu', color: 'blue', text: "May you always walk the path of truth." },
+                    { role: 'Vishnu', color: 'blue', text: "Happy Birthday. Blessings always." }
+                ]
+            },
+            'brahma_chat': {
+                id: 'brahma_chat',
+                name: 'Brahma Ji 📜',
+                status: 'Active 10m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-xl">📜</div>`,
+                lastMsg: 'A new chapter begins.',
+                time: '10m',
+                unread: true,
+                messages: [
+                    { role: 'Brahma', color: 'yellow', text: "When I wrote your destiny, I used my best ink." },
+                    { role: 'Brahma', color: 'yellow', text: "You are a special creation." },
+                    { role: 'Brahma', color: 'yellow', text: "Create your own beautiful reality this year." },
+                    { role: 'Brahma', color: 'yellow', text: "Happy Birthday!" }
+                ]
+            },
+            'laxmi': {
+                id: 'laxmi',
+                name: 'Laxmi 🪷',
+                status: 'Active 35m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-xl">🪷</div>`,
+                lastMsg: 'Prosperity is yours.',
+                time: '35m',
+                unread: true,
+                messages: [
+                    { role: 'Laxmi', color: 'pink', text: "Shubh Janmadin. ✨" },
+                    { role: 'Laxmi', color: 'pink', text: "May your home always be filled with light and laughter." },
+                    { role: 'Laxmi', color: 'pink', text: "I am sending abundance your way." },
+                    { role: 'Laxmi', color: 'pink', text: "Not just wealth, but wealth of character." }
+                ]
+            },
+            'saraswati': {
+                id: 'saraswati',
+                name: 'Saraswati 🦢',
+                status: 'Active 30m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xl">🦢</div>`,
+                lastMsg: 'Wisdom is your greatest gift.',
+                time: '30m',
+                unread: true,
+                messages: [
+                    { role: 'Saraswati', color: 'gray', text: "Basant Panchami vibes for you today." },
+                    { role: 'Saraswati', color: 'gray', text: "May your words be true and your mind be sharp." },
+                    { role: 'Saraswati', color: 'gray', text: "I bless you with the flow of creativity." },
+                    { role: 'Saraswati', color: 'gray', text: "Happy Birthday, seeker of knowledge. 📚" }
+                ]
+            },
+            'durga': {
+                id: 'durga',
+                name: 'Maa Durga 🦁',
+                status: 'Active 1h ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-xl">🦁</div>`,
+                lastMsg: 'You are a warrior.',
+                time: '1h',
+                unread: true,
+                messages: [
+                    { role: 'Durga', color: 'red', text: "Ya Devi Sarvabhuteshu..." },
+                    { role: 'Durga', color: 'red', text: "You have the shakti (power) within you to conquer any fear." },
+                    { role: 'Durga', color: 'red', text: "Roar like a lioness this year!" },
+                    { role: 'Durga', color: 'red', text: "Happy Birthday, my brave child. ⚔️" }
+                ]
+            },
+            'surya': {
+                id: 'surya',
+                name: 'Surya Dev ☀️',
+                status: 'Shining',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl">☀️</div>`,
+                lastMsg: 'Shine bright.',
+                time: '6am',
+                unread: true,
+                messages: [
+                    { role: 'Surya', color: 'orange', text: "Good morning! (Even if it's not morning)" },
+                    { role: 'Surya', color: 'orange', text: "I rose today just to celebrate you." },
+                    { role: 'Surya', color: 'orange', text: "May your aura always be radiant and warm." },
+                    { role: 'Surya', color: 'orange', text: "Happy Birthday! Stay brilliant." }
+                ]
+            },
+            'indra': {
+                id: 'indra',
+                name: 'Indra Dev ⚡',
+                status: 'Active 2h ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-xl">⚡</div>`,
+                lastMsg: 'Bringing the rains of joy.',
+                time: '2h',
+                unread: true,
+                messages: [
+                    { role: 'Indra', color: 'blue', text: "Greetings from Swarg Lok." },
+                    { role: 'Indra', color: 'blue', text: "May your life be as colorful as a rainbow." },
+                    { role: 'Indra', color: 'blue', text: "I command the clouds to shower happiness on you." },
+                    { role: 'Indra', color: 'blue', text: "Have a thunderous celebration! ⛈️" }
+                ]
+            },
+            'kartik': {
+                id: 'kartik',
+                name: 'Kartikeya 🦚',
+                status: 'Active 3h ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-xl">🦚</div>`,
+                lastMsg: 'Victory be yours.',
+                time: '3h',
+                unread: true,
+                messages: [
+                    { role: 'Kartik', color: 'teal', text: "Salutations." },
+                    { role: 'Kartik', color: 'teal', text: "Youth, beauty, and wisdom are yours." },
+                    { role: 'Kartik', color: 'teal', text: "Lead your life with confidence." },
+                    { role: 'Kartik', color: 'teal', text: "Happy Birthday! Stay sharp. 🏹" }
+                ]
+            },
+            'future_self': {
+                id: 'future_self',
+                name: 'Future Self 🚀',
+                status: 'Active 2m ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-xl">🚀</div>`,
+                lastMsg: 'Thank you for not giving up. HBD! 🎂',
+                time: '2m',
+                unread: true,
+                messages: [
+                    { role: 'Future You', color: 'indigo', text: "Hey! Just checking in from 2030." },
+                    { role: 'Future You', color: 'indigo', text: "You wouldn't believe how amazing things turn out." },
+                    { role: 'Future You', color: 'indigo', text: "Thank you for working so hard today. It pays off." },
+                    { role: 'Future You', color: 'indigo', text: "Happy Birthday! Keep going, we make it. 🥂" }
+                ]
+            },
+            'destiny': {
+                id: 'destiny',
+                name: 'Destiny 🌠',
+                status: 'Active 1h ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-xl">🌠</div>`,
+                lastMsg: 'I have big plans for you this year.',
+                time: '1h',
+                unread: true,
+                messages: [
+                    { role: 'Destiny', color: 'purple', text: "I've been writing some new chapters for you." },
+                    { role: 'Destiny', color: 'purple', text: "There are twists coming, but the good kind." },
+                    { role: 'Destiny', color: 'purple', text: "Get ready for a surprise this year." },
+                    { role: 'Destiny', color: 'purple', text: "Happy Birthday, favorite protagonist. 🌟" }
+                ]
+            },
+            'happiness': {
+                id: 'happiness',
+                name: 'Happiness 😊',
+                status: 'Active 3h ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-xl">😊</div>`,
+                lastMsg: "Knock knock! I'm moving in.",
+                time: '3h',
+                unread: true,
+                messages: [
+                    { role: 'Happiness', color: 'yellow', text: "Knock knock!" },
+                    { role: 'Happiness', color: 'yellow', text: "I'm planning to move in permanently this year." },
+                    { role: 'Happiness', color: 'yellow', text: "Hope you don't mind the company." },
+                    { role: 'Happiness', color: 'yellow', text: "Happy Birthday! 😄" }
+                ]
+            },
+            'success': {
+                id: 'success',
+                name: 'Success 📈',
+                status: 'Active 5h ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-xl">📈</div>`,
+                lastMsg: 'Pack your bags for the top.',
+                time: '5h',
+                unread: true,
+                messages: [
+                    { role: 'Success', color: 'green', text: "I'm active now." },
+                    { role: 'Success', color: 'green', text: "I saw you working hard." },
+                    { role: 'Success', color: 'green', text: "I'm just around the corner. Keep pushing." },
+                    { role: 'Success', color: 'green', text: "HBD! See you at the top. 📈" }
+                ]
+            },
+            'serenity': {
+                id: 'serenity',
+                name: 'Serenity 🍃',
+                status: 'Active 1d ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-xl">🍃</div>`,
+                lastMsg: "Breathe deep. It's your special day.",
+                time: '1d',
+                unread: true,
+                messages: [
+                    { role: 'Serenity', color: 'teal', text: "Breathe in..." },
+                    { role: 'Serenity', color: 'teal', text: "Breathe out..." },
+                    { role: 'Serenity', color: 'teal', text: "I wish you peace in every moment today." },
+                    { role: 'Serenity', color: 'teal', text: "Happy Birthday. 🍃" }
+                ]
+            },
+            'universe': {
+                id: 'universe',
+                name: 'The Universe 🌌',
+                status: 'Active 2d ago',
+                avatarHTML: `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">🌌</div>`,
+                lastMsg: 'The stars have aligned just for you.',
+                time: '2d',
+                unread: true,
+                messages: [
+                    { role: 'The Universe', color: 'gray', text: "I aligned the stars just for you today." },
+                    { role: 'The Universe', color: 'gray', text: "You are exactly where you need to be." },
+                    { role: 'The Universe', color: 'gray', text: "Trust the timing." },
+                    { role: 'The Universe', color: 'gray', text: "Happy Birthday, Stardust. 🌌" }
+                ]
+            }
+        };
+
+        // --- HTML Generators ---
+
+        function generateHTML(msg, isDesktop) {
+            const content = msg.isPoem 
+                ? `<pre class="whitespace-pre-wrap font-sans text-sm leading-relaxed">${msg.text}</pre>`
+                : `<p class="leading-relaxed">${msg.text}</p>`;
+
+            const initial = msg.role.charAt(0);
+            const textClass = msg.bg ? 'text-gray-600' : `text-${msg.color}-600`;
+            const bgClass = msg.bg ? msg.bg : `bg-${msg.color}-50 text-gray-800 border-${msg.color}-100`;
+
+            return `
+            <div class="chat-bubble flex gap-2 mb-4 items-end animate-none opacity-0">
+                <div class="w-8 h-8 rounded-full bg-${msg.color}-100 border border-${msg.color}-200 flex items-center justify-center text-[10px] font-bold text-${msg.color}-600 flex-shrink-0">
+                    ${initial}
+                </div>
+                <div class="flex flex-col max-w-[75%]">
+                    <span class="text-[10px] text-gray-500 ml-1 mb-0.5">${msg.role}</span>
+                    <div class="relative ${bgClass} border p-3 px-4 rounded-2xl rounded-bl-none shadow-sm text-sm leading-snug">
+                        ${content}
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        // --- Logic ---
+
+        let currentActiveChatId = 'heaven';
+
+        function renderSidebar() {
+            const sidebarList = document.getElementById('desktopSidebarList');
+            if (!sidebarList) return;
+
+            sidebarList.innerHTML = '';
+
+            Object.values(conversations).forEach(chat => {
+                const isActive = chat.id === currentActiveChatId;
+                const activeClass = isActive ? 'bg-gray-100 sidebar-item-active' : 'hover:bg-gray-50';
+                const unreadDot = chat.unread ? '<div class="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0"></div>' : '';
+                const titleStyle = chat.unread ? 'font-bold text-black' : 'font-semibold text-gray-900';
+                const msgStyle = chat.unread ? 'font-bold text-gray-900' : 'text-gray-500';
+                
+                const itemHTML = `
+                <div class="px-4 py-3 ${activeClass} flex items-center gap-3 cursor-pointer transition-colors" onclick="window.switchChat('${chat.id}')">
+                    <div class="relative">
+                        ${chat.avatarHTML}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-baseline mb-0.5">
+                            <h3 class="text-sm ${titleStyle} truncate">${chat.name}</h3>
+                            <span class="text-xs text-gray-500">${chat.time}</span>
+                        </div>
+                        <p class="text-sm ${msgStyle} truncate">${chat.lastMsg}</p>
+                    </div>
+                    ${unreadDot}
+                </div>
+                `;
+                sidebarList.innerHTML += itemHTML;
+            });
+        }
+
+        function updateChatHeader(chat) {
+            const headerContainer = document.getElementById('chatHeaderInfo');
+            if (!headerContainer) return;
+
+            headerContainer.innerHTML = `
+                <div class="relative">
+                    ${chat.avatarHTML.replace('w-12 h-12', 'w-9 h-9').replace('text-xl', 'text-sm')} 
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold text-gray-900 leading-none">${chat.name}</span>
+                    <span class="text-[10px] text-gray-500">${chat.status}</span>
+                </div>
+            `;
+        }
+
+        window.switchChat = function(chatId) {
+            if (!conversations[chatId]) return;
+            
+            // Mark CURRENTLY clicked chat as read.
+            conversations[chatId].unread = false;
+            
+            currentActiveChatId = chatId;
+            const chat = conversations[chatId];
+
+            // 1. Update Sidebar UI
+            renderSidebar();
+
+            // 2. Update Header
+            updateChatHeader(chat);
+
+            // 3. Clear and Render Messages
+            const desktopMessagesList = document.getElementById('desktopMessagesList');
+            const revealButton = document.getElementById('revealButtonDesktop');
+            const revealCard = document.getElementById('revealCardDesktop');
+
+            desktopMessagesList.innerHTML = '';
+            // Hide special elements first
+            if (revealButton) revealButton.classList.add('hidden');
+            if (revealButton) revealButton.style.display = ''; // Reset inline display none from clicks
+            if (revealCard) revealCard.classList.add('hidden');
+
+            // Render new messages with animation
+            chat.messages.forEach((msg, index) => {
+                const bubble = generateHTML(msg, true);
+                // Create a temporary container to turn string into DOM nodes for staggered animation
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = bubble;
+                const bubbleNode = tempDiv.firstElementChild;
+                
+                // Add staggered animation delay
+                bubbleNode.style.animation = `chatFadeIn 0.5s ease-out forwards ${index * 0.15}s`;
+                
+                desktopMessagesList.appendChild(bubbleNode);
+            });
+
+            // 4. Handle "Reveal" Button visibility (Only for Heaven chat)
+            if (chat.id === 'heaven') {
+                const totalDelay = chat.messages.length * 150; // Sync with message animation
+                setTimeout(() => {
+                    if (currentActiveChatId === 'heaven' && revealButton) {
+                        revealButton.classList.remove('hidden');
+                        revealButton.style.animation = 'chatFadeIn 0.5s ease-out forwards';
+                        revealButton.style.opacity = 1;
+                    }
+                }, totalDelay + 500);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const sunIcon = document.getElementById('sunIcon');
+            const moonIcon = document.getElementById('moonIcon');
+            
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                sunIcon.classList.toggle('hidden');
+                moonIcon.classList.toggle('hidden');
+            });
+
+            // MOBILE NAVIGATION LOGIC
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            let areNavsOpen = false;
+
+            function openAllNavs() {
+                if (topNav) topNav.classList.remove('-translate-y-full');
+                if (bottomNav) bottomNav.classList.remove('translate-y-full');
+                if (leftNav) leftNav.classList.remove('-translate-x-full');
+                if (rightNav) rightNav.classList.remove('translate-x-full');
+                if (mainContent) {
+                    mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                    mainContent.classList.remove('pt-28');
+                }
+                if (navToggleIcon) navToggleIcon.classList.add('hidden');
+                if (navToggleX) navToggleX.classList.remove('hidden');
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                if (topNav) topNav.classList.add('-translate-y-full');
+                if (bottomNav) bottomNav.classList.add('translate-y-full');
+                if (leftNav) leftNav.classList.add('-translate-x-full');
+                if (rightNav) rightNav.classList.add('translate-x-full');
+                if (mainContent) {
+                    mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                    mainContent.classList.remove('pt-28');
+                }
+                if (navToggleIcon) navToggleIcon.classList.remove('hidden');
+                if (navToggleX) navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+
+            if (navToggle) {
+                navToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    areNavsOpen ? closeAllNavs() : openAllNavs();
+                });
+            }
+            if (mainContent) {
+                mainContent.addEventListener('click', () => {
+                    if (areNavsOpen) closeAllNavs();
+                });
+            }
+
+            // DESKTOP NAVIGATION LOGIC
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const desktopNavClose = document.getElementById('desktopNavClose');
+            const desktopSidebar = document.getElementById('desktopSidebar');
+            const desktopOverlay = document.getElementById('desktopOverlay');
+
+            function openDesktopNav() {
+                if(desktopSidebar) desktopSidebar.classList.remove('-translate-x-full');
+                if(desktopOverlay) {
+                    desktopOverlay.classList.remove('hidden');
+                    // Small timeout to allow transition to work
+                    setTimeout(() => desktopOverlay.classList.remove('opacity-0'), 10);
+                }
+            }
+
+            function closeDesktopNav() {
+                if(desktopSidebar) desktopSidebar.classList.add('-translate-x-full');
+                if(desktopOverlay) {
+                    desktopOverlay.classList.add('opacity-0');
+                    setTimeout(() => desktopOverlay.classList.add('hidden'), 300);
+                }
+            }
+
+            if(desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openDesktopNav();
+                });
+            }
+
+            if(desktopNavClose) {
+                desktopNavClose.addEventListener('click', closeDesktopNav);
+            }
+
+            if(desktopOverlay) {
+                desktopOverlay.addEventListener('click', closeDesktopNav);
+            }
+
+            const chatInfoBtn = document.getElementById('chatInfoBtn');
+            const infoToast = document.getElementById('infoToast');
+
+            if (chatInfoBtn && infoToast) {
+                chatInfoBtn.addEventListener('click', () => {
+                    infoToast.classList.add('show');
+                    setTimeout(() => {
+                        infoToast.classList.remove('show');
+                    }, 3000);
+                });
+            }
+
+            // INITIALIZATION
+            
+            // 1. Render Desktop Sidebar and Default Chat
+            renderSidebar();
+            window.switchChat('heaven'); // Initialize desktop view with heaven chat
+
+            // 2. Render Mobile View (Static Heaven Chat)
+            const mobileMessagesList = document.getElementById('mobileMessagesList');
+            if (mobileMessagesList) {
+                mobileMessagesList.innerHTML = '';
+                chatMessages.forEach(msg => {
+                    mobileMessagesList.innerHTML += generateHTML(msg, false);
+                });
+            }
+
+            // Reveal Button Logic (Shared logic pattern, instantiated for both IDs)
+            function setupRevealBtn(btnId, cardId) {
+                const btn = document.getElementById(btnId);
+                const card = document.getElementById(cardId);
+                if (btn && card) {
+                    btn.addEventListener('click', () => {
+                        card.classList.remove('hidden');
+                        card.style.animation = 'chatFadeIn 0.5s ease-out forwards';
+                        card.style.opacity = 1;
+                        setTimeout(() => {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                        btn.style.display = 'none';
+                    });
+                }
+            }
+
+            setupRevealBtn('revealButton', 'revealCard'); // Mobile
+            setupRevealBtn('revealButtonDesktop', 'revealCardDesktop'); // Desktop
+
+            // Animation for Mobile on Load
+            const mobileBubbles = document.querySelectorAll('#mobileMessagesList .chat-bubble');
+            const mobileRevealBtn = document.getElementById('revealButton');
+            mobileBubbles.forEach((bubble, index) => {
+                setTimeout(() => {
+                    bubble.style.animation = 'chatFadeIn 0.5s ease-out forwards';
+                    bubble.style.opacity = 1;
+                    
+                    if (index === mobileBubbles.length - 1 && mobileRevealBtn) {
+                        setTimeout(() => {
+                            mobileRevealBtn.style.animation = 'chatFadeIn 0.5s ease-out forwards';
+                            mobileRevealBtn.style.opacity = 1;
+                        }, 800);
+                    }
+                }, index * 1200 + 500);
+            });
+        });
+    </script>
+</body>
+</html>

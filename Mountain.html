@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Mountain of Quiet Victories</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@300;400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+
+<style>
+  :root{
+    --sky1:#0b1530; 
+    --sky2:#2a2f6b; 
+    --dawn:#ffb76b; 
+    --gold:#f6e7b7;
+    --mist:#ffffff0d;
+    --text:#f7f6ff;
+    --accent:#c7bdf5;
+    --lantern-core: #ffaa00;
+
+    --current-sky1: var(--sky1);
+    --current-sky2: var(--sky2);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0}
+  body{
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    color:var(--text);
+    
+    background: linear-gradient(to bottom, var(--current-sky1), var(--current-sky2));
+    overflow-x:hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 1s ease;
+    cursor: none; 
+  }
+
+  @media (max-width: 1023px) {
+      body { cursor: auto; }
+  }
+
+  
+  .scene{
+    position:relative;
+    width:100vw;
+    height:650vh; 
+  }
+
+  
+  .viewport{
+    position:fixed; inset:0; overflow:hidden; pointer-events:none;
+  }
+
+  
+  .star{position:absolute; width:2px; height:2px; background:#fff8;
+        border-radius:50%; animation: twinkle 3.5s infinite ease-in-out}
+  .star:nth-child(odd){animation-duration: 4.7s}
+  @keyframes twinkle{0%,100%{opacity:.25} 50%{opacity:.85}}
+
+  .shooting-star {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1));
+      animation: shoot 2s linear forwards;
+      opacity: 0;
+      z-index: 1;
+      transform: rotate(20deg);
+  }
+  @keyframes shoot {
+      0% { transform: translateX(0) translateY(0) rotate(20deg); opacity: 1; width: 0; }
+      20% { width: 100px; }
+      100% { transform: translateX(500px) translateY(200px) rotate(20deg); opacity: 0; width: 0; }
+  }
+
+  .aurora {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60vh;
+      background: linear-gradient(90deg, 
+          rgba(0,255,128,0), 
+          rgba(0,255,128,0.1), 
+          rgba(160,32,240,0.1), 
+          rgba(0,255,128,0.1), 
+          rgba(0,255,128,0));
+      filter: blur(40px);
+      z-index: 0;
+      opacity: 0.6;
+      animation: aurora-shift 15s ease infinite alternate;
+      will-change: transform, opacity;
+  }
+  @media (min-width: 1024px) {
+      .aurora { display: block; }
+  }
+  @keyframes aurora-shift {
+      0% { transform: translateX(-10%) scaleY(1); opacity: 0.4; }
+      50% { opacity: 0.7; }
+      100% { transform: translateX(10%) scaleY(1.2); opacity: 0.4; }
+  }
+
+  
+  .fog{position:absolute; left:-10vw; right:-10vw; height:18vh;
+        background: radial-gradient(60% 100% at 50% 50%, #fff2 0%, #fff0 70%);
+        filter: blur(6px); opacity:.25; animation: drift 24s linear infinite}
+  .fog.f1{bottom:8vh}
+  .fog.f2{bottom:18vh; animation-duration:30s; opacity:.18}
+  @keyframes drift{from{transform:translateX(0)} to{transform:translateX(10vw)}}
+
+  .moon {
+      position: absolute;
+      width: 12vmin;
+      height: 12vmin;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #ffffff 0%, #e6e6e6 100%);
+      box-shadow: 0 0 40px rgba(255,255,255,0.4);
+      top: 15vh;
+      right: 15vw;
+      z-index: 0;
+      opacity: 1;
+      will-change: opacity, transform;
+  }
+
+  .sun{
+    position:absolute; width:55vmin; height:55vmin; border-radius:50%;
+    
+    background: radial-gradient(circle at 50% 60%, rgba(255,183,107,0.3) 0%, #fff0 60%);
+    left:50%; 
+    
+    transform: translateX(-50%) translateY(100vmin) scale(0.5); 
+    bottom:0; 
+    opacity:0; 
+    filter:blur(2px);
+    will-change: opacity, transform, background;
+    
+    transition: filter 0.5s ease; 
+    z-index: 1; 
+  }
+
+  @media (min-width: 1024px) {
+    @keyframes sunPulseGlow {
+      0%, 100% { box-shadow: 0 0 40px 10px rgba(255, 183, 107, 0.2); }
+      50% { box-shadow: 0 0 100px 30px rgba(255, 183, 107, 0.5); }
+    }
+    .sun {
+      animation: sunPulseGlow 6s ease-in-out infinite;
+    }
+  }
+
+  .lantern-container {
+      position: fixed; 
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+  }
+  .lantern {
+      position: absolute;
+      bottom: -50px;
+      width: 30px;
+      height: 45px;
+      background: radial-gradient(circle at 50% 60%, #fff 5%, var(--lantern-core) 60%, #ff4500 100%);
+      border-radius: 5px 5px 15px 15px;
+      box-shadow: 0 5px 20px var(--lantern-core);
+      opacity: 0.8;
+      animation: floatUp 18s linear forwards;
+  }
+  .lantern::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 10px;
+      width: 10px;
+      height: 5px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 50%;
+  }
+  
+  @keyframes floatUp {
+      0% { transform: translateY(10vh) rotate(0deg) scale(0.5); opacity: 0; }
+      10% { opacity: 0.9; }
+      100% { transform: translateY(-120vh) rotate(10deg) scale(1); opacity: 0; }
+  }
+
+  
+  .mountain{
+    position:absolute; left:0; right:0; bottom:-8vh; height:58vh; pointer-events:none;
+    will-change: transform;
+    z-index: 2; 
+  }
+  .mountain svg{width:100%; height:100%}
+  .mountain path{
+    fill:#0e152d; 
+  }
+  .mountain .far{fill:#0b1230} 
+
+  
+  .clouds {
+    position: absolute;
+    width: 100%;
+    height: 30vh; 
+    bottom: 50vh; 
+    left: 0;
+    opacity: 0;
+    will-change: transform, opacity;
+    transition: opacity 1s ease;
+    z-index: 0; 
+  }
+  .cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    filter: blur(10px);
+    animation: cloud-drift 40s linear infinite alternate;
+  }
+  .cloud:nth-child(1) { width: 150px; height: 100px; top: 10%; left: -5%; animation-duration: 35s; }
+  .cloud:nth-child(2) { width: 200px; height: 120px; top: 30%; right: -10%; animation-duration: 45s; }
+  .cloud:nth-child(3) { width: 180px; height: 110px; top: 55%; left: -15%; animation-duration: 30s; }
+  .cloud:nth-child(4) { width: 160px; height: 90px; top: 70%; right: -5%; animation-duration: 50s; }
+
+  @keyframes cloud-drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(20%); }
+  }
+
+  .bird-group-container {
+      display: none; 
+      position: fixed;
+      top: 15vh;
+      right: 15vw;
+      width: 250px;
+      height: 120px;
+      z-index: 4; 
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s ease;
+  }
+  
+  .foreground-trees {
+      display: none;
+      position: absolute;
+      bottom: -15vh;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      z-index: 3;
+      pointer-events: none;
+      will-change: transform;
+  }
+  .foreground-trees svg {
+      width: 100%;
+      height: 100%;
+  }
+  .tree-path {
+      fill: #050a1a; 
+  }
+
+  .desktop-extras {
+      display: none;
+  }
+  
+  #spiritCursor {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 40px; height: 40px;
+      pointer-events: none;
+      z-index: 100;
+      transform: translate(-50%, -50%);
+  }
+  #spiritCursor::before {
+      content:'';
+      position: absolute; inset:0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(200,220,255,0.4) 40%, rgba(255,255,255,0) 70%);
+      box-shadow: 0 0 20px 5px rgba(255,255,255,0.2);
+      animation: pulseCursor 2s infinite ease-in-out;
+  }
+  @keyframes pulseCursor {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 0.5; }
+  }
+
+  @media (min-width: 1024px) {
+      .bird-group-container {
+          display: block;
+          animation: flightPath 30s linear infinite alternate;
+      }
+      #spiritCursor {
+          display: block;
+      }
+      @keyframes flightPath {
+          0% { transform: translate(50px, 20px); }
+          100% { transform: translate(-50px, -20px); }
+      }
+      
+      .bird {
+          position: absolute;
+          width: 28px;
+          height: 14px;
+          stroke: #fff; 
+          stroke-width: 2px;
+          fill: none;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          animation: birdWing 2s ease-in-out infinite;
+          filter: drop-shadow(0 0 5px var(--gold));
+      }
+
+      .bird.b1 { top: 0; left: 110px; animation-delay: 0s; transform: scale(1.1); } 
+      .bird.b2 { top: 30px; left: 70px; animation-delay: 0.2s; transform: scale(0.95); } 
+      .bird.b3 { top: 30px; left: 150px; animation-delay: 0.3s; transform: scale(0.95); } 
+      .bird.b4 { top: 60px; left: 30px; animation-delay: 0.4s; transform: scale(0.8); } 
+      .bird.b5 { top: 60px; left: 190px; animation-delay: 0.5s; transform: scale(0.8); } 
+
+      @keyframes birdWing {
+          0%, 100% { transform: translateY(0) scaleY(1); }
+          50% { transform: translateY(-5px) scaleY(0.8); } 
+      }
+      
+      .foreground-trees {
+          display: block;
+      }
+
+      .desktop-extras {
+          display: flex;
+          position: fixed;
+          right: 2rem;
+          top: 50%;
+          transform: translateY(-50%);
+          flex-direction: column;
+          gap: 1.5rem;
+          z-index: 50;
+          pointer-events: none;
+      }
+      
+      .desktop-clouds {
+          display: none;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          pointer-events: none;
+          z-index: 1; 
+          overflow: hidden;
+      }
+      .dt-cloud {
+          position: absolute;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 100px;
+          filter: blur(20px);
+          animation: dtCloudFloat linear infinite;
+      }
+      .dt-cloud::after, .dt-cloud::before {
+          content: '';
+          position: absolute;
+          background: inherit;
+          border-radius: 50%;
+      }
+      .dt-cloud.c1 {
+          width: 200px; height: 60px;
+          top: 12vh; left: -250px;
+          animation-duration: 45s;
+      }
+      .dt-cloud.c1::after { width: 80px; height: 80px; top: -40px; left: 30px; }
+      .dt-cloud.c1::before { width: 60px; height: 60px; top: -30px; left: 90px; }
+
+      .dt-cloud.c2 {
+          width: 300px; height: 90px;
+          top: 22vh; left: -400px;
+          animation-duration: 65s;
+          animation-delay: -10s;
+          opacity: 0.8;
+      }
+      .dt-cloud.c2::after { width: 120px; height: 120px; top: -60px; left: 50px; }
+      .dt-cloud.c2::before { width: 100px; height: 100px; top: -50px; left: 140px; }
+
+      .dt-cloud.c3 {
+          width: 250px; height: 70px;
+          top: 8vh; left: -300px;
+          animation-duration: 55s;
+          animation-delay: -5s;
+          opacity: 0.6;
+      }
+      .dt-cloud.c3::after { width: 90px; height: 90px; top: -45px; left: 40px; }
+      .dt-cloud.c3::before { width: 70px; height: 70px; top: -35px; left: 110px; }
+
+      .dt-cloud.c4 {
+          width: 180px; height: 50px;
+          top: 18vh; left: -150px;
+          animation-duration: 38s;
+          animation-delay: -20s;
+          opacity: 0.5;
+      }
+      .dt-cloud.c4::after { width: 60px; height: 60px; top: -30px; left: 20px; }
+      .dt-cloud.c4::before { width: 50px; height: 50px; top: -25px; left: 70px; }
+
+      @keyframes dtCloudFloat {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(120vw); }
+      }
+
+      .widget-box {
+          background: rgba(11, 21, 48, 0.5);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          padding: 1rem;
+          color: var(--text);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+          transition: transform 0.3s ease;
+          text-align: center;
+          min-width: 140px;
+      }
+      .widget-label {
+          font-size: 0.65rem;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: var(--accent);
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+      }
+
+      .atmosphere-icon {
+          font-size: 24px;
+          margin-bottom: 5px;
+          color: var(--gold);
+      }
+      .atmosphere-val {
+          font-family: 'Gochi Hand', cursive;
+          font-size: 1.2rem;
+          color: #fff;
+          line-height: 1.2;
+      }
+      
+      .chapter-val {
+          font-family: 'Pacifico', cursive;
+          font-size: 1rem;
+          color: #fff;
+      }
+
+      .desktop-clouds {
+          display: block;
+      }
+  }
+  
+  .markers{
+    position:relative; width:min(92vw, 700px); margin:0 auto;
+    pointer-events:none;
+  }
+  .marker{
+    position:relative; width:100%; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .line{
+    pointer-events:auto;
+    max-width: 92vw;
+    text-align:center; line-height:1.35; letter-spacing:.2px;
+    font-size: clamp(18px, 4.8vw, 26px);
+    color: var(--text);
+    padding: 0 2vw;
+    opacity:0; transform: translateY(18px);
+    will-change: opacity, transform;
+    transition: opacity .7s ease, transform .7s ease;
+    text-shadow: 0 1px 20px #0006;
+  }
+  .line.accent{color: var(--gold)}
+  .line.show{opacity:1; transform: translateY(0)}
+  .line small{display:block; opacity:.8; margin-top:.6rem; font-size:.9em; color:var(--accent)}
+
+  .climb-visual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    z-index: -1;
+    opacity: 0.3; 
+    pointer-events: none;
+  }
+  .mountain-path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1000; 
+    stroke-dashoffset: 1000; 
+    transition: stroke-dashoffset 3s ease-out;
+  }
+  
+  .marker.show .mountain-path {
+    stroke-dashoffset: 0; 
+  }
+  
+  .firefly-dot {
+    fill: var(--gold);
+    filter: blur(2px);
+    opacity: 0;
+  }
+  .marker.show .firefly-dot.path-climb {
+    opacity: 1;
+    offset-path: path("M20,180 L60,150 L90,160 L130,110 L160,130 L200,80 L240,90 L280,40");
+    animation: flyAlong 3s ease-out forwards;
+  }
+  .marker.show .firefly-dot.path-lotus {
+    opacity: 1;
+    animation: pulse-glow 3s infinite ease-in-out;
+    transform-origin: center;
+  }
+  
+  .seed-path {
+    fill: var(--gold);
+    opacity: 0;
+  }
+  .marker.show .seed-path {
+    animation: floatSeed 5s ease-out forwards;
+  }
+  .marker.show .seed-path:nth-child(3) { animation-delay: 0.2s; animation-duration: 6s; }
+  .marker.show .seed-path:nth-child(4) { animation-delay: 0.6s; animation-duration: 7s; }
+  .marker.show .seed-path:nth-child(5) { animation-delay: 1.0s; animation-duration: 5.5s; }
+
+  .marker.show .firefly-dot.path-butterfly {
+     opacity: 1;
+     offset-path: path("M50,160 Q100,200 150,150 T250,100");
+     animation: flyAlong 4s ease-in-out forwards;
+     fill: var(--accent); 
+     box-shadow: 0 0 10px var(--gold);
+  }
+
+  .sunglasses {
+    fill: #333;
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  .marker.show .sunglasses {
+    animation: dealWithIt 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    animation-delay: 0.5s;
+  }
+  .smile-curve {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+  }
+  .marker.show .smile-curve {
+    transition: stroke-dashoffset 1s ease forwards;
+    transition-delay: 1.5s;
+    stroke-dashoffset: 0;
+  }
+  @keyframes dealWithIt {
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .cape-path {
+    fill: var(--accent); 
+    opacity: 0.6;
+    transform-origin: 150px 100px;
+    transform: scale(0);
+  }
+  .marker.show .cape-path {
+    animation: cape-flutter 2s ease-out forwards;
+  }
+  @keyframes cape-flutter {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1) rotate(-3deg); opacity: 0.8; }
+    100% { transform: scale(1) rotate(3deg); opacity: 0.6; }
+  }
+
+  .phoenix-wrapper {
+    opacity: 0;
+    transform-origin: center;
+    display: block;
+  }
+  .marker.show .phoenix-wrapper {
+    animation: phoenix-rise-anim 4s ease-out forwards;
+  }
+  .phoenix-stroke {
+      stroke: var(--lantern-core); 
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 3px rgba(255, 69, 0, 0.8)); 
+  }
+
+  @keyframes phoenix-rise-anim {
+    0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  
+  .ember-dot {
+    fill: #ff4500; 
+    opacity: 0;
+    filter: blur(1px);
+  }
+  .marker.show .ember-dot {
+    animation: ember-float 3s ease-out infinite;
+  }
+  .marker.show .ember-dot:nth-child(1) { animation-delay: 0.5s; }
+  .marker.show .ember-dot:nth-child(2) { animation-delay: 1.2s; }
+  .marker.show .ember-dot:nth-child(3) { animation-delay: 0.8s; }
+
+  @keyframes ember-float {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-40px); opacity: 0; }
+  }
+
+
+  @keyframes flyAlong {
+    0% { offset-distance: 0%; opacity: 0;}
+    10% { opacity: 1;}
+    100% { offset-distance: 100%; opacity: 1;}
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+  @keyframes floatSeed {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.8; }
+    100% { transform: translate(80px, -100px) rotate(20deg); opacity: 0; }
+  }
+
+  .climb-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .climb-title {
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.6em;
+    color: #ffffff; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6); 
+    margin-bottom: -5px;
+    font-weight: 700;
+  }
+  .climb-main {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.4em;
+    color: var(--gold);
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); 
+  }
+  .climb-sub {
+    font-family: 'Gochi Hand', cursive;
+    font-size: 0.9em;
+    color: #ffffff; 
+    margin-top: 15px;
+    opacity: 1; 
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8); 
+  }
+
+  .poem-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #ffffff; 
+    text-shadow: 0 2px 5px rgba(0,0,0,0.7); 
+    margin-top: 1rem;
+    font-weight: 500; 
+    text-align: center;
+  }
+
+
+  .birthday-text {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.6em;
+      color: var(--gold);
+      display: block;
+      margin-top: 0.5em;
+      text-shadow: 0 0 20px rgba(255, 170, 0, 0.6); 
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 1s ease;
+  }
+  .line.show .birthday-text {
+      opacity: 1;
+      transform: scale(1);
+  }
+
+  .scroll-indicator {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.7;
+    z-index: 50;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .scroll-text {
+    font-size: 11px;
+    margin-bottom: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .scroll-arrow {
+    width: 16px;
+    height: 16px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(45deg);
+    animation: arrow-bounce 2s infinite;
+  }
+  @keyframes arrow-bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0) rotate(45deg);}
+    40% {transform: translateY(-8px) rotate(45deg);}
+    60% {transform: translateY(-4px) rotate(45deg);}
+  }
+
+  
+  .ripple{
+    position:absolute; width:140px; height:140px; border-radius:50%;
+    border:1px solid #fff3; opacity:0; left:50%; top:50%;
+    transform: translate(-50%,-50%) scale(.7);
+    animation: pulse 1.6s ease-out forwards;
+    z-index: 99;
+  }
+  @keyframes pulse{
+    10%{opacity:.5}
+    100%{opacity:0; transform: translate(-50%,-50%) scale(1.35)}
+  }
+
+  
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  
+  .nav-panel, #navToggleIcon, #navToggleX {
+      transition: all 0.3s ease-in-out;
+  }
+  .nav-panel {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+  }
+  .nav-panel::-webkit-scrollbar {
+      display: none;
+  }
+  .festive-text {
+      font-family: 'Gochi Hand', cursive;
+  }
+  button {
+      user-select: none;
+  }
+
+</style>
+</head>
+<body>
+
+<aside class="desktop-extras">
+    
+    <div class="widget-box">
+        <div class="widget-label">Atmosphere</div>
+        <div class="atmosphere-icon" id="deskAtmoIcon">🌫️</div>
+        <div class="atmosphere-val" id="deskAtmoVal">Morning Mist</div>
+    </div>
+
+    <div class="widget-box">
+        <div class="widget-label">Chapter</div>
+        <div class="chapter-val" id="deskChapterVal">Beginnings</div>
+    </div>
+    
+</aside>
+
+<div id="spiritCursor"></div>
+
+<div>
+    <button id="navToggle" 
+            class="fixed top-4 left-4 z-[70] p-2 rounded-md bg-indigo-900/80 backdrop-blur-sm text-yellow-200 shadow-lg hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all" 
+            aria-label="Toggle navigation">
+        
+        <svg id="navToggleIcon" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+        
+        <svg id="navToggleX" class="w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+
+    <nav id="desktopSidebar" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-96 bg-slate-900/95 backdrop-blur-md shadow-2xl transform -translate-x-full transition-transform duration-500 ease-out hidden lg:flex flex-col border-r border-white/10 pt-20 pb-10 px-6 overflow-y-auto">
+        <div class="grid grid-cols-2 gap-4 w-full">
+            <a href="index.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Home</a>
+            <a href="Cake.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">21_Door</a>
+            <a href="chat.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Heaven</a>
+            <a href="Diary.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Diary</a>
+            <a href="anatomy.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Anatomy</a>
+            <a href="Box.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Box</a>
+            <a href="Special.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Special</a>
+            <a href="color.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Color</a>
+            <a href="you.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">You</a>
+            <a href="Teacher.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Teacher</a>
+            <a href="Universe.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Universe</a>
+            <a href="The_River.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">River</a>
+            <a href="Mountain.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Mountain</a>
+            <a href="Skill.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Cartoon</a>
+            <a href="Periodik_table.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Concept</a>
+            <a href="Calender.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Calender</a>
+            <a href="Perspective.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Perspective</a>
+            <a href="Santa.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Santa</a>
+            <a href="Presence.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Presence</a>
+            <a href="Cloud.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Cloud</a>
+            <a href="Ink.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Spotlight</a>
+            <a href="Room.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Room</a>
+            <a href="Radio.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Radio</a>
+            <a href="Food.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Food</a>
+            <a href="Music.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Music</a>
+            <a href="letter.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Letter</a>
+            <a href="Msg.html" class="nav-link p-3 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200 festive-text text-center border border-white/5">Message</a>
+        </div>
+    </nav>
+
+    <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-indigo-900 text-yellow-200 shadow-md flex items-center justify-center space-x-2 -translate-y-full lg:hidden">
+      <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-2S0 festive-text">Message</a>
+      <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors duration-200 festive-text">Letter</a>
+      <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Music</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-indigo-900 text-yellow-200 shadow-md flex items-center justify-center space-x-2 translate-y-full lg:hidden">
+      <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Skill</a>
+      <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Paper Star</a>
+      <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-slate-950 text-yellow-200 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20 lg:hidden">
+      <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors duration-200 festive-text">Home</a>
+      <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Cake</a>
+      <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">21_Door</a>
+      <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors duration-200 festive-text">Heaven</a>
+      <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Diary</a>
+      <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors duration-200 festive-text">Anatomy</a>
+      <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Box</a>
+      <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors duration-200 festive-text">Special</a>
+      <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Color</a>
+      <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors duration-200 festive-text">You</a>
+      <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Teacher</a>
+      <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Universe</a>
+      <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">River</a>
+      <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Mountain</a>
+      </nav>
+      
+      <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 bg-slate-950 text-yellow-200 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20 lg:hidden">
+        <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Periodik_table</a>
+        <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Calender</a>
+        <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Perspective</a>
+        <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Butterfly</a>
+        <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Room</a>
+        <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Radio</a>
+        <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors duration-200 festive-text">Food</a>
+    </nav>
+</div>
+
+<div class="scene" id="scene">
+  <div class="viewport" aria-hidden="true">
+    <div class="lantern-container" id="lanternContainer"></div>
+    
+    <div class="star" style="top:8vh; left:12vw"></div>
+    <div class="star" style="top:16vh; left:72vw"></div>
+    <div class="star" style="top:24vh; left:34vw"></div>
+    <div class="star" style="top:32vh; left:58vw"></div>
+    <div class="star" style="top:12vh; left:88vw"></div>
+    <div class="star" style="top:38vh; left:20vw"></div>
+
+    <div class="aurora" id="auroraLayer"></div>
+    
+    <div id="skyEffects" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+    <div class="moon" id="moon"></div>
+    <div class="sun" id="sun"></div>
+    
+    <div class="fog f1"></div>
+    <div class="fog f2"></div>
+
+    <div class="mountain" id="mountain">
+      <svg viewBox="0 0 1000 400" preserveAspectRatio="none" role="img" aria-label="Mountain silhouette">
+        <path class="far" d="M0,330 L140,300 L220,320 L360,250 L480,320 L620,280 L720,300 L860,260 L1000,320 L1000,400 L0,400 Z"/>
+        <path d="M0,350 L120,320 L180,340 L300,260 L420,340 L560,300 L640,320 L800,280 L1000,340 L1000,400 L0,400 Z"/>
+      </svg>
+    </div>
+    
+    <div class="foreground-trees" id="fgTrees">
+        <svg viewBox="0 0 1200 400" preserveAspectRatio="none">
+            <path class="tree-path" d="M-50,400 L0,150 L50,400 M1150,400 L1200,180 L1250,400 M80,400 L120,280 L160,400 M1000,400 L1060,250 L1120,400" />
+            
+            <path class="tree-path opacity-80" d="M250,380 L252,360 L260,355 L265,340 L260,335 L265,325 L275,325 L280,335 L275,340 L285,355 L290,360 L290,380 Z" transform="scale(0.8) translate(100, 50)" />
+        </svg>
+    </div>
+
+    <div class="clouds" id="clouds">
+      <div class="cloud"></div>
+      <div class="cloud"></div>
+      <div class="cloud"></div>
+      <div class="cloud"></div>
+    </div>
+    
+    <div class="bird-group-container" id="birdGroup">
+        <svg class="bird b1" viewBox="0 0 40 20"><path d="M2,12 Q10,0 20,12 Q30,0 38,12" /></svg>
+        <svg class="bird b2" viewBox="0 0 40 20"><path d="M2,12 Q10,0 20,12 Q30,0 38,12" /></svg>
+        <svg class="bird b3" viewBox="0 0 40 20"><path d="M2,12 Q10,0 20,12 Q30,0 38,12" /></svg>
+        <svg class="bird b4" viewBox="0 0 40 20"><path d="M2,12 Q10,0 20,12 Q30,0 38,12" /></svg>
+        <svg class="bird b5" viewBox="0 0 40 20"><path d="M2,12 Q10,0 20,12 Q30,0 38,12" /></svg>
+    </div>
+
+    <div class="desktop-clouds">
+        <div class="dt-cloud c1"></div>
+        <div class="dt-cloud c2"></div>
+        <div class="dt-cloud c3"></div> 
+        <div class="dt-cloud c4"></div>
+    </div>
+
+  </div>
+
+  <div class="markers" aria-live="polite">
+    <section class="marker">
+      <div class="line accent">The world is lucky to have your light.<br><span class="birthday-text">Happy Birthday!</span></div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+        <svg class="climb-visual" viewBox="0 0 300 200">
+          <path class="mountain-path" d="M20,180 L60,150 L90,160 L130,110 L160,130 L200,80 L240,90 L280,40" />
+          <circle r="3" class="firefly-dot path-climb" />
+        </svg>
+        
+        <div class="climb-text-container">
+          <div class="climb-title">Every person</div>
+          <div class="climb-main">Climbs Mountains</div>
+          <div class="climb-sub">...but only a few do it quietly.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+        <svg class="climb-visual" viewBox="0 0 300 200">
+           <path class="mountain-path" d="M150,180 L150,120 Q150,120 120,100 M150,120 Q150,120 180,100 M150,120 L150,80" />
+           <circle class="firefly-dot path-lotus" cx="150" cy="80" r="3" />
+        </svg>
+
+        <div class="climb-text-container">
+           <div class="climb-title">Hidden Resilience</div>
+           <div class="poem-body">
+             You survived days you never spoke about,<br>
+             Carrying the weight with a silent grace.<br>
+             You healed the hurt without a shout,<br>
+             And let the light return to your face.
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+         <svg class="climb-visual" viewBox="0 0 300 200">
+            <path class="mountain-path" d="M100,180 Q110,130 100,100" style="stroke-width:1" />
+            <circle cx="100" cy="100" r="8" style="fill:var(--gold); opacity:0.6;" />
+            <circle class="seed-path" cx="100" cy="100" r="2" />
+            <circle class="seed-path" cx="100" cy="100" r="2" />
+            <circle class="seed-path" cx="100" cy="100" r="2" />
+         </svg>
+
+         <div class="climb-text-container">
+            <div class="climb-title">Gentle Strength</div>
+            <div class="poem-body">
+              Your power doesn't need to be loud,<br>
+              It is the quiet confidence of the dawn.<br>
+              Rising steadily, making us proud,<br>
+              Long after the darkness is gone.
+            </div>
+         </div>
+      </div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+        <svg class="climb-visual" viewBox="0 0 300 200">
+           <path class="mountain-path" d="M50,160 Q100,200 150,150 T250,100" style="stroke-dasharray: 10 10;" />
+           <circle class="firefly-dot path-butterfly" r="4" />
+        </svg>
+
+        <div class="climb-text-container">
+           <div class="climb-title">Graceful Transformation</div>
+           <div class="poem-body">
+             You healed in your own sacred time,<br>
+             A quiet magic, deep and true.<br>
+             Not for applause, but for the joy<br>
+             Of becoming the wonderful <em>You</em>.
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+        <svg class="climb-visual" viewBox="0 0 300 200">
+           <path class="mountain-path" d="M100,150 L150,50 L200,150" />
+           <g class="sunglasses">
+             <rect x="130" y="80" width="18" height="10" rx="2" />
+             <rect x="152" y="80" width="18" height="10" rx="2" />
+             <line x1="148" y1="85" x2="152" y2="85" stroke="#333" stroke-width="2" />
+           </g>
+           <path class="smile-curve" d="M135,110 Q150,125 165,110" />
+        </svg>
+
+        <div class="climb-text-container">
+           <div class="climb-title">Secret Superstar</div>
+           <div class="poem-body">
+             Some victories need a loud parade.<br>
+             Yours just need a quiet smirk.<br>
+             (You're like a happiness ninja—<br>
+             stealthy, skilled, and totally badass.)
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+        <svg class="climb-visual" viewBox="0 0 300 200">
+           <path class="mountain-path" d="M150,160 L150,100 M150,100 L130,120 M150,100 L170,120 M150,100 Q150,80 150,70" />
+           <circle class="mountain-path" cx="150" cy="60" r="10" />
+           <path class="cape-path" d="M145,100 Q120,140 110,180 L190,180 L180,140 L155,100" />
+        </svg>
+
+        <div class="climb-text-container">
+           <div class="climb-title">Unstoppable Force</div>
+           <div class="poem-body">
+             You doubt your power?<br>
+             You are a storm wrapped in sunshine.<br>
+             Capable of moving mountains<br>
+             (and you make it look easy).
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker">
+      <div class="line">
+        <svg class="climb-visual" viewBox="0 0 300 200">
+           <g class="phoenix-wrapper">
+             <path class="mountain-path phoenix-stroke" d="M150,130 Q145,110 150,90 Q155,75 150,70 Q145,65 140,75" />
+             
+             <path class="mountain-path phoenix-stroke" d="M150,90 Q110,70 60,40 M150,100 Q100,90 50,80 M150,110 Q110,110 70,100" />
+             
+             <path class="mountain-path phoenix-stroke" d="M150,90 Q190,70 240,40 M150,100 Q200,90 250,80 M150,110 Q190,110 230,100" />
+             
+             <path class="mountain-path phoenix-stroke" d="M150,130 Q130,170 120,190 M150,130 Q150,180 150,195 M150,130 Q170,170 180,190" />
+
+             <circle class="ember-dot" cx="130" cy="150" r="1.5" />
+             <circle class="ember-dot" cx="170" cy="160" r="2" />
+             <circle class="ember-dot" cx="150" cy="180" r="1" />
+           </g>
+        </svg>
+
+        <div class="climb-text-container">
+           <div class="climb-title">Infinite Horizon</div>
+           <div class="poem-body">
+             Your journey is a masterpiece of quiet courage.<br>
+             The world doesn't just need loud heroes;<br>
+             It needs souls like yours that burn bright.<br>
+             <span style="font-family: 'Pacifico', cursive; font-size: 1.2em; color: var(--gold); display:block; margin-top:10px;">Even in silence… you rise.</span>
+           </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="sr-only" id="sr-final">Final milestone reached.</div>
+</div>
+
+<div class="scroll-indicator" id="cue">
+    <div class="scroll-text">Scroll to reflect</div>
+    <div class="scroll-arrow"></div>
+</div>
+
+<script>
+  (function(){
+    'use strict';
+
+    const mountain = document.getElementById('mountain');
+    const sun = document.getElementById('sun');
+    const moon = document.getElementById('moon');
+    const scene = document.getElementById('scene');
+    const cue = document.getElementById('cue');
+    const clouds = document.getElementById('clouds'); 
+    const lanternContainer = document.getElementById('lanternContainer');
+    const body = document.body; 
+    
+    const birdGroup = document.getElementById('birdGroup');
+    
+    const deskChapterVal = document.getElementById('deskChapterVal');
+    const deskAtmoVal = document.getElementById('deskAtmoVal');
+    const deskAtmoIcon = document.getElementById('deskAtmoIcon');
+    const fgTrees = document.getElementById('fgTrees');
+
+    const auroraLayer = document.getElementById('auroraLayer');
+    const spiritCursor = document.getElementById('spiritCursor');
+    const skyEffects = document.getElementById('skyEffects');
+
+    let targetScroll = window.scrollY || document.documentElement.scrollTop;
+    let currentScroll = targetScroll;
+    const lerpFactor = 0.08; 
+    let docH = scene.offsetHeight - window.innerHeight;
+    
+    let lanternsTriggered = false;
+
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+
+    if (window.innerWidth >= 1024) {
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        }, {passive:true});
+
+        setInterval(() => {
+            if (window.scrollY < 1000) { 
+                spawnShootingStar();
+            }
+        }, 4000);
+    }
+
+    function spawnShootingStar() {
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+        star.style.left = Math.random() * 80 + 'vw';
+        star.style.top = Math.random() * 30 + 'vh';
+        star.style.transform = `rotate(${Math.random() * 45}deg)`;
+        skyEffects.appendChild(star);
+        setTimeout(() => star.remove(), 2000);
+    }
+
+    function lerp(start, end, amt) {
+      return (1 - amt) * start + amt * end;
+    }
+
+    function spawnLanterns() {
+        if (lanternsTriggered) return;
+        lanternsTriggered = true;
+        
+        for(let i=0; i<35; i++) {
+            const lantern = document.createElement('div');
+            lantern.className = 'lantern';
+            lantern.style.left = Math.random() * 100 + 'vw';
+            lantern.style.animationDuration = (10 + Math.random() * 15) + 's'; 
+            lantern.style.animationDelay = Math.random() * 2 + 's';
+            lanternContainer.appendChild(lantern);
+        }
+    }
+    
+    function updateDesktopWidgets(p) {
+        if (window.innerWidth < 1024) return;
+
+        if(deskChapterVal && deskAtmoVal && deskAtmoIcon) {
+            if (p < 0.1) {
+                deskChapterVal.innerText = "Beginnings";
+                deskAtmoVal.innerText = "Morning Mist";
+                deskAtmoIcon.innerText = "🌫️";
+            }
+            else if (p < 0.25) {
+                deskChapterVal.innerText = "The Climb";
+                deskAtmoVal.innerText = "Clear Skies";
+                deskAtmoIcon.innerText = "☀️";
+            }
+            else if (p < 0.5) {
+                deskChapterVal.innerText = "Resilience";
+                deskAtmoVal.innerText = "Steady Wind";
+                deskAtmoIcon.innerText = "🌬️";
+            }
+            else if (p < 0.75) {
+                deskChapterVal.innerText = "Transformation";
+                deskAtmoVal.innerText = "Golden Hour";
+                deskAtmoIcon.innerText = "🌅";
+            }
+            else if (p < 0.9) {
+                deskChapterVal.innerText = "The Summit";
+                deskAtmoVal.innerText = "Starlight";
+                deskAtmoIcon.innerText = "✨";
+            }
+            else {
+                deskChapterVal.innerText = "New Horizons";
+                deskAtmoVal.innerText = "Infinite";
+                deskAtmoIcon.innerText = "🌌";
+            }
+        }
+        
+        if(fgTrees) {
+            const treeMove = p * -60; 
+            fgTrees.style.transform = `translateY(${treeMove}px)`;
+        }
+
+        if (auroraLayer) {
+            const auroraOp = Math.max(0, 1 - (p * 3));
+            auroraLayer.style.opacity = auroraOp;
+        }
+    }
+
+    function onScroll(){
+      targetScroll = window.scrollY || document.documentElement.scrollTop;
+      docH = scene.offsetHeight - window.innerHeight;
+    }
+
+    function runAnimationLoop(){
+      if (Math.abs(targetScroll - currentScroll) > 0.01) {
+        currentScroll = lerp(currentScroll, targetScroll, lerpFactor);
+      } else {
+        currentScroll = targetScroll;
+      }
+      
+      const p = Math.min(1, Math.max(0, currentScroll / (docH || 1)));
+
+      const parallax = p * 12; 
+      mountain.style.transform = `translateY(${parallax.toFixed(2)}px)`;
+      
+      updateDesktopWidgets(p);
+
+      if(moon) {
+          const moonPhase = Math.min(1, p * 3); 
+          moon.style.opacity = (1 - moonPhase).toFixed(2);
+          moon.style.transform = `translateY(${p * 50}vmin)`;
+      }
+
+      if (window.innerWidth >= 1024 && spiritCursor) {
+          cursorX = lerp(cursorX, mouseX, 0.15);
+          cursorY = lerp(cursorY, mouseY, 0.15);
+          spiritCursor.style.left = cursorX + 'px';
+          spiritCursor.style.top = cursorY + 'px';
+      }
+      
+      
+      const sunRiseStart = 0.10; 
+      const sunRevealEnd = 0.95;
+      const sunRevealProgress = Math.min(1, Math.max(0, (p - sunRiseStart) / (sunRevealEnd - sunRiseStart)));
+
+      
+      const finalSunY = 30; 
+      const finalSunScale = 1.0;
+      const finalSunOpacity = 1;
+
+      
+      const currentSunY = lerp(100, finalSunY, sunRevealProgress); 
+      const currentSunScale = lerp(0.5, finalSunScale, sunRevealProgress);
+      const currentSunOpacity = lerp(0, finalSunOpacity, sunRevealProgress);
+
+      sun.style.transform = `translateX(-50%) translateY(${currentSunY.toFixed(2)}vmin) scale(${currentSunScale.toFixed(2)})`;
+      sun.style.opacity = String(currentSunOpacity.toFixed(2));
+      
+      
+      const glowIntensity = lerp(0.3, 1.0, sunRevealProgress); 
+      sun.style.background = `radial-gradient(circle at 50% 60%, rgba(255,183,107,${glowIntensity.toFixed(2)}) 0%, #fff0 60%)`;
+
+      
+      
+      const skyTransitionStart = 0.15; 
+      const skyTransitionEnd = 1.0;
+      const skyProgress = Math.min(1, Math.max(0, (p - skyTransitionStart) / (skyTransitionEnd - skyTransitionStart)));
+
+      
+      const dawnSky1 = '#87CEEB'; 
+      const dawnSky2 = '#FFDAB9'; 
+
+      const lerpColor = (c1, c2, factor) => {
+          const hexToRgb = hex => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+          const rgbToHex = rgb => '#' + rgb.map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+
+          const rgb1 = hexToRgb(c1);
+          const rgb2 = hexToRgb(c2);
+          const r = lerp(rgb1[0], rgb2[0], factor);
+          const g = lerp(rgb1[1], rgb2[1], factor);
+          const b = lerp(rgb1[2], rgb2[2], factor);
+          return rgbToHex([r, g, b]);
+      };
+      
+      body.style.setProperty('--current-sky1', lerpColor(getComputedStyle(document.documentElement).getPropertyValue('--sky1'), dawnSky1, skyProgress));
+      body.style.setProperty('--current-sky2', lerpColor(getComputedStyle(document.documentElement).getPropertyValue('--sky2'), dawnSky2, skyProgress));
+
+      const cloudsAppearStart = 0.70; 
+      const cloudsAppearEnd = 0.98;
+      const cloudsProgress = Math.min(1, Math.max(0, (p - cloudsAppearStart) / (cloudsAppearEnd - cloudsAppearStart)));
+      clouds.style.opacity = cloudsProgress.toFixed(2);
+      clouds.style.zIndex = (p > sunRiseStart && p < sunRevealEnd) ? '1' : '0';
+      
+      const cueFadeStart = 0.05; 
+      const cueFadeEnd = 0.20; 
+      const cueFadeProgress = Math.min(1, Math.max(0, (p - cueFadeStart) / (cueFadeEnd - cueFadeStart)));
+      cue.style.opacity = String(Math.max(0, (1 - cueFadeProgress)).toFixed(2));
+
+      if (birdGroup && window.innerWidth >= 1024) {
+         const birdStart = 0.85; 
+         const birdEnd = 0.98;   
+         const birdOpacity = Math.min(1, Math.max(0, (p - birdStart) / (birdEnd - birdStart)));
+         birdGroup.style.opacity = birdOpacity.toFixed(2);
+      }
+      
+      window.requestAnimationFrame(runAnimationLoop);
+    }
+    
+    window.addEventListener('scroll', onScroll, {passive:true});
+    window.addEventListener('resize', () => {
+        docH = scene.offsetHeight - window.innerHeight;
+    }, {passive:true});
+
+    runAnimationLoop();
+    spawnLanterns();
+
+    try {
+      const io = new IntersectionObserver(entries=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            const el = e.target.querySelector('.line');
+            if (el) {
+              el.classList.add('show');
+            }
+          }
+        });
+      }, {
+        threshold: .45 
+      });
+      document.querySelectorAll('.marker').forEach(m=>io.observe(m));
+    } catch (e) {
+      console.warn("IntersectionObserver not supported. Line animations may not work.");
+    }
+    
+    document.body.addEventListener('click', (ev)=>{
+      if (ev.target.closest('a, button')) return;
+
+      const r = document.createElement('div');
+      r.className = 'ripple';
+      r.style.left = ev.clientX + 'px';
+      r.style.top = ev.clientY + 'px';
+      document.body.appendChild(r);
+      setTimeout(()=>r.remove(), 1600);
+    }, {passive:true});
+    
+  })();
+  
+  document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.lg\\:hidden .nav-link');
+      const topNav = document.getElementById('topNav');
+      const bottomNav = document.getElementById('bottomNav');
+      const leftNav = document.getElementById('leftNav');
+      const rightNav = document.getElementById('rightNav');
+      const desktopSidebar = document.getElementById('desktopSidebar');
+      const navToggle = document.getElementById('navToggle'); 
+      const navToggleIcon = document.getElementById('navToggleIcon');
+      const navToggleX = document.getElementById('navToggleX');
+
+      let areNavsOpen = false;
+
+      function openAllNavs() {
+          // Check screen size
+          if (window.innerWidth >= 1024) {
+              // Desktop Logic
+              if(desktopSidebar) desktopSidebar.classList.remove('-translate-x-full');
+          } else {
+              // Mobile Logic
+              if(!topNav) return; 
+              topNav.classList.remove('-translate-y-full');
+              bottomNav.classList.remove('translate-y-full');
+              leftNav.classList.remove('-translate-x-full');
+              rightNav.classList.remove('translate-x-full');
+          }
+          
+          navToggleIcon.classList.add('hidden');
+          navToggleX.classList.remove('hidden');
+          navToggle.setAttribute('aria-expanded', 'true'); 
+          areNavsOpen = true;
+      }
+
+      function closeAllNavs() {
+          // Check screen size
+          if (window.innerWidth >= 1024) {
+              // Desktop Logic
+              if(desktopSidebar) desktopSidebar.classList.add('-translate-x-full');
+          } else {
+              // Mobile Logic
+              if(!topNav) return;
+              topNav.classList.add('-translate-y-full');
+              bottomNav.classList.add('translate-y-full');
+              leftNav.classList.add('-translate-x-full');
+              rightNav.classList.add('translate-x-full');
+          }
+
+          navToggleIcon.classList.remove('hidden');
+          navToggleX.classList.add('hidden');
+          navToggle.setAttribute('aria-expanded', 'false'); 
+          areNavsOpen = false;
+      }
+
+      if (navToggle) {
+          navToggle.addEventListener('click', (e) => {
+              e.stopPropagation(); 
+              if (areNavsOpen) closeAllNavs(); else openAllNavs();
+          });
+      }
+      
+      document.addEventListener('click', (e) => {
+          if (areNavsOpen) {
+              const clickedInsideNav = e.target.closest('.nav-panel');
+              const clickedInsideToggle = e.target.closest('#navToggle');
+              if (!clickedInsideNav && !clickedInsideToggle) {
+                  closeAllNavs();
+              }
+          }
+      });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<title>Butterfly Story — Cinematic Monarch</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --sky1:#f6fbff; --sky2:#eaf2ff; --sky3:#e2e9ff;
+  --ink:#26263a; --soft:#6a6a88; --accent:#ff7fb6; --pill:#ffffffee;
+  --glow:#ffdfb0;
+  --flap-slow: .85s;
+  --flap-fly:  .58s;
+  --flap-land: .95s;
+  --rest-angle: -8deg;
+  --sunflower-petal: #fcc419;
+  --sunflower-petal-dark: #f59f00;
+  --sunflower-center: #5c4033;
+  --sunflower-stem: #38761d;
+  --sun-color-start: #FFD700; 
+  --sun-color-end: #FFA500; 
+  --sun-glow-color: #FFECB3; 
+}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  margin:0;padding:0}
+body{
+  height:100vh; overflow:hidden;
+   font-family:Inter,system-ui,sans-serif;
+  background:
+    radial-gradient(120vmax 80vmax at 50% -20%, #fff6 0%, #0000 55%),
+    linear-gradient(180deg,var(--sky1),var(--sky2) 60%,var(--sky3));
+  color:var(--ink);
+}
+
+.wrap{position:relative;width:100%;height:100%;overflow:hidden}
+
+/* --- SCENE ELEMENTS --- */
+.sun {
+  position: absolute;
+  top: -10vh; 
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30vh; 
+  height: 30vh;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, var(--sun-color-start) 0%, var(--sun-color-end) 100%);
+  box-shadow: 0 0 80px 30px var(--sun-glow-color);
+  z-index: 0; 
+  pointer-events: none;
+}
+
+/* NEW: Sun Rays */
+.sun-rays {
+    position: absolute;
+    top: -10vh; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 120vmax; 
+    height: 120vmax;
+    background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.08) 0deg 5deg, transparent 5deg 15deg);
+    border-radius: 50%;
+    animation: rotateRays 120s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+    mix-blend-mode: overlay;
+}
+@keyframes rotateRays { 
+    from { transform: translateX(-50%) rotate(0deg); }
+    to { transform: translateX(-50%) rotate(360deg); } 
+}
+
+.sunflower-svg {
+  position: absolute;
+  bottom: 0;
+  height: 70vh; 
+  width: 35vh; 
+  max-width: 250px; 
+  z-index: 2;
+  pointer-events: none;
+}
+.left-sun {
+  left: 0;
+  transform: translateX(-40%); 
+}
+.right-sun {
+  right: 0;
+  transform: translateX(40%) scaleX(-1);
+}
+
+/* Garden Sunflowers (Desktop Only) */
+.garden-sun {
+  position: absolute;
+  bottom: 0;
+  z-index: 1; /* Behind main sunflowers */
+  pointer-events: none;
+  transform-origin: bottom center;
+}
+.gs-1 { left: 10%; height: 45vh; width: 22vh; transform: rotate(5deg); filter: brightness(0.95); }
+.gs-2 { left: 25%; height: 35vh; width: 18vh; transform: rotate(-3deg); filter: brightness(0.9) blur(0.5px); z-index: 0; }
+.gs-3 { right: 25%; height: 38vh; width: 19vh; transform: scaleX(-1) rotate(-2deg); filter: brightness(0.9) blur(0.5px); z-index: 0; }
+.gs-4 { right: 12%; height: 48vh; width: 24vh; transform: scaleX(-1) rotate(4deg); filter: brightness(0.95); }
+.gs-5 { left: 42%; height: 28vh; width: 14vh; bottom: -2vh; transform: rotate(2deg); filter: brightness(0.85) blur(1px); z-index: 0; }
+
+/* Generated Sunflowers */
+.generated-sunflower {
+    position: absolute;
+    bottom: -2vh;
+    transform-origin: bottom center;
+    pointer-events: none;
+}
+
+
+/* --- DESKTOP DECORATIONS --- */
+.cloud {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 100px;
+    filter: blur(8px);
+    opacity: 0.6;
+    z-index: 1;
+    pointer-events: none;
+    animation: drift linear infinite;
+}
+.cloud::after, .cloud::before {
+    content:''; position:absolute; background:#fff; border-radius:50%;
+}
+.cloud::after { width: 50%; height: 120%; top: -40%; left: 15%; filter: blur(4px); }
+.cloud::before { width: 40%; height: 100%; top: -30%; left: 45%; filter: blur(4px); }
+
+.c1 { width: 200px; height: 60px; top: 15%; left: -250px; animation-duration: 65s; opacity: 0.7; }
+.c2 { width: 160px; height: 50px; top: 25%; left: -200px; animation-duration: 90s; animation-delay: -20s; opacity: 0.5; }
+.c3 { width: 250px; height: 70px; top: 8%; left: -300px; animation-duration: 110s; animation-delay: -5s; opacity: 0.4; }
+.c4 { width: 180px; height: 55px; top: 20%; left: -220px; animation-duration: 75s; animation-delay: -40s; opacity: 0.6; }
+.c5 { width: 120px; height: 40px; top: 12%; left: -150px; animation-duration: 95s; animation-delay: -60s; opacity: 0.4; }
+
+@keyframes drift { to { transform: translateX(120vw); } }
+
+.corner-bush {
+    position: absolute;
+    bottom: -20px;
+    height: 30vh;
+    width: auto;
+    z-index: 4; /* In front of sunflowers and grass */
+    pointer-events: none;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+}
+.cb-left { left: 2vw; transform: rotate(-2deg); }
+.cb-right { right: 2vw; transform: scaleX(-1) rotate(-2deg); }
+
+/* Distant Hills - Revised Positioning */
+.distant-hills {
+    position: absolute;
+    bottom: 0; /* Aligned to bottom */
+    left: 0;
+    width: 100%;
+    height: 30vh;
+    z-index: 0; /* Behind ground */
+    pointer-events: none;
+    /* Added to smooth the look */
+    filter: blur(0.5px);
+}
+
+/* Continuous Grass Strip for Desktop */
+.desktop-grass {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 14vh;
+    z-index: 2; /* In front of flowers */
+    pointer-events: none;
+    opacity: 0.8;
+}
+/* Second Layer of Grass for Depth */
+.desktop-grass-2 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 22vh; /* Taller */
+    z-index: 1; /* Behind flowers */
+    pointer-events: none;
+    opacity: 0.5;
+    filter: brightness(0.8);
+}
+
+.grass-blade {
+    fill: #5a913b;
+    animation: sway 3s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+}
+@keyframes sway { from { transform: rotate(0deg); } to { transform: rotate(2deg); } }
+
+/* Random Flowers */
+.random-flower {
+    position: absolute;
+    bottom: -10px; /* Hidden slightly below */
+    z-index: 2; /* Sandwiched between grass layers */
+    pointer-events: none;
+    transform-origin: bottom center;
+    animation: flowerSway 3s ease-in-out infinite alternate;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+}
+@keyframes flowerSway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+
+/* Dandelion Seeds */
+.dandelion-seed {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    z-index: 5;
+    animation: seedFloat linear infinite;
+    opacity: 0;
+}
+@keyframes seedFloat {
+    0% { transform: translate(0,0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.7; }
+    80% { opacity: 0.7; }
+    100% { transform: translate(var(--tx), var(--ty)) rotate(var(--r)); opacity: 0; }
+}
+
+/* --- BIRDS --- */
+.bird-container {
+    position: absolute;
+    z-index: 1; /* Background sky */
+    pointer-events: none;
+    opacity: 0.6;
+}
+.bird-svg {
+    width: 24px;
+    height: 12px;
+    fill: none;
+    stroke: var(--soft);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: birdFlap 0.4s ease-in-out infinite alternate;
+}
+@keyframes birdFlap {
+    from { transform: translateY(0) scaleY(1); }
+    to { transform: translateY(3px) scaleY(0.6); }
+}
+
+.b1 { top: 15%; left: -50px; animation: fly1 35s linear infinite; }
+.b2 { top: 25%; left: -50px; animation: fly2 45s linear infinite; animation-delay: 15s; }
+.b3 { top: 10%; right: -50px; animation: fly3 40s linear infinite; animation-delay: 5s; }
+.b4 { top: 35%; left: -50px; animation: fly1 38s linear infinite; animation-delay: 25s; opacity: 0.5; }
+.b5 { top: 5%; right: -50px; animation: fly3 42s linear infinite; animation-delay: 12s; opacity: 0.4; }
+.b6 { top: 18%; left: -50px; animation: fly2 40s linear infinite; animation-delay: 30s; opacity: 0.5; }
+
+@keyframes fly1 {
+    0% { transform: translateX(-10vw) scale(0.7); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateX(110vw) translateY(-5vh) scale(0.7); opacity: 0; }
+}
+@keyframes fly2 {
+    0% { transform: translateX(-10vw) scale(0.5); opacity: 0; }
+    100% { transform: translateX(110vw) translateY(8vh) scale(0.5); opacity: 0; }
+}
+@keyframes fly3 {
+    0% { transform: translateX(10vw) scaleX(-1) scale(0.6); opacity: 0; }
+    100% { transform: translateX(-110vw) translateY(5vh) scaleX(-1) scale(0.6); opacity: 0; }
+}
+
+/* Pollen particles */
+.pollen {
+    position: absolute;
+    background: #ffd700;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: floatPollen 8s ease-in-out infinite;
+    z-index: 5;
+}
+@keyframes floatPollen {
+    0% { transform: translate(0,0); opacity: 0; }
+    20% { opacity: 0.8; }
+    80% { opacity: 0.6; }
+    100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+}
+
+
+.dust{position:absolute;inset:0;pointer-events:none;z-index:1}
+.d{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:#fff;opacity:.7;
+  filter:drop-shadow(0 0 6px #fff8);
+  animation:rise linear infinite;
+}
+@keyframes rise{
+  to{transform:translateY(-110vh) translateX(var(--drift));opacity:1}
+}
+
+.ground{
+  position:absolute;left:0;right:0;bottom:-9vh;height:28vh;z-index:0;
+  background:
+    radial-gradient(60vmax 12vmax at 20% 0%,#c6ffd780 0 40%,#0000 41%),
+    radial-gradient(60vmax 12vmax at 80% 0%,#ffd9ea80 0 40%,#0000 41%),
+    linear-gradient(180deg, #8B4513 0%, #A0522D 50%, #D2B48C 90%, #E4F7FF 100%);
+  border-top-left-radius:50% 20%;
+  border-top-right-radius:50% 20%;
+  filter:blur(1px);
+}
+
+.hint{
+  position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  font-size:13px;color:var(--soft);
+  background:#ffffffc8;padding:8px 12px;border-radius:999px;
+  backdrop-filter:blur(6px);box-shadow:0 6px 18px #0001;
+  z-index:4;
+}
+
+.words{position:absolute;inset:0;pointer-events:none;z-index:3}
+.pill{
+  position:absolute;
+  transform:translate(-50%,-50%) translateY(-8px);
+  background:var(--pill);border-radius:999px;padding:8px 12px;
+  border:1px solid #00000012;color:var(--ink);
+  font-size:14px;opacity:0;
+  animation:drop .9s ease-out forwards;
+  box-shadow:0 6px 20px #0002,0 0 0 6px #ffffff60 inset;
+}
+@keyframes drop{
+  0%{transform:translate(-50%,-50%) translateY(-12px) scale(.96);opacity:0}
+  60%{opacity:1}
+  100%{transform:translate(-50%,-50%) translateY(0) scale(1);opacity:1}
+}
+
+/* --- BUTTERFLY --- */
+.butterfly{
+  position:absolute;left:0;top:0;
+  --x:50vw;--y:60vh;--r:0deg;
+  width:130px;height:110px;z-index:5;
+  transform:translate(var(--x),var(--y)) rotate(var(--r));
+  filter:drop-shadow(0 10px 16px rgba(0,0,0,.16));
+}
+.butterfly.glow{
+  filter:
+    drop-shadow(0 0 12px rgba(255,223,176,.75))
+    drop-shadow(0 10px 16px rgba(0,0,0,.18));
+}
+
+.wing{
+  position:absolute;top:20px;width:90px;height:80px;
+  animation: flap var(--flap-slow) ease-in-out infinite;
+  animation-delay: 0s !important;
+  will-change: transform;
+}
+.wing.left{
+  left:-12px; transform-origin:92% 50%;
+}
+.wing.right{
+  right:-12px; transform-origin:8% 50%; transform:scaleX(-1);
+}
+
+@keyframes flap{
+  0%   { transform: rotate(14deg); }
+  50%  { transform: rotate(-16deg); }
+  100% { transform: rotate(14deg); }
+}
+
+.body{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:18px;height:80px;border-radius:10px;
+  background:linear-gradient(#2a2a3d,#1a1a29);
+}
+.antenna{
+  position:absolute;left:50%;top:8px;width:32px;height:32px;
+  border-top:2px solid #1e1e2e;border-right:2px solid #1e1e2e;
+  border-radius:50%;transform:translateX(-50%) rotate(40deg);
+}
+
+.butterfly.flying   .wing{ animation-duration: var(--flap-fly); }
+.butterfly.landing  .wing{ animation-duration: var(--flap-land); }
+
+.butterfly.rest .wing{
+  animation-play-state: paused;
+  transform: rotate(var(--rest-angle)) !important;
+}
+
+.final{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(90vw,520px);padding:20px;
+  background:#ffffffee;border:1px solid #0001;border-radius:18px;
+  backdrop-filter:blur(8px);
+  text-align:center;
+  box-shadow:0 20px 60px #0002,0 0 0 8px #ffffff70 inset;
+  opacity:0;pointer-events:none;z-index:10;
+  transition:opacity .8s ease,transform .8s ease;
+}
+.final.show{opacity:1;transform:translate(-50%,-50%) scale(1.02)}
+.final h3{font-size:22px;margin:0 0 10px}
+.final p{font-size:15px;color:#4a4a66;line-height:1.6}
+.final .accent{color:var(--accent);text-shadow:0 0 10px var(--glow)}
+.final h3 {
+    font-family: 'Pacifico', cursive;
+}
+
+
+.controls{position:fixed;right:12px;bottom:12px;z-index:12}
+.btn{
+  background:#fff;border:1px solid #0002;padding:8px 12px;
+  border-radius:999px;box-shadow:0 6px 16px #0001;font-size:12px;
+  cursor:pointer;
+}
+.btn:active{transform:translateY(1px)}
+
+/* --- NAVIGATION STYLES --- */
+.nav-panel, #navToggleIcon, #navToggleX {
+    transition: all 0.3s ease-in-out;
+}
+.nav-panel {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.nav-panel::-webkit-scrollbar {
+    display: none;
+}
+.festive-text {
+    font-family: 'Gochi Hand', cursive;
+}
+h1, h2, .nav-header {
+     font-family: 'Pacifico', cursive;
+}
+button {
+    user-select: none;
+}
+
+/* DESKTOP NAV SPECIFIC */
+#desktopNav {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.desktop-link {
+    transition: all 0.2s ease;
+}
+.desktop-link:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: translateX(4px);
+    color: #db2777; /* pink-600 */
+}
+</style>
+</head>
+
+<body>
+
+<!-- ========================================== -->
+<!-- MOBILE NAVIGATION (HIDDEN ON LARGE SCREENS) -->
+<!-- ========================================== -->
+
+<div class="mobile-only lg:hidden">
+    <button id="navToggle" class="fixed top-6 left-6 z-[70] p-2 bg-white/80 text-gray-700 backdrop-blur-sm rounded-full shadow-lg hover:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      
+      <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-white/80 backdrop-blur-sm text-[var(--ink)] shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+      <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">message</a>
+      <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white transition-colors duration-200 festive-text">Letter</a>
+      <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Music</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-white/80 backdrop-blur-sm text-[var(--ink)] shadow-md flex items-center justify-center space-x-2 translate-y-full">
+      <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Skill</a>
+      <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Paper Star</a>
+      <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-white/90 backdrop-blur-sm text-[var(--ink)] shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+      <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white transition-colors duration-200 festive-text">Home</a>
+      <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Cake</a>
+      <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">21_Door</a>
+      <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white transition-colors duration-200 festive-text">Heaven</a>
+      <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Diary</a>
+      <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white transition-colors duration-200 festive-text">Anatomy</a>
+      <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Box</a>
+      <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white transition-colors duration-200 festive-text">Special</a>
+      <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Color</a>
+      <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white transition-colors duration-200 festive-text">You</a>
+      <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Teacher</a>
+      <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Universe</a>
+      <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">River</a>
+      <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Mountain</a>
+    </nav>
+    
+    <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 bg-white/90 backdrop-blur-sm text-[var(--ink)] shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+      <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Periodik_table</a>
+      <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Concept</a>
+      <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Calender</a>
+      <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Perspective</a>
+      <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Santa</a>
+      <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Presence</a>
+      <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Cloud</a>
+      <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Paint</a>
+      <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium bg-gray-200 font-bold transition-colors duration-200 festive-text">Butterfly</a>
+      <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Weather</a>
+      <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Spotlight</a>
+      <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Room</a>
+      <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Radio</a>
+      <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors duration-200 festive-text">Food</a>
+    </nav>
+</div>
+
+<!-- ========================================== -->
+<!-- DESKTOP NAVIGATION (VISIBLE ON LARGE SCREENS) -->
+<!-- ========================================== -->
+
+<div class="desktop-only hidden lg:block">
+    <!-- Desktop Toggle Button (High Z-Index & Contrast) -->
+    <button id="desktopToggle" class="fixed top-6 left-6 z-[100] p-3 bg-white text-pink-600 rounded-full shadow-2xl hover:scale-110 transition-all duration-300 focus:outline-none ring-2 ring-pink-100">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+    </button>
+
+    <!-- Desktop Sidebar Panel (High Z-Index) -->
+    <nav id="desktopNav" class="fixed top-0 left-0 h-full w-96 bg-white/95 backdrop-blur-xl z-[90] shadow-2xl -translate-x-full border-r border-pink-100/50 flex flex-col">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-100/50 bg-white/50">
+            <h2 class="text-2xl text-[var(--ink)] nav-header">Menu</h2>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <!-- Double Column Grid -->
+            <div class="grid grid-cols-2 gap-3 space-x-2">
+                <!-- Links imported from mobile sections -->
+                <a href="index.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Home</a>
+                <a href="Cake.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Cake</a>
+                <a href="21_Wish.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">21_Door</a>
+                <a href="chat.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Heaven</a>
+                <a href="Diary.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Diary</a>
+                <a href="anatomy.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Anatomy</a>
+                <a href="Box.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Box</a>
+                <a href="Special.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Special</a>
+                <a href="color.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Color</a>
+                <a href="you.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">You</a>
+                <a href="Teacher.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Teacher</a>
+                <a href="Universe.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Universe</a>
+                <a href="The_River.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">River</a>
+                <a href="Mountain.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Mountain</a>
+                <a href="Skill.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Skill</a>
+                <a href="Paper_Star.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Paper Star</a>
+                <a href="Carttoon.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Cartoon</a>
+                <a href="Periodik_table.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Periodik_table</a>
+                <a href="Concept.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Concept</a>
+                <a href="Calender.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Calender</a>
+                <a href="Perspective.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Perspective</a>
+                <a href="Santa.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Santa</a>
+                <a href="Presence.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Presence</a>
+                <a href="Cloud.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Cloud</a>
+                <a href="Ink.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Paint</a>
+                <a href="Butterfly.html" class="desktop-link block p-3 rounded-xl bg-pink-100 text-pink-700 font-bold festive-text text-lg border border-pink-200 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Butterfly</a>
+                <a href="Weather.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Weather</a>
+                <a href="Spotlight.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Spotlight</a>
+                <a href="Room.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Room</a>
+                <a href="Radio.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Radio</a>
+                <a href="Food.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Food</a>
+                <a href="Music.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Music</a>
+                <a href="letter.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Letter</a>
+                <a href="Msg.html" class="desktop-link block p-3 rounded-xl bg-white/40 text-gray-700 font-medium festive-text text-lg">Message</a>
+            </div>
+            <div class="h-20"></div> <!-- Spacer for bottom area -->
+        </div>
+    </nav>
+</div>
+
+
+<div class="wrap" id="scene">
+  <div class="sun"></div>
+  <div class="sun-rays hidden lg:block"></div>
+  
+  <!-- Distant Hills (Moved before .desktop-decor and .ground to be behind them) -->
+  <svg class="distant-hills hidden lg:block" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,120 C400,60 800,100 1200,50 L1200,120 L0,120 Z" fill="#b8e0d2" opacity="0.6" />
+      <path d="M0,120 C300,90 600,110 900,60 C1100,30 1200,120 1200,120 L0,120 Z" fill="#95c7b6" opacity="0.5" />
+  </svg>
+
+  <!-- DESKTOP DECORATIONS (Only visible on lg screens) -->
+  <div class="desktop-decor hidden lg:block pointer-events-none absolute inset-0 z-[1]">
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="cloud c3"></div>
+      <div class="cloud c4"></div>
+      <div class="cloud c5"></div>
+      
+      <!-- Birds -->
+      <div class="bird-container b1">
+          <svg class="bird-svg" viewBox="0 0 24 12">
+              <path d="M1,6 Q6,-2 12,6 Q18,-2 23,6" />
+          </svg>
+      </div>
+      <div class="bird-container b2">
+          <svg class="bird-svg" viewBox="0 0 24 12">
+              <path d="M1,6 Q6,-2 12,6 Q18,-2 23,6" />
+          </svg>
+      </div>
+      <div class="bird-container b3">
+          <svg class="bird-svg" viewBox="0 0 24 12">
+              <path d="M1,6 Q6,-2 12,6 Q18,-2 23,6" />
+          </svg>
+      </div>
+      <!-- Additional Birds -->
+      <div class="bird-container b4">
+          <svg class="bird-svg" viewBox="0 0 24 12">
+              <path d="M1,6 Q6,-2 12,6 Q18,-2 23,6" />
+          </svg>
+      </div>
+      <div class="bird-container b5">
+          <svg class="bird-svg" viewBox="0 0 24 12">
+              <path d="M1,6 Q6,-2 12,6 Q18,-2 23,6" />
+          </svg>
+      </div>
+      <div class="bird-container b6">
+          <svg class="bird-svg" viewBox="0 0 24 12">
+              <path d="M1,6 Q6,-2 12,6 Q18,-2 23,6" />
+          </svg>
+      </div>
+      
+      <!-- Garden Sunflowers (New) -->
+      <!-- GS 1: Left Mid -->
+      <svg class="sunflower-svg garden-sun gs-1" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+        <defs><radialGradient id="sc-g1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7a523a"/><stop offset="100%" stop-color="#5c4033"/></radialGradient></defs>
+        <g transform="translate(0, 0)"> <rect x="45" y="50" width="10" height="180" fill="#38761d" /> <path d="M55, 100 Q 80, 80 80, 130 C 80, 140 60, 120 55, 110 Z" fill="#38761d" opacity="0.8" />
+          <g transform="translate(50, 60)">
+            <g fill="#fcc419"> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" /> </g>
+            <circle cx="0" cy="0" r="28" fill="url(#sc-g1)" />
+          </g>
+        </g>
+      </svg>
+      <!-- GS 2: Left Back -->
+      <svg class="sunflower-svg garden-sun gs-2" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+        <g transform="translate(0, 0)"> <rect x="45" y="50" width="10" height="180" fill="#38761d" /> 
+          <g transform="translate(50, 60)">
+            <g fill="#fcc419"> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" /> </g>
+            <circle cx="0" cy="0" r="28" fill="#5c4033" />
+          </g>
+        </g>
+      </svg>
+      <!-- GS 3: Right Back -->
+      <svg class="sunflower-svg garden-sun gs-3" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+        <g transform="translate(0, 0)"> <rect x="45" y="50" width="10" height="180" fill="#38761d" /> 
+          <g transform="translate(50, 60)">
+            <g fill="#fcc419"> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" /> </g>
+            <circle cx="0" cy="0" r="28" fill="#5c4033" />
+          </g>
+        </g>
+      </svg>
+      <!-- GS 4: Right Mid -->
+      <svg class="sunflower-svg garden-sun gs-4" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+        <g transform="translate(0, 0)"> <rect x="45" y="50" width="10" height="180" fill="#38761d" /> <path d="M55, 100 Q 80, 80 80, 130 C 80, 140 60, 120 55, 110 Z" fill="#38761d" opacity="0.8" />
+          <g transform="translate(50, 60)">
+            <g fill="#fcc419"> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" /> </g>
+            <circle cx="0" cy="0" r="28" fill="#5c4033" />
+          </g>
+        </g>
+      </svg>
+      <!-- GS 5: Center Back -->
+      <svg class="sunflower-svg garden-sun gs-5" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+        <g transform="translate(0, 0)"> <rect x="45" y="50" width="10" height="180" fill="#38761d" /> 
+          <g transform="translate(50, 60)">
+            <g fill="#fcc419"> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" /> <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" /> </g>
+            <circle cx="0" cy="0" r="28" fill="#5c4033" />
+          </g>
+        </g>
+      </svg>
+
+      <!-- Random Flowers Layer -->
+      <div id="flower-layer" class="absolute bottom-0 left-0 w-full h-[20vh] pointer-events-none z-[2]"></div>
+      
+      <!-- Dynamic Garden Layer (For JS-Generated Sunflowers) -->
+      <div id="garden-layer" class="absolute inset-0 pointer-events-none"></div>
+
+      <!-- Wildflowers Bottom Left -->
+      <svg class="corner-bush cb-left" viewBox="0 0 100 150" overflow="visible">
+          <g fill="var(--sunflower-stem)">
+              <path d="M50,150 Q20,100 10,60" stroke="#38761d" stroke-width="2" fill="none"/>
+              <path d="M50,150 Q60,100 80,70" stroke="#38761d" stroke-width="2" fill="none"/>
+              <path d="M50,150 Q40,110 30,50" stroke="#38761d" stroke-width="2" fill="none"/>
+              <!-- Leaves -->
+              <ellipse cx="20" cy="110" rx="8" ry="3" transform="rotate(-20)" fill="#4a8a2a"/>
+              <ellipse cx="70" cy="120" rx="8" ry="3" transform="rotate(20)" fill="#4a8a2a"/>
+          </g>
+          <!-- Tiny Flowers -->
+          <g transform="translate(10,60)">
+              <circle r="4" fill="white"/>
+              <circle r="1.5" fill="gold"/>
+          </g>
+          <g transform="translate(80,70)">
+              <circle r="4" fill="#ffb7b2"/>
+              <circle r="1.5" fill="yellow"/>
+          </g>
+          <g transform="translate(30,50)">
+              <circle r="4" fill="white"/>
+              <circle r="1.5" fill="gold"/>
+          </g>
+      </svg>
+      
+      <!-- Wildflowers Bottom Right -->
+      <svg class="corner-bush cb-right" viewBox="0 0 100 150" overflow="visible">
+          <g fill="var(--sunflower-stem)">
+              <path d="M50,150 Q20,100 10,60" stroke="#38761d" stroke-width="2" fill="none"/>
+              <path d="M50,150 Q60,100 80,70" stroke="#38761d" stroke-width="2" fill="none"/>
+              <path d="M50,150 Q40,110 30,50" stroke="#38761d" stroke-width="2" fill="none"/>
+              <ellipse cx="20" cy="110" rx="8" ry="3" transform="rotate(-20)" fill="#4a8a2a"/>
+              <ellipse cx="70" cy="120" rx="8" ry="3" transform="rotate(20)" fill="#4a8a2a"/>
+          </g>
+           <g transform="translate(10,60)">
+              <circle r="4" fill="#ffb7b2"/>
+              <circle r="1.5" fill="yellow"/>
+          </g>
+          <g transform="translate(80,70)">
+              <circle r="4" fill="white"/>
+              <circle r="1.5" fill="gold"/>
+          </g>
+          <g transform="translate(30,50)">
+              <circle r="4" fill="#ffb7b2"/>
+              <circle r="1.5" fill="yellow"/>
+          </g>
+      </svg>
+      
+      <!-- Layer 2 Grass (Back) -->
+      <svg class="desktop-grass-2" viewBox="0 0 100 20" preserveAspectRatio="none">
+         <defs>
+              <pattern id="grassPatternBack" width="12" height="20" patternUnits="userSpaceOnUse">
+                  <path class="grass-blade" d="M2,20 Q6,10 4,4 L8,20 Z" fill="#2d5a1e" opacity="0.6"/>
+                  <path class="grass-blade" d="M6,20 Q10,12 8,6 L12,20 Z" fill="#1e4414" opacity="0.5" style="animation-delay: -1.5s"/>
+              </pattern>
+         </defs>
+         <rect width="100%" height="100%" fill="url(#grassPatternBack)"/>
+      </svg>
+
+      <!-- Continuous Grass Strip for Desktop (Front) -->
+      <svg class="desktop-grass" viewBox="0 0 100 20" preserveAspectRatio="none">
+          <defs>
+              <pattern id="grassPattern" width="10" height="20" patternUnits="userSpaceOnUse">
+                  <path class="grass-blade" d="M0,20 Q5,5 2,0 L8,20 Z" fill="#4a8a2a" opacity="0.6"/>
+                  <path class="grass-blade" d="M5,20 Q8,10 7,5 L10,20 Z" fill="#38761d" opacity="0.7" style="animation-delay: -1s"/>
+              </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grassPattern)"/>
+      </svg>
+
+      <!-- Golden Pollen & Dandelion Seeds -->
+      <div id="pollen-layer"></div>
+      <div id="seed-layer" class="absolute inset-0 pointer-events-none z-[3]"></div>
+  </div>
+
+<svg class="sunflower-svg left-sun" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+    <defs>
+      <radialGradient id="sun-center-left" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#7a523a"/>
+        <stop offset="100%" stop-color="var(--sunflower-center)"/>
+      </radialGradient>
+    </defs>
+    <g transform="translate(0, 0)"> 
+      <rect x="45" y="50" width="10" height="180" fill="var(--sunflower-stem)" />
+      <path d="M55, 100 Q 80, 80 80, 130 C 80, 140 60, 120 55, 110 Z" fill="var(--sunflower-stem)" opacity="0.8" />
+      <g transform="translate(50, 60)">
+        <g fill="var(--sunflower-petal)">
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" />
+        </g>
+        <g fill="var(--sunflower-petal-dark)" transform="rotate(22.5)">
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" />
+        </g>
+        <circle cx="0" cy="0" r="28" fill="url(#sun-center-left)" />
+      </g>
+    </g>
+  </svg>
+
+  <svg class="sunflower-svg right-sun" viewBox="0 0 100 200" preserveAspectRatio="xMinYMax slice">
+    <defs>
+      <radialGradient id="sun-center-right" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#7a523a"/>
+        <stop offset="100%" stop-color="var(--sunflower-center)"/>
+      </radialGradient>
+    </defs>
+   <g transform="translate(0, 0)"> 
+      <rect x="45" y="50" width="10" height="180" fill="var(--sunflower-stem)" />
+      <path d="M55, 100 Q 80, 80 80, 130 C 80, 140 60, 120 55, 110 Z" fill="var(--sunflower-stem)" opacity="0.8" />
+      <g transform="translate(50, 60)">
+        <g fill="var(--sunflower-petal)">
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" />
+        </g>
+        <g fill="var(--sunflower-petal-dark)" transform="rotate(22.5)">
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(0)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(45)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(90)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(135)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(180)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(225)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(270)" />
+          <polygon points="0,0 10,25 0,50 -10,25" transform="rotate(315)" />
+        </g>
+       <circle cx="0" cy="0" r="28" fill="url(#sun-center-right)" />
+      </g>
+    </g>
+  </svg>
+  
+  <div class="dust" id="dust"></div>
+  <div class="words" id="words"></div>
+
+  <div class="butterfly glow rest" id="bf" aria-label="Butterfly (Monarch)">
+    <svg class="wing left" viewBox="0 0 200 160" aria-hidden="true">
+      <defs>
+        <linearGradient id="monoO1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffb14a"/>
+          <stop offset="55%" stop-color="#ff7a1f"/>
+          <stop offset="100%" stop-color="#e05612"/>
+        </linearGradient>
+      </defs>
+      <g>
+        <path d="M180,20 C120,10 70,25 30,70 C10,95 8,125 20,140
+                 C38,160 72,150 100,138 C132,124 160,104 180,80
+                 C196,60 198,40 180,20 Z"
+              fill="#16151c" stroke="#0b0b0f" stroke-width="3"/>
+        <path d="M170,28 C140,26 92,40 58,75 C50,84 46,95 48,110
+                 C58,120 72,118 98,106 C124,94 150,76 170,56 Z"
+              fill="url(#monoO1)"/>
+        <path d="M120,30 C94,36 70,52 52,74 C48,78 46,84 45,90
+                 C60,78 98,60 120,52 Z"
+              fill="url(#monoO1)"/>
+        <g fill="#fff">
+          <circle cx="155" cy="22" r="5"/>
+          <circle cx="140" cy="20" r="4"/>
+          <circle cx="125" cy="22" r="4"/>
+          <circle cx="112" cy="26" r="3.6"/>
+        </g>
+      </g>
+    </svg>
+
+    <svg class="wing right" viewBox="0 0 200 160" aria-hidden="true">
+      <g transform="translate(200,0) scale(-1,1)">
+        <path d="M180,20 C120,10 70,25 30,70 C10,95 8,125 20,140
+                 C38,160 72,150 100,138 C132,124 160,104 180,80
+                 C196,60 198,40 180,20 Z"
+              fill="#16151c" stroke="#0b0b0f" stroke-width="3"/>
+        <path d="M170,28 C140,26 92,40 58,75 C50,84 46,95 48,110
+                 C58,120 72,118 98,106 C124,94 150,76 170,56 Z"
+              fill="url(#monoO1)"/>
+        <path d="M120,30 C94,36 70,52 52,74 C48,78 46,84 45,90
+                 C60,78 98,60 120,52 Z"
+              fill="url(#monoO1)"/>
+        <g fill="#fff">
+          <circle cx="155" cy="22" r="5"/>
+          <circle cx="140" cy="20" r="4"/>
+          <circle cx="125" cy="22" r="4"/>
+          <circle cx="112" cy="26" r="3.6"/>
+        </g>
+      </g>
+    </svg>
+
+    <div class="body"></div>
+    <div class="antenna"></div>
+  </div>
+
+  <div class="hint" id="hint" style="top:788px; bottom:auto; transform:translateX(-50%);">Tap anywhere — she’ll fly there & drop a word.</div>
+
+  <div class="final" id="final">
+    <h3>✨Happy 21st Birthday <span class="accent">✨</span></h3>
+    <p>Just like butterflies can’t see their own wings, you often don’t realize how beautiful, kind, and amazing you truly are…
+       but everyone around you does.
+
+       On your special day, I just want you to know:
+       You’re wonderful in ways you may not even notice,
+       and that’s what makes you even more special.
+
+       Wishing you a day as lovely as your heart. ✨💐  
+       Thank you for being <span class="accent">gentle, bright, thoughtful</span> 
+       and quietly magical.</p>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="resetBtn">Reset</button>
+  </div>
+
+  <div class="ground"></div>
+</div>
+
+<script>
+(() => {
+  const scene = document.getElementById("scene");
+  const bf = document.getElementById("bf");
+  const wordsLayer = document.getElementById("words");
+  const finalCard = document.getElementById("final");
+  const hint = document.getElementById("hint");
+
+  // --- MOBILE NAV ELEMENTS ---
+  let areNavsOpen = false;
+  const navLinks = document.querySelectorAll('.mobile-only .nav-link');
+  const topNav = document.getElementById('topNav');
+  const bottomNav = document.getElementById('bottomNav');
+  const leftNav = document.getElementById('leftNav');
+  const rightNav = document.getElementById('rightNav');
+  const navToggle = document.getElementById('navToggle');
+  const navToggleIcon = document.getElementById('navToggleIcon');
+  const navToggleX = document.getElementById('navToggleX');
+
+  // --- DESKTOP NAV ELEMENTS ---
+  let isDesktopNavOpen = false;
+  const desktopToggle = document.getElementById('desktopToggle');
+  const desktopNav = document.getElementById('desktopNav');
+  const desktopLinks = document.querySelectorAll('.desktop-link');
+
+  // --- MOBILE NAV FUNCTIONS ---
+  function openAllNavs() {
+      topNav.classList.remove('-translate-y-full');
+      bottomNav.classList.remove('translate-y-full');
+      leftNav.classList.remove('-translate-x-full');
+      rightNav.classList.remove('translate-x-full');
+      
+      navToggleIcon.classList.add('hidden');
+      navToggleX.classList.remove('hidden');
+      areNavsOpen = true;
+  }
+
+  function closeAllNavs() {
+      topNav.classList.add('-translate-y-full');
+      bottomNav.classList.add('translate-y-full');
+      leftNav.classList.add('-translate-x-full');
+      rightNav.classList.add('translate-x-full');
+      
+      navToggleIcon.classList.remove('hidden');
+      navToggleX.classList.add('hidden');
+      areNavsOpen = false;
+  }
+
+  function toggleAllNavs() {
+      if (areNavsOpen) {
+          closeAllNavs();
+      } else {
+          openAllNavs();
+      }
+  }
+
+  if(navToggle) {
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        toggleAllNavs();
+    });
+  }
+
+  navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+          const targetHref = e.currentTarget.getAttribute('href');
+          if (targetHref.startsWith('#')) { e.preventDefault(); }
+          if (areNavsOpen) { setTimeout(closeAllNavs, 100); }
+      });
+  });
+
+  // --- DESKTOP NAV FUNCTIONS ---
+  function toggleDesktopNav() {
+      if(isDesktopNavOpen) {
+          closeDesktopNav();
+      } else {
+          openDesktopNav();
+      }
+  }
+
+  function openDesktopNav() {
+      desktopNav.classList.remove('-translate-x-full');
+      isDesktopNavOpen = true;
+  }
+
+  function closeDesktopNav() {
+      desktopNav.classList.add('-translate-x-full');
+      isDesktopNavOpen = false;
+  }
+
+  if(desktopToggle) {
+      desktopToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleDesktopNav();
+      });
+  }
+
+  desktopLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+          // Allow default link behavior but close nav
+          if(isDesktopNavOpen) setTimeout(closeDesktopNav, 100);
+      });
+  });
+  
+  // --- SCENE CLICK LOGIC (HANDLES BOTH NAV CLOSING & BUTTERFLY) ---
+  const mainContent = document.getElementById('scene'); 
+  
+  // Existing dust logic
+  const dust = document.getElementById("dust");
+  for (let i=0;i<38;i++){
+    const d=document.createElement("div");
+    d.className="d";
+    d.style.left=(Math.random()*100)+'vw';
+    d.style.bottom=(-10+Math.random()*110)+'vh';
+    d.style.animationDuration=(8+Math.random()*10)+'s';
+    d.style.animationDelay=(Math.random()*-12)+'s';
+    d.style.setProperty('--drift',(Math.random()*40-20)+'px');
+    dust.appendChild(d);
+  }
+
+  // --- DESKTOP POLLEN LOGIC ---
+  const pollenLayer = document.getElementById("pollen-layer");
+  if(pollenLayer) {
+    // Only generate pollen if the layer exists (desktop check handled via CSS opacity/display roughly but good to have)
+    for(let i=0; i<15; i++) {
+        const p = document.createElement("div");
+        p.className = "pollen";
+        const size = Math.random() * 4 + 2; // 2px to 6px
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.top = Math.random() * 80 + 10 + "%";
+        p.style.animationDuration = (Math.random() * 5 + 5) + "s";
+        p.style.animationDelay = (Math.random() * -5) + "s";
+        p.style.setProperty('--tx', (Math.random() * 100 - 50) + "px");
+        p.style.setProperty('--ty', (Math.random() * 50 - 25) + "px");
+        pollenLayer.appendChild(p);
+    }
+  }
+
+  // --- DESKTOP FLOWER GENERATOR (WILDFLOWERS) ---
+  const flowerLayer = document.getElementById("flower-layer");
+  if(flowerLayer) {
+      const colors = ["#ffb7b2", "#ff9cee", "#b5ead7", "#c7ceea", "#e2f0cb", "#fff"];
+      for(let i=0; i<90; i++) {
+         const f = document.createElement("div");
+         f.classList.add("random-flower");
+         
+         const x = Math.random() * 100;
+         const scale = 0.5 + Math.random() * 0.7; // Random size
+         const color = colors[Math.floor(Math.random() * colors.length)];
+         const delay = Math.random() * -5 + "s";
+         
+         // Create simplified SVG Flower string
+         f.innerHTML = `
+         <svg viewBox="0 0 20 40" width="20" height="40" style="overflow:visible">
+             <line x1="10" y1="40" x2="10" y2="10" stroke="#4a8a2a" stroke-width="2" />
+             <circle cx="10" cy="10" r="8" fill="${color}" />
+             <circle cx="10" cy="10" r="3" fill="#ffe066" />
+         </svg>
+         `;
+         
+         f.style.left = x + "%";
+         f.style.bottom = (Math.random() * 10) + "px"; // Slight varying ground height
+         f.style.transform = `scale(${scale})`;
+         f.style.animationDelay = delay;
+         
+         flowerLayer.appendChild(f);
+      }
+  }
+
+  // --- DESKTOP GARDEN SUNFLOWER GENERATOR ---
+  const gardenLayer = document.getElementById("garden-layer");
+  if(gardenLayer) {
+      // Create petals strings once to reuse
+      const petals1 = Array.from({length:8}).map((_,j) => 
+          `<polygon points="0,0 10,25 0,50 -10,25" transform="rotate(${j*45})" fill="#fcc419" />`
+      ).join('');
+      const petals2 = Array.from({length:8}).map((_,j) => 
+          `<polygon points="0,0 10,25 0,50 -10,25" transform="rotate(${j*45 + 22.5}) scale(0.8)" fill="#f59f00" />`
+      ).join('');
+
+      for(let i=0; i<30; i++) {
+          const sun = document.createElement("div");
+          sun.className = "generated-sunflower";
+          
+          // Random properties for lush garden feel
+          const left = Math.random() * 100;
+          const scale = 0.4 + Math.random() * 0.6; // varies from small to full size
+          const rotate = -15 + Math.random() * 30; // lean left or right
+          const brightness = 0.7 + Math.random() * 0.35; // depth
+          const zIndex = Math.random() > 0.6 ? 1 : 0; // some in front, some behind
+          
+          sun.style.left = left + "%";
+          sun.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+          sun.style.filter = `brightness(${brightness})`;
+          sun.style.zIndex = zIndex;
+          
+          sun.innerHTML = `
+            <svg viewBox="0 0 100 200" style="width:20vh; height:40vh; overflow:visible;">
+                <g transform="translate(0,0)">
+                    <rect x="48" y="60" width="4" height="140" fill="#2d5a1e" />
+                    <!-- Leaves -->
+                    <path d="M50,140 Q80,120 70,100 Q60,120 50,130" fill="#2d5a1e" />
+                    <path d="M50,160 Q20,140 30,120 Q40,140 50,150" fill="#2d5a1e" />
+                    <!-- Flower Head -->
+                    <g transform="translate(50, 60)">
+                        <g>
+                            ${petals1}
+                            ${petals2}
+                        </g>
+                        <circle cx="0" cy="0" r="18" fill="#5c4033" />
+                    </g>
+                </g>
+            </svg>
+          `;
+          gardenLayer.appendChild(sun);
+      }
+  }
+
+  // --- DESKTOP DANDELION SEED GENERATOR ---
+  const seedLayer = document.getElementById("seed-layer");
+  if(seedLayer) {
+      for(let i=0; i<15; i++) {
+         const s = document.createElement("div");
+         s.className = "dandelion-seed";
+         
+         // Simple white seed shape
+         s.innerHTML = `
+         <svg viewBox="0 0 20 20" width="20" height="20" style="overflow:visible">
+             <line x1="10" y1="10" x2="10" y2="20" stroke="white" stroke-width="1"/>
+             <circle cx="10" cy="10" r="1.5" fill="white"/>
+             <path d="M10,10 L5,5 M10,10 L15,5 M10,10 L5,10 M10,10 L15,10" stroke="white" stroke-width="0.5"/>
+         </svg>
+         `;
+         
+         s.style.left = Math.random() * 100 + "%";
+         s.style.top = Math.random() * 80 + 10 + "%"; // Avoid very top/bottom
+         s.style.animationDuration = (10 + Math.random() * 15) + "s";
+         s.style.animationDelay = (Math.random() * -20) + "s";
+         
+         s.style.setProperty('--tx', (50 + Math.random() * 100) + "px"); // Drift right
+         s.style.setProperty('--ty', (-50 + Math.random() * -100) + "px"); // Drift up
+         s.style.setProperty('--r', (Math.random() * 360) + "deg"); // Rotate
+         
+         seedLayer.appendChild(s);
+      }
+  }
+
+  const WORDS = [
+    "gentle","bright","curious","kind","rare","soft-spoken",
+    "warm-hearted","patient","thoughtful","brave","magic","enough"
+  ];
+
+  let idx = 0, busy=false;
+  let bx = window.innerWidth*0.5;
+  let by = window.innerHeight*0.6;
+
+  let t=0, idleTimer=null;
+  function wobble(){
+    t+=0.016;
+    const wobX = Math.sin(t*1.2)*0.8;
+    const wobY = Math.cos(t*1.1)*0.8;
+    setPos(bx+wobX, by+wobY);
+    requestAnimationFrame(wobble);
+  }
+  wobble();
+
+  enterRest();
+
+  function setPos(x,y){
+    bf.style.setProperty('--x', x+'px');
+    bf.style.setProperty('--y', y+'px');
+  }
+
+  function ease(k){return k<.5 ? 2*k*k : -1+(4-2*k)*k;}
+
+  function clearIdleTimer(){ if(idleTimer){ clearTimeout(idleTimer); idleTimer=null; } }
+  function scheduleRest(){
+    clearIdleTimer();
+    idleTimer = setTimeout(()=> enterRest(), 3500);
+  }
+
+  function enterRest(){
+    bf.classList.remove('flying','landing');
+    bf.classList.add('rest');
+  }
+  function leaveRest(){
+    bf.classList.remove('rest');
+  }
+
+  function onStartFlight(){
+    leaveRest();
+    bf.classList.remove('landing');
+    bf.classList.add('flying');
+  }
+
+  function onLandSoftFold(){
+    bf.classList.remove('flying');
+    bf.classList.add('landing');
+    setTimeout(()=> enterRest(), 700);
+  }
+
+  function flyTo(x,y,done){
+    busy=true; if(hint) hint.remove(); clearIdleTimer(); onStartFlight();
+
+    const m=24;
+    x=Math.max(m,Math.min(window.innerWidth-m,x));
+    y=Math.max(m,Math.min(window.innerHeight-m-70,y));
+
+    const sx=bx, sy=by, dx=x-sx, dy=y-sy;
+    const dist=Math.hypot(dx,dy);
+    const dur=Math.min(1300,Math.max(550,dist*1.3));
+
+    const angle=Math.atan2(dy,dx)*180/Math.PI;
+    bf.style.setProperty('--r',(angle/6)+'deg');
+
+    const start=performance.now();
+    const arc=Math.min(130,Math.max(60,dist/4));
+
+    function step(time){
+      const k=Math.min(1,(time-start)/dur);
+      const e=ease(k);
+
+      bx=sx+dx*e + Math.sin(time*0.01)*3;
+      by=sy+dy*e - Math.sin(Math.PI*e)*arc + Math.cos(time*0.012)*2;
+
+      setPos(bx,by);
+
+      if(k<1){
+        requestAnimationFrame(step);
+      } else {
+        bf.style.setProperty('--r','0deg');
+        let tt=0, by0=by;
+        function land(){
+          tt+=0.06;
+          const off=Math.sin(tt)*1.3*Math.exp(-tt/3);
+          setPos(bx, by0+off);
+          if(tt<6) requestAnimationFrame(land);
+          else{
+            onLandSoftFold();
+            busy=false; done && done();
+            scheduleRest();
+          }
+        }
+        land();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function dropWord(x,y,text){
+    const p=document.createElement("div");
+    p.className="pill";
+    p.textContent=text;
+    p.style.left=x+"px";
+    p.style.top=y+"px";
+    wordsLayer.appendChild(p);
+  }
+
+  // Unified click handler
+  scene.addEventListener("click",(e)=>{
+    // 1. Check if we clicked a control button
+    if(e.target.closest(".btn")) return;
+    
+    // 2. Mobile Logic: If navs are open, close them and return
+    if(areNavsOpen) {
+        closeAllNavs();
+        return;
+    }
+
+    // 3. Desktop Logic: If nav is open, close it and return
+    if(isDesktopNavOpen) {
+        closeDesktopNav();
+        return;
+    }
+
+    // 4. Butterfly Logic (Only runs if navs were closed)
+    if(busy) return; 
+
+    const r=scene.getBoundingClientRect();
+    const x=e.clientX-r.left;
+    const y=e.clientY-r.top;
+
+    flyTo(x,y,()=>{
+      if(idx < WORDS.length){
+        dropWord(bx,by,WORDS[idx]);
+        idx++;
+        if(idx===WORDS.length){
+          setTimeout(()=>finalCard.classList.add("show"),600);
+        }
+      }
+    });
+  });
+
+  document.getElementById("resetBtn").onclick=()=>{
+    if (areNavsOpen) closeAllNavs();
+    if (isDesktopNavOpen) closeDesktopNav();
+    
+    wordsLayer.innerHTML="";
+    idx=0;busy=false;
+    finalCard.classList.remove("show");
+    bf.style.setProperty('--r','0deg');
+    bx=window.innerWidth*0.5; by=window.innerHeight*0.6;
+    setPos(bx,by);
+    enterRest();
+  };
+
+})();
+</script>
+
+</body>
+</html>

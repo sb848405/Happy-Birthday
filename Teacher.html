@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Teacher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX, #desktopSidebar, #letterDetailModal { transition: all 0.3s ease-in-out; }
+        #mainContent, .nav-panel, #desktopSidebar, #letterDetailContent { -ms-overflow-style: none; scrollbar-width: none; }
+        #mainContent::-webkit-scrollbar, .nav-panel::-webkit-scrollbar, #desktopSidebar::-webkit-scrollbar, #letterDetailContent::-webkit-scrollbar { display: none; }
+        
+        .festive-text { font-family: 'Gochi Hand', cursive; }
+        body {
+            font-family: 'Balsamiq Sans', sans-serif; 
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #fff0f5, #ffe4e1, #ffd700, #ffb6c1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            min-height: 100vh;
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🖍️</text></svg>") 0 20, auto;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                background: #2f3e30; 
+                animation: none;
+                overflow: hidden;
+            }
+            
+            .decorative-shape, #particles-container, .mobile-background-fx {
+                display: none !important;
+            }
+
+            .glass-card, .zenith-climax, .chalkboard {
+                background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                backdrop-filter: none !important;
+                min-height: auto !important;
+                padding: 0 !important;
+                transform: none !important;
+                animation: none !important;
+            }
+            
+            #story-container {
+                width: 55vw !important; 
+                max-width: 1200px;
+                height: 50vh; 
+                position: fixed;
+                top: 45%; 
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 20;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                pointer-events: none; 
+            }
+
+            #story-container h1, #story-container h2 {
+                font-family: 'Gochi Hand', cursive !important;
+                color: rgba(255, 255, 255, 0.95) !important;
+                text-shadow: 2px 2px 1px rgba(0,0,0,0.4);
+                letter-spacing: 0.08em;
+                line-height: 1.2;
+                margin-bottom: 1.5rem;
+            }
+
+            #story-container p, #story-container span, #story-container div {
+                font-family: 'Gochi Hand', cursive !important;
+                color: rgba(255, 255, 255, 0.85) !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+                letter-spacing: 0.05em;
+                line-height: 1.6;
+            }
+            
+            .text-pink-600, .text-rose-500, .text-purple-600 { color: #f8bbd0 !important; text-shadow: 1px 1px 0 #ad1457; } 
+            .text-indigo-600 { color: #c5cae9 !important; text-shadow: 1px 1px 0 #283593; } 
+            .text-orange-500 { color: #ffe0b2 !important; text-shadow: 1px 1px 0 #e65100; } 
+            .text-gray-700 { color: #eceff1 !important; }
+
+            .story-page h1 { font-size: 3.5rem !important; }
+            .story-page h2 { font-size: 3rem !important; }
+            .story-page p.lead { font-size: 1.75rem !important; opacity: 0.9; }
+            .story-page p { font-size: 1.5rem !important; }
+            
+            #main-content {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .story-page {
+                min-height: auto !important;
+                padding-bottom: 0 !important;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .page-dot { display: none !important; }
+
+            #desktop-nav-controls {
+                pointer-events: auto;
+            }
+
+            .prop-item {
+                transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+                pointer-events: none;
+                position: absolute; 
+                bottom: 0;
+            }
+            .prop-item.active-prop {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            
+            .hidden-word { opacity: 0; }
+            .visible-word { opacity: 1; transition: opacity 0.1s; }
+            
+            #active-duster {
+                transition: transform 0.1s linear;
+                filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.5));
+            }
+            
+            #active-chalk {
+                transition: top 0.1s linear, left 0.1s linear;
+                filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+            }
+
+            #classroom-clock {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .page-dots-container { display: none !important; }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .emoji-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: -1; }
+        .falling-emoji { position: absolute; font-size: 2.5rem; opacity: 0; animation: fall-fade 10s linear infinite; }
+        @keyframes fall-fade {
+            0% { transform: translateY(-100px) translateX(0) scale(0.8); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(calc(100vh + 100px)) translateX(20px) scale(1.2); opacity: 0; }
+        }
+        .title-font { font-family: 'Balsamiq Sans', sans-serif; }
+        .chalk-font { font-family: 'Gochi Hand', cursive; }
+        .gradient-text { 
+            background-image: linear-gradient(45deg, #ff69b4, #ffd700); 
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1)); 
+        }
+        .story-page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            min-height: auto; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 2rem;
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            .story-page {
+                min-height: 60vh;
+                padding-bottom: 0;
+            }
+        }
+        .story-page.active {
+            display: flex;
+            opacity: 1;
+        }
+        .chalkboard {
+            background-color: #2c3e50;
+            background-image: radial-gradient(#34495e 15%, transparent 16%), radial-gradient(#34495e 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border: 8px solid #8d6e63;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            color: white;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 1.5rem; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 25px #ffd700, 0 0 10px #ff69b4; }
+            50% { box-shadow: 0 0 45px #ffb3e6, 0 0 20px #ff69b4; }
+            100% { box-shadow: 0 0 25px #ffd700, 0 0 10px #ff69b4; }
+        }
+        @keyframes breathe {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .zenith-climax {
+            background: linear-gradient(135deg, #ff69b4, #ffb3e6, #ffd700); 
+            border: 5px solid #ffb3e6; border-radius: 2rem;
+            animation: pulse-glow 3s infinite ease-in-out;
+            transform-style: preserve-3d; perspective: 1000px;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+       
+        .zenith-letter-animate { animation: breathe 2s infinite ease-in-out; display: inline-block; }
+        #message-modal-overlay { display: none; position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 55; }
+        #custom-message-box {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            transition: all 0.3s ease-in-out; opacity: 0; pointer-events: none; z-index: 60; 
+        }
+        #custom-message-box.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+        #letterDetailModal { opacity: 0; pointer-events: none; transform: scale(0.9); }
+        #letterDetailModal.active { opacity: 1; pointer-events: auto; transform: scale(1); }
+        button { user-select: none; }
+        .sidebar-btn { transition: all 0.2s ease; }
+        .sidebar-btn:hover { background-color: rgba(255, 255, 255, 0.2); transform: translateX(5px); }
+        #particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .particle {
+            position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); animation: floatParticle 5s infinite ease-in-out;
+        }
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 0.4; }
+        }
+        .decorative-shape { position: absolute; z-index: -2; opacity: 0.3; pointer-events: none; }
+        .shape-1 {
+            top: 10%; left: -5%; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(255, 105, 180, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%; animation: gentle-float 8s infinite ease-in-out;
+        }
+        .shape-2 {
+            bottom: 20%; right: -5%; width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%; animation: gentle-float 6s infinite ease-in-out reverse;
+        }
+        @keyframes gentle-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        #desktop-overlay { opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+        #desktop-overlay.active { opacity: 1; visibility: visible; }
+        .cursor-trail-dot {
+            position: fixed; width: 12px; height: 12px; border-radius: 50%; pointer-events: none; z-index: 9999;
+            animation: trailFade 0.8s linear forwards; box-shadow: 0 0 5px rgba(255,255,255,0.8);
+        }
+        @keyframes trailFade {
+            0% { transform: scale(1) translateY(0); opacity: 0.8; }
+            100% { transform: scale(0.2) translateY(20px); opacity: 0; }
+        }
+        
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased text-gray-800 bg-pink-50">
+    
+    <div class="hidden md:block fixed inset-0 z-0 pointer-events-none w-full h-full bg-[#2f3e30]">
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1920 1080">
+            <defs>
+                <radialGradient id="wallGradient" cx="0.5" cy="0.4" r="0.8">
+                    <stop offset="0%" stop-color="#4a5d45" /> 
+                    <stop offset="100%" stop-color="#2f3e30" /> 
+                </radialGradient>
+                
+                <pattern id="woodFloorPattern" x="0" y="0" width="100" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
+                    <rect width="100" height="30" fill="#a1887f"/>
+                    <path d="M0 29 L100 29" stroke="#6d4c41" stroke-width="1"/>
+                    <path d="M10 10 Q60 5 90 20" stroke="#8d6e63" stroke-width="1" fill="none" opacity="0.6"/>
+                </pattern>
+
+                <filter id="chalkSurface" x="0%" y="0%" width="100%" height="100%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+                    <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.1 0" in="noise" result="coloredNoise"/>
+                    <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply"/>
+                </filter>
+
+                <linearGradient id="woodFrameGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#795548"/>
+                    <stop offset="20%" stop-color="#8d6e63"/>
+                    <stop offset="50%" stop-color="#a1887f"/>
+                    <stop offset="80%" stop-color="#8d6e63"/>
+                    <stop offset="100%" stop-color="#795548"/>
+                </linearGradient>
+            </defs>
+
+            <rect x="0" y="0" width="1920" height="1080" fill="url(#wallGradient)"/>
+            <rect x="0" y="0" width="1920" height="1080" filter="url(#chalkSurface)" opacity="0.1"/>
+
+            <rect x="0" y="950" width="1920" height="130" fill="url(#woodFloorPattern)"/>
+            <rect x="0" y="950" width="1920" height="20" fill="black" opacity="0.3" filter="blur(8px)"/>
+
+            <g transform="translate(100, 840)" opacity="0.9">
+                <rect x="0" y="0" width="220" height="110" fill="#cfd8dc" rx="2"/>
+                <g stroke="#b0bec5" stroke-width="3">
+                    <line x1="20" y1="5" x2="20" y2="105"/>
+                    <line x1="45" y1="5" x2="45" y2="105"/>
+                    <line x1="70" y1="5" x2="70" y2="105"/>
+                    <line x1="95" y1="5" x2="95" y2="105"/>
+                    <line x1="120" y1="5" x2="120" y2="105"/>
+                    <line x1="145" y1="5" x2="145" y2="105"/>
+                    <line x1="170" y1="5" x2="170" y2="105"/>
+                    <line x1="195" y1="5" x2="195" y2="105"/>
+                </g>
+                <rect x="0" y="0" width="220" height="10" fill="#b0bec5" rx="2"/>
+                <rect x="0" y="100" width="220" height="10" fill="#b0bec5" rx="2"/>
+            </g>
+
+            <g transform="translate(1650, 350)">
+                <rect x="5" y="5" width="100" height="140" fill="rgba(0,0,0,0.3)" rx="4" filter="blur(2px)"/>
+                <rect x="0" y="0" width="100" height="140" fill="#8d6e63" rx="4"/>
+                <rect x="10" y="15" width="80" height="115" fill="#f5f5f5"/>
+                <g stroke="#e0e0e0" stroke-width="2">
+                    <line x1="15" y1="40" x2="85" y2="40"/>
+                    <line x1="15" y1="60" x2="85" y2="60"/>
+                    <line x1="15" y1="80" x2="85" y2="80"/>
+                    <line x1="15" y1="100" x2="85" y2="100"/>
+                </g>
+                <rect x="25" y="-5" width="50" height="25" fill="#546e7a" rx="2"/>
+                <circle cx="50" cy="5" r="5" fill="#37474f"/>
+            </g>
+            <g transform="translate(1550, 850)">
+                <rect x="0" y="20" width="180" height="100" fill="#6d4c41"/> 
+                <rect x="-10" y="0" width="200" height="20" fill="#8d6e63" rx="2"/> 
+                <rect x="10" y="30" width="160" height="40" fill="#5d4037" rx="2"/> 
+                <circle cx="90" cy="50" r="5" fill="#d7ccc8"/> 
+                
+                <rect x="40" y="-15" width="100" height="15" fill="#ef9a9a" stroke="#c62828" stroke-width="1"/>
+                <rect x="50" y="-30" width="80" height="15" fill="#90caf9" stroke="#1565c0" stroke-width="1"/>
+                <rect x="45" y="-45" width="90" height="15" fill="#a5d6a7" stroke="#2e7d32" stroke-width="1"/>
+            </g>
+
+            <g transform="translate(335, 215)">
+                <rect x="15" y="15" width="1250" height="650" rx="12" fill="black" opacity="0.4" filter="blur(15px)"/>
+                
+                <rect x="0" y="0" width="1250" height="650" rx="12" fill="url(#woodFrameGradient)" stroke="#4e342e" stroke-width="4"/>
+                
+                <rect x="25" y="25" width="1200" height="600" fill="#1b2e20"/> 
+                <rect x="25" y="25" width="1200" height="600" fill="url(#vignette)" opacity="0.3"/> 
+                <rect x="25" y="25" width="1200" height="600" filter="url(#chalkSurface)" opacity="0.3"/>
+                
+                <rect x="0" y="650" width="1250" height="25" fill="#5d4037"/>
+                <rect x="10" y="650" width="1230" height="10" fill="#3e2723" opacity="0.4"/>
+                
+                <rect x="600" y="655" width="40" height="6" fill="#fff" rx="2" transform="rotate(2 620 658)"/>
+                <rect x="650" y="655" width="30" height="6" fill="#f48fb1" rx="2" transform="rotate(-5 665 658)"/>
+                <rect x="800" y="652" width="70" height="18" fill="#3e2723" rx="2"/>
+                <rect x="800" y="652" width="70" height="6" fill="#d7ccc8" rx="2"/>
+            </g>
+            
+            <radialGradient id="roomVignette" cx="0.5" cy="0.5" r="0.9">
+                <stop offset="0%" stop-color="transparent" />
+                <stop offset="100%" stop-color="rgba(0,0,0,0.5)" />
+            </radialGradient>
+            <rect x="0" y="0" width="1920" height="1080" fill="url(#roomVignette)" pointer-events="none"/>
+        </svg>
+    </div>
+
+    <!-- Functional Clock -->
+    <div id="classroom-clock" class="hidden md:block fixed top-12 left-12 w-48 h-48 z-40 bg-white rounded-full border-[6px] border-[#37474f]">
+        <!-- Clock Face -->
+        <div class="relative w-full h-full">
+            <!-- Numbers -->
+            <div class="absolute inset-0 flex items-center justify-center font-bold text-gray-800 text-xl font-['Inter']">
+                <span class="absolute top-1 left-1/2 -translate-x-1/2">12</span>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2">3</span>
+                <span class="absolute bottom-1 left-1/2 -translate-x-1/2">6</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2">9</span>
+            </div>
+            <!-- Minute Marks (simplified) -->
+            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" fill="none" stroke="#cfd8dc" stroke-width="1" opacity="0.5"/>
+                <line x1="50" y1="2" x2="50" y2="6" stroke="#000" stroke-width="2" />
+                <line x1="50" y1="94" x2="50" y2="98" stroke="#000" stroke-width="2" />
+                <line x1="94" y1="50" x2="98" y2="50" stroke="#000" stroke-width="2" />
+                <line x1="2" y1="50" x2="6" y2="50" stroke="#000" stroke-width="2" />
+            </svg>
+            <!-- Hands -->
+            <div id="hour-hand" class="absolute top-1/2 left-1/2 w-1.5 h-12 bg-gray-900 origin-bottom -translate-x-1/2 -translate-y-full rounded-full transition-transform duration-1000 ease-linear"></div>
+            <div id="minute-hand" class="absolute top-1/2 left-1/2 w-1 h-16 bg-gray-700 origin-bottom -translate-x-1/2 -translate-y-full rounded-full transition-transform duration-1000 ease-linear"></div>
+            <div id="second-hand" class="absolute top-1/2 left-1/2 w-0.5 h-18 bg-red-500 origin-bottom -translate-x-1/2 -translate-y-full rounded-full transition-transform duration-1000 ease-linear"></div>
+            <div class="absolute top-1/2 left-1/2 w-3 h-3 bg-red-500 rounded-full -translate-x-1/2 -translate-y-1/2 border-2 border-white"></div>
+        </div>
+    </div>
+
+    <div id="teacher-desk-container" class="hidden md:block fixed bottom-0 left-0 w-full h-[20vh] z-30 pointer-events-none">
+        
+        <div class="absolute bottom-0 w-full h-full bg-[#5d4037] border-t-8 border-[#3e2723] shadow-2xl" 
+             style="background: linear-gradient(to bottom, #6d4c41 0%, #4e342e 100%);">
+             <div class="w-full h-full opacity-10" style="background-image: repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,0,0,0.2) 50px, rgba(0,0,0,0.2) 53px);"></div>
+        </div>
+
+        <div class="absolute -top-[120px] left-0 w-full h-[150px] pointer-events-none">
+            
+            <!-- Permanent Stack of Books on Far Right -->
+            <div class="absolute bottom-0 right-[2%] w-[140px] z-20">
+                 <svg width="140" height="120" viewBox="0 0 140 120" class="drop-shadow-2xl filter drop-shadow-lg">
+                    <!-- Book 1 (Bottom) -->
+                    <path d="M10,110 L130,110 L120,90 L20,90 Z" fill="#3e2723"/> 
+                    <rect x="20" y="90" width="100" height="20" fill="#5d4037"/> 
+                    <rect x="25" y="95" width="90" height="10" fill="#d7ccc8" rx="1"/> 
+
+                    <!-- Book 2 (Middle, slightly rotated) -->
+                    <g transform="rotate(-3 70 85)">
+                        <path d="M15,85 L125,85 L115,65 L25,65 Z" fill="#0d47a1"/>
+                        <rect x="25" y="65" width="90" height="20" fill="#1565c0"/>
+                        <rect x="30" y="70" width="80" height="10" fill="#fff" rx="1"/>
+                    </g>
+
+                    <!-- Book 3 (Top) -->
+                    <g transform="rotate(2 70 60)">
+                        <path d="M20,60 L120,60 L110,40 L30,40 Z" fill="#b71c1c"/>
+                        <rect x="30" y="40" width="80" height="20" fill="#c62828"/>
+                        <rect x="35" y="45" width="70" height="10" fill="#fff" rx="1"/>
+                        <text x="70" y="54" font-family="Arial" font-size="6" fill="white" text-anchor="middle" font-weight="bold">HISTORY</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Left Side Decoration Zone -->
+            <div class="absolute bottom-0 left-[10%] w-[160px] flex justify-center">
+                <div id="prop-1" class="prop-item active-prop">
+                    <svg width="140" height="140" viewBox="0 0 140 140" class="drop-shadow-xl">
+                        <rect x="10" y="100" width="120" height="30" fill="#37474f" rx="2"/>
+                        <rect x="12" y="102" width="116" height="26" fill="#cfd8dc"/>
+                        <path d="M70,90 C50,90 40,70 40,50 C40,20 55,10 70,20 C85,10 100,20 100,50 C100,70 90,90 70,90 Z" fill="url(#appleGrad)"/>
+                        <defs>
+                            <radialGradient id="appleGrad" cx="0.3" cy="0.3" r="0.8">
+                                <stop offset="0%" stop-color="#ff8a80"/>
+                                <stop offset="100%" stop-color="#d32f2f"/>
+                            </radialGradient>
+                        </defs>
+                        <path d="M70,20 Q75,5 85,0" stroke="#5d4037" stroke-width="4" fill="none"/>
+                        <path d="M70,20 Q60,5 50,10" fill="#66bb6a"/>
+                        <ellipse cx="55" cy="40" rx="5" ry="10" fill="white" opacity="0.3" transform="rotate(20)"/>
+                    </svg>
+                </div>
+
+                <div id="prop-3" class="prop-item">
+                    <svg width="140" height="160" viewBox="0 0 140 160" class="drop-shadow-xl">
+                        <ellipse cx="70" cy="150" rx="40" ry="10" fill="#5d4037"/>
+                        <rect x="65" y="110" width="10" height="40" fill="#3e2723"/>
+                        <path d="M70,120 A55,55 0 1,1 70,10" fill="none" stroke="#cfd8dc" stroke-width="6"/>
+                        <circle cx="70" cy="65" r="45" fill="#4fc3f7"/>
+                        <path d="M50,40 Q70,30 80,50 T60,80" fill="#81c784" opacity="0.8"/>
+                        <path d="M90,50 Q110,60 100,90" fill="#81c784" opacity="0.8"/>
+                        <circle cx="50" cy="45" r="5" fill="white" opacity="0.3"/>
+                    </svg>
+                </div>
+
+                <div id="prop-5" class="prop-item">
+                    <svg width="100" height="160" viewBox="0 0 100 160" class="drop-shadow-xl">
+                        <path d="M20,150 L80,150 L90,130 L10,130 Z" fill="#37474f"/>
+                        <path d="M30,130 Q20,80 40,50" fill="none" stroke="#455a64" stroke-width="12" stroke-linecap="round"/>
+                        <rect x="35" y="30" width="20" height="60" fill="#cfd8dc" transform="rotate(-30 45 60)"/>
+                        <rect x="58" y="10" width="15" height="10" fill="#37474f" transform="rotate(-30 65 15)"/>
+                        <rect x="35" y="100" width="40" height="5" fill="#37474f"/>
+                    </svg>
+                </div>
+
+                 <div id="prop-7" class="prop-item">
+                    <svg width="140" height="120" viewBox="0 0 140 120" class="drop-shadow-xl">
+                        <ellipse cx="70" cy="110" rx="60" ry="10" fill="#eeeeee"/>
+                        <path d="M20,105 L20,60 Q70,80 120,60 L120,105 Q70,125 20,105" fill="#8d6e63"/> 
+                        <path d="M20,60 Q70,80 120,60 Q70,40 20,60" fill="#d7ccc8"/> 
+                        <path d="M20,60 Q30,70 40,60 T60,60 T80,60 T100,60 T120,60" fill="none" stroke="#f48fb1" stroke-width="4"/>
+                        <rect x="50" y="35" width="6" height="25" fill="#90caf9"/>
+                        <rect x="70" y="30" width="6" height="30" fill="#ffcc80"/>
+                        <rect x="90" y="35" width="6" height="25" fill="#a5d6a7"/>
+                        <ellipse cx="53" cy="30" rx="3" ry="6" fill="#ffeb3b"/>
+                        <ellipse cx="73" cy="25" rx="3" ry="6" fill="#ffeb3b"/>
+                        <ellipse cx="93" cy="30" rx="3" ry="6" fill="#ffeb3b"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Right Side Decoration Zone -->
+            <div class="absolute bottom-0 right-[15%] w-[160px] flex justify-center">
+                <div id="prop-2" class="prop-item">
+                    <svg width="120" height="160" viewBox="0 0 120 160" class="drop-shadow-xl">
+                        <path d="M30,110 L90,110 L80,150 L40,150 Z" fill="#8d6e63"/>
+                        <rect x="25" y="110" width="70" height="15" fill="#a1887f" rx="2"/>
+                        <path d="M60,110 Q60,80 60,60" stroke="#4caf50" stroke-width="4" fill="none"/>
+                        <ellipse cx="40" cy="70" rx="15" ry="8" fill="#66bb6a" transform="rotate(-30 40 70)"/>
+                        <ellipse cx="80" cy="50" rx="15" ry="8" fill="#66bb6a" transform="rotate(30 80 50)"/>
+                        <ellipse cx="50" cy="40" rx="15" ry="8" fill="#81c784" transform="rotate(-10 50 40)"/>
+                        <ellipse cx="70" cy="90" rx="12" ry="6" fill="#81c784" transform="rotate(20 70 90)"/>
+                    </svg>
+                </div>
+
+                <div id="prop-4" class="prop-item">
+                    <svg width="150" height="100" viewBox="0 0 150 100" class="drop-shadow-xl">
+                        <rect x="10" y="80" width="80" height="10" fill="white" stroke="#ccc"/>
+                        <rect x="15" y="75" width="80" height="10" fill="white" stroke="#ccc" transform="rotate(-5)"/>
+                        <path d="M100,40 L140,40 L135,90 L105,90 Z" fill="white"/>
+                        <ellipse cx="120" cy="40" rx="20" ry="5" fill="#d7ccc8"/> 
+                        <ellipse cx="120" cy="40" rx="16" ry="3" fill="#3e2723"/> 
+                        <path d="M140,50 Q150,50 150,65 T138,80" fill="none" stroke="white" stroke-width="5"/>
+                        <path d="M110,20 Q115,10 110,0" stroke="white" stroke-width="2" opacity="0.5" fill="none"/>
+                        <path d="M125,25 Q130,15 125,5" stroke="white" stroke-width="2" opacity="0.5" fill="none"/>
+                    </svg>
+                </div>
+
+                <div id="prop-6" class="prop-item">
+                    <svg width="120" height="160" viewBox="0 0 120 160" class="drop-shadow-xl">
+                        <path d="M40,150 L80,150 L90,80 Q60,60 30,80 Z" fill="url(#vaseGrad)"/>
+                        <defs>
+                            <linearGradient id="vaseGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#b3e5fc" opacity="0.8"/>
+                                <stop offset="100%" stop-color="#4fc3f7" opacity="0.6"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="40" cy="50" r="10" fill="#f48fb1"/>
+                        <circle cx="80" cy="60" r="12" fill="#ce93d8"/>
+                        <circle cx="60" cy="40" r="8" fill="#ffcc80"/>
+                        <line x1="60" y1="80" x2="40" y2="50" stroke="#66bb6a" stroke-width="2"/>
+                        <line x1="60" y1="80" x2="80" y2="60" stroke="#66bb6a" stroke-width="2"/>
+                        <line x1="60" y1="80" x2="60" y2="40" stroke="#66bb6a" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="active-duster" class="hidden fixed z-[60] pointer-events-none" style="top: 0; left: 0;">
+         <svg width="120" height="60" viewBox="0 0 120 60">
+             <rect x="10" y="10" width="100" height="40" fill="#3e2723" rx="4" transform="rotate(-5 60 30)" />
+             <rect x="10" y="30" width="100" height="20" fill="#d7ccc8" rx="2" transform="rotate(-5 60 30)" />
+         </svg>
+    </div>
+    
+    <div id="active-chalk" class="hidden fixed z-[60] pointer-events-none" style="top: 0; left: 0;">
+         <svg width="60" height="60" viewBox="0 0 60 60">
+             <rect x="20" y="20" width="10" height="40" fill="#fff" transform="rotate(-30 25 40)"/>
+         </svg>
+    </div>
+
+    <div id="desktop-nav-controls" class="hidden md:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] pointer-events-none z-50 justify-between items-end pb-4 px-12">
+        <button onclick="changePage(-1)" class="pointer-events-auto text-white/60 hover:text-white transition-all font-['Gochi_Hand'] text-3xl flex items-center gap-2 group hover:scale-105">
+            <span class="group-hover:-translate-x-1 transition-transform font-bold text-4xl">❮</span> 
+            <span class="group-hover:text-yellow-100 uppercase tracking-widest border-b-2 border-transparent group-hover:border-white/50 pb-1">Prev</span>
+        </button>
+        <button onclick="changePage(1)" class="pointer-events-auto text-white/80 hover:text-yellow-200 transition-all font-['Gochi_Hand'] text-4xl flex items-center gap-2 group hover:scale-105">
+            <span class="group-hover:text-yellow-100 uppercase tracking-widest border-b-2 border-transparent group-hover:border-yellow-200/50 pb-1">Next</span>
+            <span class="group-hover:translate-x-1 transition-transform font-bold text-5xl">❯</span>
+        </button>
+    </div>
+
+    <div class="decorative-shape shape-1 mobile-background-fx"></div>
+    <div class="decorative-shape shape-2 mobile-background-fx"></div>
+
+    <div class="mobile-only-nav md:hidden">
+        <button id="navToggle" class="fixed top-6 left-6 z-[70] p-2 bg-pink-500 text-white rounded-full shadow-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
+            <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+            <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-pink-500 text-yellow-100 shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Massege</a>
+            <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Music</a>
+        </nav>
+        <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-pink-500 text-yellow-100 shadow-md flex items-center justify-center space-x-2 translate-y-full">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-pink-700 text-yellow-100 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 bg-pink-700 text-yellow-100 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-2References">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Food</a>
+            <a href="Msg.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Message</a>
+            <a href="letter.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Letter</a>
+            <a href="Music.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Music</a>
+        </nav>
+    </div>
+    <button id="desktopNavToggle" class="hidden md:flex fixed top-8 left-8 z-[70] p-3 bg-pink-600 text-white rounded-full shadow-xl hover:bg-pink-500 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-pink-300">
+        <svg id="desktopMenuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+        <svg id="desktopCloseIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+    <div id="desktop-overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60] hidden md:block"></div>
+    <aside id="desktopSidebar" class="hidden md:flex flex-col w-[400px] fixed inset-y-0 left-0 bg-pink-600/95 backdrop-blur-xl text-white z-[65] border-r border-pink-400 shadow-2xl -translate-x-full">
+        <div class="p-8 pt-24 bg-pink-700/50 backdrop-blur-md z-10 border-b border-pink-400/50">
+            <h2 class="title-font text-4xl font-bold text-yellow-200 mb-2">Navigation</h2>
+            <p class="text-base text-pink-100 opacity-90 font-light">Explore every corner of the universe.</p>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <div class="grid grid-cols-2 gap-4">
+                <a href="index.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Home</a>
+                <a href="Cake.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Cake</a>
+                <a href="21_Wish.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">21_Door</a>
+                <a href="chat.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Heaven</a>
+                <a href="Diary.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Diary</a>
+                <a href="anatomy.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Anatomy</a>
+                <a href="Box.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Box</a>
+                <a href="Special.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Special</a>
+                <a href="color.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Color</a>
+                <a href="you.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">You</a>
+                <a href="Teacher.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Teacher</a>
+                <a href="Universe.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Universe</a>
+                <a href="The_River.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">River</a>
+                <a href="Mountain.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Mountain</a>
+                <a href="Skill.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Skill</a>
+                <a href="Paper_Star.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Paper Star</a>
+                <a href="Carttoon.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Cartoon</a>
+                <a href="Periodik_table.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Periodik_table</a>
+                <a href="Concept.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Concept</a>
+                <a href="Calender.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Calender</a>
+                <a href="Perspective.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Perspective</a>
+                <a href="Santa.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Santa</a>
+                <a href="Presence.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Presence</a>
+                <a href="Cloud.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Cloud</a>
+                <a href="Ink.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Paint</a>
+                <a href="Butterfly.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Butterfly</a>
+                <a href="Weather.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Weather</a>
+                <a href="Spotlight.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Spotlight</a>
+                <a href="Room.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Room</a>
+                <a href="Radio.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Radio</a>
+                <a href="Food.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Food</a>
+                <a href="Msg.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Message</a>
+                <a href="letter.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Letter</a>
+                <a href="Music.html" class="sidebar-btn block px-4 py-3 rounded-xl bg-white/10 festive-text text-lg text-center border border-white/10 hover:border-yellow-200/50">Music</a>
+            </div>
+        </div>
+    </aside>
+    <main id="mainContent" class="absolute inset-0 pt-28 pb-16 overflow-y-auto md:ml-0 md:pt-0 md:pb-0">
+        <div class="emoji-container" id="emoji-background"></div>
+        <div id="message-modal-overlay"></div>
+        <div id="custom-message-box" class="p-6 max-w-sm w-11/12 bg-pink-600 border-2 border-pink-400 rounded-xl shadow-2xl text-center">
+            <p id="message-text" class="text-xl font-medium text-white"></p>
+            <button onclick="revealMainContent()" class="mt-4 px-4 py-2 bg-pink-400 hover:bg-pink-500 rounded-lg text-white font-semibold transition">Got it!</button>
+        </div>
+        <div id="initial-question-modal" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-pink-300/90 transition-opacity duration-500">
+            <div class="p-8 w-full max-w-sm bg-white rounded-3xl shadow-2xl text-center border-4 border-pink-400">
+                <h1 class="title-font text-3xl font-bold gradient-text mb-6">A Little Question...</h1>
+                <p class="text-lg mb-8 text-gray-800">Are you a teacher?</p> 
+                <div class="flex flex-col space-y-4">
+                    <button onclick="answerQuestion(true)" class="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-2xl transition duration-300 shadow-lg shadow-pink-500/50">Yes</button>
+                    <button onclick="answerQuestion(false)" class="w-full py-3 bg-fuchsia-500 hover:bg-fuchsia-600 text-white font-semibold rounded-2xl transition duration-300 shadow-lg shadow-fuchsia-500/50">No</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="main-content" class="min-h-screen p-4 pt-12 md:p-0 hidden relative z-10 md:mx-auto flex flex-col justify-center">
+            
+            <header class="text-center mb-8 relative md:hidden">
+                <div id="particles-container"></div>
+            </header>
+            
+            <section id="story-container" class="max-w-4xl mx-auto w-full relative min-h-[60vh] md:min-h-0">
+                <div class="story-page active" id="page-1">
+                    <div class="chalkboard p-4 md:p-0 transform w-full mx-auto md:bg-transparent md:border-0 md:shadow-none">
+                        <h1 class="text-white text-center">Happy Birthday Teacher <span class="text-4xl">👩‍🏫</span></h1>
+                        <div class="w-24 h-0.5 bg-white/20 my-2 rounded"></div>
+                        <p class="lead text-yellow-100 italic mb-4">Today, class is canceled...</p>
+                        <p class="text-white">Because it's time to celebrate the one who teaches us everything</p>
+                        <p class="hidden md:block text-white mt-4 text-lg">"A good teacher is like a candle it consumes itself to light the way for others."</p>
+                        <div class="w-full flex justify-end mt-4 px-12">
+                            <span class="text-white/60 text-xl">– Your Student</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-page" id="page-2">
+                    <div class="glass-card p-5 md:p-0 w-full mx-auto">
+                        <div class="text-5xl md:text-6xl mb-4">🌱</div>
+                        <h2 class="text-pink-600">The Art of Patience</h2>
+                        <div class="w-16 h-0.5 bg-white/10 my-2 rounded"></div>
+                        <p>
+                            You carry patience the way some people carry instinct, naturally, without effort. In your teaching, you never hurry understanding; you wait for it, protect it, let it grow at its own pace. You know when to explain and when silence will teach more. Outside the classroom, the same calm guides you, listening before reacting, choosing timing over impulse. Your patience doesn’t slow the world around you, it steadies it, turning uncertainty into clarity and moments into quiet progress.
+                        </p>
+                        <p class="hidden md:block mt-6 text-xl text-pink-200">Thank you for not giving up on us, even when we gave up on ourselves.</p>
+                    </div>
+                </div>
+
+                <div class="story-page" id="page-3">
+                    <div class="glass-card p-5 md:p-0 w-full mx-auto">
+                        <div class="text-5xl md:text-6xl mb-4">💡</div>
+                        <h2 class="text-indigo-600">Beyond the Textbook</h2>
+                        <div class="w-16 h-0.5 bg-white/10 my-2 rounded"></div>
+                        <p>
+                            Your understanding doesn’t arrive through explanations, it arrives through attention. You notice what hesitates before it speaks, what needs space before it needs answers. In teaching, you adjust without announcing it, shaping the moment so learning feels reachable. In life, you read between actions, not words, and respond to what’s actually there. You don’t simplify people or situations, you meet them where they are, and that ability makes everything around you feel considered.
+                        </p>
+                        <p class="hidden md:block mt-6 text-xl text-indigo-200">Your wisdom goes far beyond the syllabus.</p>
+                    </div>
+                </div>
+
+                <div class="story-page" id="page-4">
+                    <div class="glass-card p-5 md:p-0 w-full mx-auto">
+                        <div class="text-5xl md:text-6xl mb-4">🔥</div>
+                        <h2 class="text-orange-500">Unmatched Effort</h2>
+                        <div class="w-16 h-0.5 bg-white/10 my-2 rounded"></div>
+                        <p>
+                            Your effort is deeply personal. You notice ability before it becomes confidence, and you treat potential as something worth protecting. You give time, attention, and belief, not to shape student into what you expect, but to help them reach what they already carry. You guide without pressure, support without keeping score. When others succeed, you don’t stand in front of the moment, you stand quietly behind it, content in knowing you helped it happen. Your happiness grows not from recognition, but from seeing someone become more of themselves because you believed they could.
+                        </p>
+                        <p class="hidden md:block mt-6 text-xl text-orange-200">Your hard work does not go unnoticed. I appreciate you</p>
+                    </div>
+                </div>
+
+                <div class="story-page" id="page-5">
+                    <div class="glass-card p-5 md:p-0 w-full mx-auto">
+                        <div class="text-5xl md:text-6xl mb-4">✨</div>
+                        <h2 class="text-purple-600">The Ripple Effect</h2>
+                        <div class="w-16 h-0.5 bg-white/10 my-2 rounded"></div>
+                        <p>
+                            You shape lives in ways that stay. As a teacher, you help students see their own ability before they believe in it themselves, turning hesitation into confidence and effort into direction. When confusion appears, you arrive like light, not overwhelming, just enough to show the next step clearly. You build foundations quietly, through clarity, consistency, and care, making growth feel natural rather than forced. Beyond the classroom, you guide people the same way, simply and patiently, helping them move forward without pressure. You don’t just teach or help, you leave people stronger, more certain, and ready to grow on their own.
+                        </p>
+                        <p class="hidden md:block mt-6 text-xl text-purple-200">You are the architect of our dreams.</p>
+                    </div>
+                </div>
+
+                <div class="story-page" id="page-6">
+                    <div class="glass-card p-5 md:p-0 w-full mx-auto">
+                        <div class="text-5xl md:text-6xl mb-4">💖</div>
+                        <h2 class="text-rose-500">More Than a Teacher</h2>
+                        <div class="w-16 h-0.5 bg-white/10 my-2 rounded"></div>
+                        <p>
+                            Beyond the lessons, I admire who you are as a person. Your kindness and genuine heart make the world softer beyond being a teacher, you are deeply human in the way you move through the world. You listen more than you speak, notice what others miss, and respond with sincerity rather than performance. You carry responsibility without making it feel heavy for anyone else. Your kindness is practical, shown in small decisions, quiet help, and genuine concern. You don’t try to be impressive, you try to be present. And in that presence, people feel understood, supported, and accepted for who they are.
+                            You teach us not just how to learn, but how to live with integrity.
+                        </p>
+                        <p class="hidden md:block mt-6 text-xl text-rose-200">Wishing you a year filled with the same kindness you show us.</p>
+                    </div>
+                </div>
+
+                <div class="story-page" id="page-7">
+                    <div class="zenith-climax p-6 md:p-0 text-center transform w-full mx-auto md:bg-transparent md:border-0 md:shadow-none">
+                        <h1 class="font-extrabold text-white drop-shadow-lg mb-4 animate-bounce" style="font-size: 4rem;">
+                            HAPPY BIRTHDAY
+                            <br>
+                            🎉🎂🎈
+                        </h1>
+                        <p class="text-xl text-yellow-100 font-medium mb-4">
+                            To the best teacher in the world.
+                        </p>
+                        <p class="text-lg text-white/80 italic">
+                            Thank you for being you.
+                        </p>
+                        <p class="hidden md:block mt-6 text-2xl text-yellow-200">May your year be as amazing as your classes!</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="flex justify-center items-center mt-8 mb-12 md:mt-2 md:mb-0">
+                <div class="flex space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot active-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-pink-400 opacity-50 page-dot"></span>
+                </div>
+            </div>
+        </div>
+    </main> 
+    <script>
+        let mainSynth, heartbeat, heartbeatLoop, windAmbience, violinPad;
+        let musicStarted = false;
+        let currentPage = 1;
+        const totalPages = 7;
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isAnimating = false;
+
+        function showMessage(text) {
+            document.getElementById('emoji-background').style.display = 'none';
+            document.getElementById('message-modal-overlay').style.display = 'block';
+            const box = document.getElementById('custom-message-box');
+            document.getElementById('message-text').innerText = text;
+            box.classList.add('show');
+        }
+
+        function revealMainContent() {
+            document.getElementById('custom-message-box').classList.remove('show');
+            document.getElementById('message-modal-overlay').style.display = 'none';
+            document.getElementById('emoji-background').style.display = 'block';
+            const mainContent = document.getElementById('main-content');
+            mainContent.classList.remove('hidden');
+            mainContent.style.opacity = '0';
+            setTimeout(() => {
+                mainContent.style.opacity = '1';
+            }, 50);
+            setupAudio();
+            if (window.innerWidth < 768) {
+                createParticles();
+            }
+            setupSwipe();
+            updatePageDisplay();
+            // Start clock
+            startClock();
+        }
+
+        function changePage(direction) {
+            if (isAnimating) return;
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                if (window.innerWidth >= 768) {
+                    isAnimating = true;
+                    
+                    const duster = document.getElementById('active-duster');
+                    duster.classList.remove('hidden');
+                    
+                    const startX = 300;
+                    const endX = window.innerWidth - 300;
+                    const dusterAnim = duster.animate([
+                        { transform: `translate(${startX}px, 200px) rotate(0deg)` },
+                        { transform: `translate(${endX}px, 250px) rotate(5deg)` },
+                        { transform: `translate(${startX}px, 350px) rotate(-5deg)` },
+                        { transform: `translate(${endX}px, 450px) rotate(5deg)` },
+                        { transform: `translate(${startX}px, 550px) rotate(0deg)` }
+                    ], {
+                        duration: 1500,
+                        easing: 'ease-in-out'
+                    });
+                    
+                    setTimeout(() => {
+                        document.getElementById(`page-${currentPage}`).classList.remove('active');
+                        currentPage = newPage;
+                        
+                        const nextPageEl = document.getElementById(`page-${currentPage}`);
+                        nextPageEl.classList.add('active');
+                        
+                        const textElements = nextPageEl.querySelectorAll('h1, h2, p, span, div');
+                        textElements.forEach(el => el.classList.add('hidden-word'));
+                        
+                        document.querySelectorAll('.prop-item').forEach(p => p.classList.remove('active-prop'));
+                        const prop = document.getElementById(`prop-${currentPage}`);
+                        if(prop) prop.classList.add('active-prop');
+                        
+                        updatePageDisplay();
+                    }, 750);
+                    
+                    dusterAnim.onfinish = () => {
+                        duster.classList.add('hidden');
+                        
+                        const chalk = document.getElementById('active-chalk');
+                        chalk.classList.remove('hidden');
+                        
+                        const nextPageEl = document.getElementById(`page-${currentPage}`);
+                        const textElements = Array.from(nextPageEl.querySelectorAll('h1, h2, p, span, div'))
+                            .filter(el => el.innerText.trim().length > 0 && !el.querySelector('span') && !el.classList.contains('hidden')); 
+                        
+                        let delay = 0;
+                        textElements.forEach((el, index) => {
+                            setTimeout(() => {
+                                const rect = el.getBoundingClientRect();
+                                chalk.style.top = (rect.top + rect.height/2) + 'px';
+                                chalk.style.left = (rect.right + 20) + 'px'; 
+                                
+                                el.classList.remove('hidden-word');
+                                el.classList.add('visible-word');
+                                
+                            }, delay);
+                            delay += 300; 
+                        });
+                        
+                        setTimeout(() => {
+                            chalk.classList.add('hidden');
+                            isAnimating = false;
+                        }, delay + 200);
+                    };
+                    
+                } else {
+                    document.getElementById(`page-${currentPage}`).classList.remove('active');
+                    currentPage = newPage;
+                    document.getElementById(`page-${currentPage}`).classList.add('active');
+                    updatePageDisplay();
+                }
+
+                if (currentPage === totalPages) {
+                    startEmojiRain(50);
+                    if(mainSynth) {
+                        mainSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n");
+                    }
+                }
+            }
+        }
+
+        function updatePageDisplay() {
+            const dots = document.querySelectorAll('.page-dot');
+            dots.forEach((dot, index) => {
+                if (index + 1 === currentPage) {
+                    dot.classList.remove('opacity-50', 'bg-pink-400');
+                    dot.classList.add('opacity-100', 'bg-pink-600', 'scale-125', 'active-dot');
+                } else {
+                    dot.classList.add('opacity-50', 'bg-pink-400');
+                    dot.classList.remove('opacity-100', 'bg-pink-600', 'scale-125', 'active-dot');
+                }
+            });
+        }
+
+        function handleGesture() {
+            if (touchEndX < touchStartX - 50) {
+                changePage(1); 
+            }
+            if (touchEndX > touchStartX + 50) {
+                changePage(-1); 
+            }
+        }
+
+        function setupSwipe() {
+            const container = document.getElementById('main-content');
+            container.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            container.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleGesture();
+            });
+            
+            container.addEventListener('click', (e) => {
+                if (e.target.closest('.desktop-nav-btn') || e.target.closest('#desktop-nav-controls button') || e.target.closest('#desk-props')) return;
+                if (window.getSelection().toString().length > 0) return;
+
+                const swipeDistance = Math.abs(touchEndX - touchStartX);
+                if (swipeDistance > 50) {
+                    touchStartX = 0;
+                    touchEndX = 0;
+                    return;
+                }
+
+                const screenWidth = window.innerWidth;
+                if (screenWidth < 768) {
+                    if (e.clientX < screenWidth / 2) {
+                        changePage(-1);
+                    } else {
+                        changePage(1);
+                    }
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') changePage(1);
+                if (e.key === 'ArrowLeft') changePage(-1);
+            });
+        }
+
+        async function setupAudio() {
+            if (musicStarted || !window.Tone) return;
+            musicStarted = true;
+            try {
+                await Tone.start();
+                if (Tone.Transport.state !== 'started') Tone.Transport.start();
+                mainSynth = new Tone.PolySynth(Tone.AMSynth, {
+                    volume: -20,
+                    oscillator: { type: "square" },
+                    envelope: { attack: 0.5, decay: 1, sustain: 0.8, release: 2 }
+                }).toDestination();
+                const chord = ["C3", "Eb3", "G3", "Bb3"];
+                new Tone.Loop(time => {
+                    mainSynth.triggerAttackRelease(chord, "4m", time, 0.7);
+                }, "4m").start(0);
+                heartbeat = new Tone.MembraneSynth().toDestination();
+                heartbeat.volume.value = -12;
+                heartbeat.chain(new Tone.Reverb(1).toDestination());
+                heartbeat.mute = true; 
+                heartbeatLoop = new Tone.Loop(time => {
+                    heartbeat.triggerAttackRelease("C1", "8n", time);
+                }, "0.7s").start(0);
+                heartbeatLoop.mute = true; 
+                windAmbience = new Tone.NoiseSynth({
+                    noise: { type: "pink" },
+                    envelope: { attack: 4, decay: 0.5, sustain: 1, release: 5 }
+                }).toDestination();
+                windAmbience.volume.value = -25;
+                windAmbience.chain(new Tone.Reverb(4).toDestination());
+                windAmbience.mute = true;
+                violinPad = new Tone.FMSynth({
+                    volume: -20,
+                    modulationIndex: 10,
+                    envelope: { attack: 4, decay: 0.5, sustain: 0.8, release: 5 },
+                    modulation: { type: "sine" }
+                }).toDestination();
+                violinPad.mute = true;
+            } catch (e) {
+                console.error("Audio setup failed:", e);
+            }
+        }
+        
+        const emojis = ['🐼', '🐻', '🐰', '🦊', '🐸', '🐥', '🦄', '🌟', '💖', '🌈', '🎂', '🎉', '📚', '✏️'];
+        const emojiContainer = document.getElementById('emoji-background');
+        function createFallingEmoji() {
+            const emoji = document.createElement('span');
+            emoji.classList.add('falling-emoji');
+            emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.style.left = Math.random() * 100 + 'vw';
+            emoji.style.animationDuration = (Math.random() * 8 + 6) + 's'; 
+            emoji.style.animationDelay = (Math.random() * 5) + 's'; 
+            emojiContainer.appendChild(emoji);
+            emoji.addEventListener('animationend', () => {
+                emoji.remove();
+                if (Math.random() > 0.5) createFallingEmoji(); 
+            });
+        }
+        function startEmojiRain(count = 20) {
+            for (let i = 0; i < count; i++) {
+                createFallingEmoji();
+            }
+        }
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                particle.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                container.appendChild(particle);
+            }
+        }
+        function answerQuestion(isTeacher) {
+            const message = isTeacher
+                ? "'O','H','I','O' 'Ohio' 😅 (Hope you remember)"
+                : "'O','H','I','O' 'Ohio' 😅 (Did you forget you teach me this)";
+            document.getElementById('initial-question-modal').style.opacity = '0';
+            showMessage(message);
+            setTimeout(() => {
+                document.getElementById('initial-question-modal').classList.add('hidden');
+            }, 500); 
+        }
+
+        // Clock function
+        function startClock() {
+            function updateClock() {
+                const now = new Date();
+                const second = now.getSeconds();
+                const minute = now.getMinutes();
+                const hour = now.getHours();
+                
+                const secondDeg = ((second / 60) * 360);
+                const minuteDeg = ((minute / 60) * 360) + ((second/60)*6);
+                const hourDeg = ((hour % 12 / 12) * 360) + ((minute/60)*30);
+
+                document.getElementById('second-hand').style.transform = `translateX(-50%) translateY(-100%) rotate(${secondDeg}deg)`;
+                document.getElementById('minute-hand').style.transform = `translateX(-50%) translateY(-100%) rotate(${minuteDeg}deg)`;
+                document.getElementById('hour-hand').style.transform = `translateX(-50%) translateY(-100%) rotate(${hourDeg}deg)`;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+        }
+
+        window.onload = function() {
+            startEmojiRain(15); 
+            // Also start clock here in case modal isn't used
+            startClock();
+        }
+        document.addEventListener('mousemove', function(e) {
+            const colors = ['#FF69B4', '#FFD700', '#00FFFF', '#FF1493', '#ADFF2F'];
+            const trail = document.createElement('div');
+            trail.classList.add('cursor-trail-dot');
+            trail.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            document.body.appendChild(trail);
+            setTimeout(() => trail.remove(), 800);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.mobile-only-nav .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            let areNavsOpen = false;
+            function openAllNavs() {
+                if(!topNav) return; 
+                topNav.classList.remove('-translate-y-full');
+                bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full');
+                rightNav.classList.remove('translate-x-full');
+                mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                mainContent.classList.remove('pt-28'); 
+                navToggleIcon.classList.add('hidden');
+                navToggleX.classList.remove('hidden');
+                areNavsOpen = true;
+            }
+            function closeAllNavs() {
+                if(!topNav) return;
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                rightNav.classList.add('translate-x-full');
+                mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                mainContent.classList.add('pt-28'); 
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+            if(navToggle) {
+                navToggle.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    toggleAllNavs();
+                });
+            }
+            mainContent.addEventListener('click', () => {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                }
+            });
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (areNavsOpen) {
+                        closeAllNavs();
+                    }
+                });
+            });
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const desktopSidebar = document.getElementById('desktopSidebar');
+            const desktopMenuIcon = document.getElementById('desktopMenuIcon');
+            const desktopCloseIcon = document.getElementById('desktopCloseIcon');
+            const desktopOverlay = document.getElementById('desktop-overlay');
+            let isDesktopNavOpen = false;
+            function toggleDesktopNav() {
+                if (isDesktopNavOpen) {
+                    desktopSidebar.classList.add('-translate-x-full');
+                    desktopMenuIcon.classList.remove('hidden');
+                    desktopCloseIcon.classList.add('hidden');
+                    desktopOverlay.classList.remove('active');
+                    isDesktopNavOpen = false;
+                } else {
+                    desktopSidebar.classList.remove('-translate-x-full');
+                    desktopMenuIcon.classList.add('hidden');
+                    desktopCloseIcon.classList.remove('hidden');
+                    desktopOverlay.classList.add('active');
+                    isDesktopNavOpen = true;
+                }
+            }
+            function closeDesktopNav() {
+                if (isDesktopNavOpen) {
+                    desktopSidebar.classList.add('-translate-x-full');
+                    desktopMenuIcon.classList.remove('hidden');
+                    desktopCloseIcon.classList.add('hidden');
+                    desktopOverlay.classList.remove('active');
+                    isDesktopNavOpen = false;
+                }
+            }
+            if (desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDesktopNav();
+                });
+            }
+            if (desktopOverlay) {
+                desktopOverlay.addEventListener('click', () => {
+                    closeDesktopNav();
+                });
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isDesktopNavOpen) {
+                    closeDesktopNav();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

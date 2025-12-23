@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d0d10" />
+<title>The 8 Invisible Rooms</title>
+<meta name="description" content="A bright, minimal, classy birthday microsite: The Invisible Rooms." />
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@200;300;400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#0b0b12;
+    --ink-soft:#2a2a3a;
+    --paper:#ffffff;
+    --muted:#e7e7ef;
+
+    --g1: radial-gradient(circle at center, #fff2cc, #ffe0b2); 
+    --g2: radial-gradient(circle at center, #e6ffcc, #c1ffb2); 
+    --g3: radial-gradient(circle at center, #ccf2ff, #b2e0ff); 
+    --g4: radial-gradient(circle at center, #ffccf2, #ffb2e0); 
+    --g5: radial-gradient(circle at center, #e0ccff, #c1b2ff); 
+    --g6: radial-gradient(circle at center, #f2f2f2, #e0e0e0); 
+    --g7: radial-gradient(circle at center, #ffebcc, #ffd6b2); 
+    --g8: linear-gradient(to bottom, #4FC3F7 0%, #B3E5FC 100%); /* Bright Day Sky */
+    
+    --mg1: linear-gradient(135deg, #ffd17a, #ff7ad9);
+    --mg2: linear-gradient(135deg, #b7ff7a, #7ad3ff);
+    --mg3: linear-gradient(135deg, #ff9c7a, #b07aff);
+    --mg4: linear-gradient(135deg, #7affc4, #ffa1de);
+    --mg5: linear-gradient(135deg, #7ad3ff, #b07aff);
+    --mg6: linear-gradient(135deg, #ffa1de, #7affc4);
+    --mg7: linear-gradient(135deg, #ffe27a, #ff7ad9);
+    --mg8: linear-gradient(135deg, #ffc3a0, #ffafbd); /* New Home Room Mobile Gradient */
+
+    --c1: #ffd17a; 
+    --c2: #b7ff7a; 
+    --c3: #7ad3ff; 
+    --c4: #ffa1de; 
+    --c5: #b07aff; 
+    --c6: #ffffff; 
+    --c7: #ffe27a;
+    --c8: #ff99ac; /* New Home Room Accent */
+
+    --blur: 14px;
+    --radius: 18px;
+    --shadow: 0 20px 60px rgba(0,0,0,0.5), 0 2px 10px rgba(0,0,0,0.3);
+
+    --f-title: clamp(28px, 7vw, 48px);
+    --f-line: clamp(16px, 4.4vw, 22px);
+
+    --reveal: 700ms cubic-bezier(.22,.61,.36,1);
+    --float: 10s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    :root{ --reveal: 0ms linear; }
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background: #FDF5E6;
+    color:var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    overflow: hidden; 
+  }
+
+  .title{
+    margin:0 0 8px;
+    font-size: var(--f-title);
+    font-weight: 800;
+    letter-spacing: .2px;
+    line-height:1.1;
+    font-family: 'Pacifico', cursive; 
+    color: #4a4a4a;
+  }
+
+  .underline{
+    width:0%; height:3px;
+    background: linear-gradient(90deg,#111,#666);
+    border-radius: 999px;
+    transition: width var(--reveal);
+    opacity:.35;
+  }
+  .room.active .underline{ width: 120px; }
+
+  p.lead{
+    margin:14px 0 0;
+    font-size: var(--f-line);
+    color:#222437;
+    line-height:1.55;
+    letter-spacing:.2px;
+  }
+  p.punch{
+    margin:10px 0 0;
+    font-size: clamp(13px, 3.9vw, 18px);
+    color:#d03099;
+    font-weight: 700; 
+    opacity:0;
+    transform: translateY(8px);
+    transition: all var(--reveal);
+  }
+  .room.active p.punch{ opacity:1; transform: translateY(0); }
+
+  .progress{
+    position:fixed; top:0; left:0;
+    height:4px; width:0%;
+    background: linear-gradient(90deg,#7ad3ff,#ff7ad9,#ffe27a);
+    box-shadow: 0 0 12px rgba(0,0,0,.1);
+    z-index: 70;
+    transition: width .25s ease;
+  }
+  
+  .mobile-next-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-family: 'Gochi Hand', cursive;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+  }
+  .mobile-next-btn:active {
+      transform: translateX(-50%) scale(0.95);
+      background: #fff;
+  }
+  .mobile-next-btn svg {
+      width: 20px; height: 20px;
+  }
+
+  @media (max-width: 1023px) {
+      main{
+        height:100dvh;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+      }
+      section.room{
+        position:relative;
+        min-height:100dvh;
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        scroll-snap-align: start;
+        overflow:hidden;
+        background-color: #FDF5E6; 
+        box-shadow: none; 
+      }
+      
+      .room-3d-wrap { display: none; }
+      
+      .room-window {
+          position: relative; 
+          width: 260px; 
+          height: 200px;
+          border-radius: 24px; 
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          overflow: hidden;
+          z-index: 2; 
+          background: #fff;
+          margin-bottom: -40px;
+          top: 0; left: 0; transform: none;
+          flex-shrink: 0;
+      }
+      
+      .room-window .bg {
+          position:absolute; inset:0;
+          filter: none; transform: none;
+          animation: none; opacity:1;
+      }
+
+      .room-icon {
+          position: absolute; top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 80px; height: 80px; 
+          color: rgba(255, 255, 255, 0.3);
+          z-index: 3;
+      }
+      .room-icon svg { width: 100%; height: 100%; stroke-width: 1.5; }
+
+      .card{
+        position:relative; z-index: 10;
+        width: 85vw; max-width: 360px;
+        padding: 40px 24px 30px;
+        border-radius: 24px;
+        background: #ffffff; 
+        border: none;
+        color:#333;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        margin-top: 0;
+        opacity: 1; transform: none;
+        text-align: center;
+      }
+      .room.active .card{ opacity: 1; transform: none; }
+      
+      .inner{
+        background: transparent;
+        border: none;
+        padding: 0;
+      }
+      
+      .card h2.title {
+          font-size: 28px;
+          color: #333;
+          margin-bottom: 16px;
+          text-align: center;
+      }
+      .card .underline {
+          margin: 0 auto 16px;
+          background: linear-gradient(90deg, #ccc, #eee);
+      }
+      .card p.lead {
+          font-size: 15px;
+          line-height: 1.6;
+          color: #555;
+          text-align: center;
+      }
+      .card p.punch {
+          text-align: center;
+          color: #d03099;
+          font-size: 16px;
+          margin-top: 20px;
+          transform: none;
+          opacity: 1;
+      }
+
+      .floaters{ display: none; }
+      
+      .room-shelf {
+          position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; 
+          background: #5a4d41;
+          box-shadow: none; z-index: 1;
+      }
+      .room-shelf::before { display: none; }
+      
+      .desktop-door-wrapper { display: none; }
+  }
+
+  @media (min-width: 1024px) {
+      
+      body {
+          background: #ffffff; 
+      }
+
+      main {
+        height: 100vh; width: 100vw;
+        overflow: hidden; 
+        display: block; 
+        perspective: 1500px;
+        perspective-origin: 50% 50%;
+      }
+      
+      .floaters, .room-window, .room-icon, .room-shelf, .card, .mobile-next-btn { display: none; }
+      
+      section.room {
+        position: absolute; 
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        display: flex;
+        align-items: center; justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1s ease;
+        transform-style: preserve-3d;
+        overflow: hidden;
+      }
+
+      section.room.active {
+          opacity: 1;
+          pointer-events: auto;
+          z-index: 10;
+      }
+      
+      .room-3d-wrap {
+          position: relative;
+          width: 100vw; 
+          height: 100vh; 
+          transform-style: preserve-3d;
+          transition: transform 2s cubic-bezier(0.7, 0, 0.3, 1);
+          transform: translateZ(0); 
+          pointer-events: none; 
+      }
+      
+      .room-decor {
+          position: absolute; inset: 0;
+          pointer-events: none;
+          transform-style: preserve-3d;
+          z-index: 15;
+      }
+      
+      .decor-shape {
+          position: absolute;
+          transform-style: preserve-3d;
+          opacity: 0.6; 
+          filter: contrast(1.2) brightness(1.2); 
+      }
+
+      .bar {
+          bottom: 20%; left: var(--l);
+          width: 2vw; height: 10vw;
+          background: var(--c1);
+          transform: translateZ(-300px);
+          animation: soundWave 2s infinite ease-in-out alternate;
+          animation-delay: var(--d);
+          box-shadow: 0 0 40px var(--c1), 0 0 80px var(--c1);
+      }
+      @keyframes soundWave { 0% { height: 5vw; opacity:0.5; } 100% { height: 25vw; opacity:1; } }
+
+      .orb {
+          top: var(--t); left: var(--l);
+          width: 4vw; height: 4vw;
+          border-radius: 50%;
+          background: radial-gradient(circle at 30% 30%, #ffffff, var(--c2));
+          transform: translateZ(var(--z));
+          animation: floatOrb 8s infinite ease-in-out;
+          box-shadow: 0 0 40px var(--c2);
+          mix-blend-mode: screen;
+      }
+      @keyframes floatOrb { 0% { transform: translateZ(var(--z)) translateY(0); } 50% { transform: translateZ(var(--z)) translateY(-20px); } 100% { transform: translateZ(var(--z)) translateY(0); } }
+
+      .cube-frame {
+          top: var(--t); right: var(--r);
+          width: 6vw; height: 6vw;
+          border: 3px solid var(--c3); 
+          transform: translateZ(-200px) rotateX(45deg) rotateY(45deg);
+          animation: spinCube 20s linear infinite;
+          box-shadow: 0 0 25px var(--c3), inset 0 0 25px var(--c3);
+      }
+      @keyframes spinCube { 100% { transform: translateZ(-200px) rotateX(405deg) rotateY(405deg); } }
+
+      .cloud {
+          top: var(--t); left: var(--l);
+          width: 15vw; height: 15vw;
+          background: radial-gradient(closest-side, var(--c4), transparent);
+          transform: translateZ(-100px);
+          filter: blur(20px);
+          opacity: 0.7; 
+          animation: breathe 6s infinite ease-in-out alternate;
+          mix-blend-mode: plus-lighter; 
+      }
+      @keyframes breathe { 0% { transform: translateZ(-100px) scale(1); } 100% { transform: translateZ(-100px) scale(1.1); } }
+
+      .plane {
+          top: 20%; left: var(--l);
+          width: 3px; height: 60%;
+          background: var(--c5);
+          transform: translateZ(-250px) rotateZ(var(--r));
+          box-shadow: 0 0 30px var(--c5), 0 0 10px #fff;
+          opacity: 0.8;
+      }
+
+      .sparkle {
+          bottom: 0; left: var(--l);
+          width: 0.6vw; height: 0.6vw;
+          background: #fff;
+          border-radius: 50%;
+          transform: translateZ(-150px);
+          animation: rise 5s infinite linear;
+          animation-delay: var(--d);
+          box-shadow: 0 0 15px #fff, 0 0 30px var(--c6);
+      }
+      @keyframes rise { 0% { transform: translateZ(-150px) translateY(0); opacity:0; } 50% { opacity:1; } 100% { transform: translateZ(-150px) translateY(-50vh); opacity:0; } }
+
+      .sun-glow {
+          top: 50%; left: 50%;
+          width: 50vw; height: 50vw;
+          background: radial-gradient(circle, #fff5cc, var(--c7), transparent 70%);
+          transform: translate(-50%, -50%) translateZ(-450px);
+          opacity: 0.8;
+          animation: pulseSun 4s infinite ease-in-out alternate;
+          mix-blend-mode: screen;
+      }
+      @keyframes pulseSun { 0% { opacity: 0.6; transform: translate(-50%, -50%) translateZ(-450px) scale(1); } 100% { opacity: 0.9; transform: translate(-50%, -50%) translateZ(-450px) scale(1.1); } }
+
+      
+      .house-container-2d {
+          position: absolute;
+          bottom: 5vh; 
+          left: 50%;
+          transform: translateX(-50%) translateZ(20px) scale(0.9);
+          width: 280px; 
+          height: auto;
+          z-index: 20;
+          pointer-events: auto; 
+      }
+      
+      .house-svg {
+          width: 100%; height: auto;
+          filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3));
+          transition: filter 0.3s;
+      }
+      .house-container-2d:hover .house-svg {
+          filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+      }
+      
+      .door-trigger {
+          position: absolute;
+          bottom: 0; left: 50%;
+          transform: translateX(-50%);
+          width: 60px; height: 90px;
+          cursor: pointer;
+          z-index: 50;
+      }
+
+      .sun-scenery {
+          position: absolute; top: 10%; right: 20%;
+          width: 80px; height: 80px;
+          background: radial-gradient(circle, #ffd700, #ff8c00);
+          border-radius: 50%;
+          box-shadow: 0 0 40px #ffd700;
+          transform: translateZ(-300px);
+      }
+      .moon-scenery {
+          position: absolute; top: 10%; left: 20%;
+          width: 60px; height: 60px;
+          background: transparent;
+          border-radius: 50%;
+          box-shadow: -15px 15px 0 0 #fdfdfd; 
+          transform: translateZ(-300px) rotate(-30deg);
+          filter: drop-shadow(0 0 10px rgba(255,255,255,0.6));
+      }
+      
+      .stars-container {
+          position: absolute; inset: 0;
+          transform: translateZ(-400px);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 1.5s ease;
+      }
+      .star {
+          position: absolute; background: white; border-radius: 50%;
+          animation: twinkle 4s infinite ease-in-out;
+      }
+      @keyframes twinkle { 0%,100%{opacity:0.8;} 50%{opacity:0.3;} }
+
+      .station-sign-wrap {
+          position: absolute;
+          bottom: 10%; 
+          right: 10%; 
+          width: 180px; 
+          height: 220px;
+          transform-style: preserve-3d;
+          transform: translateZ(50px) rotateY(-10deg);
+          z-index: 40;
+      }
+      .station-board {
+          position: absolute; bottom: 160px; left: 0;
+          width: 100%; height: 70px;
+          background: #FFC107; 
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          box-shadow: 0 0 0 3px #000, inset 0 0 15px rgba(255,255,255,0.5), 0 8px 15px rgba(0,0,0,0.3); 
+          border-radius: 30px; 
+      }
+      .station-pole {
+          position: absolute; bottom: 0;
+          width: 10px; height: 230px; 
+          background: linear-gradient(90deg, #1a1a1a, #4d4d4d, #1a1a1a);
+          border-radius: 4px;
+      }
+      .station-pole.left { left: 40px; }
+      .station-pole.right { right: 40px; }
+      
+      .station-text {
+          font-family: 'Inter', sans-serif;
+          font-weight: 900;
+          color: #000;
+          font-size: 20px;
+          line-height: 1;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+      }
+      .station-subtext {
+          font-family: 'Noto Sans', sans-serif; 
+          font-size: 14px;
+          font-weight: 700;
+          margin-top: 3px;
+          color: #000;
+      }
+
+      /* Room 8 Specific overrides */
+      #room-8 .wall-left, #room-8 .wall-right, #room-8 .wall-ceiling { display: none !important; }
+      
+      /* Grass Surface Floor */
+      #room-8 .wall-floor {
+          background-color: #4caf50; 
+          background-image: linear-gradient(to bottom, #4caf50 0%, #66bb6a 100%);
+          width: 200vw; height: 50vh; 
+          left: -50vw; 
+          top: auto;
+          bottom: 0; 
+          transform: none; 
+          opacity: 1 !important; 
+          z-index: 10;
+      }
+      
+      #room-8 .wall-back { 
+          background: transparent; 
+          border: none; box-shadow: none; 
+      }
+      
+      /* Room 8 Layout Adjustments */
+      #room-8 .wall-content-wrapper {
+          left: 50%;
+          top: 5vh; /* Moved significantly higher */
+          transform: translateX(-50%) translateZ(60px);
+          text-align: center;
+          width: 90vw;
+          border-left: none;
+          padding-left: 0;
+          z-index: 60; 
+      }
+      #room-8 .wall-content-wrapper p.lead {
+          border-left: none;
+          padding-left: 0;
+          margin: 0.5rem auto;
+          max-width: 600px;
+      }
+      
+      #room-8 .card { background: linear-gradient(to bottom right, #fff0f5, #fff); }
+
+      #room-8 .wall-back, #room-8 .wall-floor, #room-8 .sun-scenery, #room-8 .moon-scenery, #room-8 .title, #room-8 .lead {
+          transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Night Mode Overrides */
+      section.room#room-8.night-mode {
+          --g8: linear-gradient(to bottom, #0B1026 0%, #2B32B2 100%);
+          --c8: #5c6bc0;
+      }
+      #room-8.night-mode .title { 
+          color: #ffffff !important; 
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4) !important;
+          opacity: 1 !important; 
+      }
+      #room-8.night-mode p.lead { 
+          color: #e0e0e0 !important; 
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      }
+      #room-8.night-mode p.punch { 
+          color: #ff80ab !important; 
+          text-shadow: 0 0 10px rgba(255,128,171,0.5); 
+      }
+      
+      #room-8.night-mode .wall-floor {
+          background: #1B5E20; 
+          background-image: linear-gradient(to bottom, #0d2b11 0%, #1B5E20 100%);
+      }
+      
+      #room-8.night-mode .sun-scenery { top: 150%; opacity: 0; transform: translateZ(-300px) scale(0.8); }
+      #room-8.night-mode .moon-scenery { top: 10%; opacity: 1; transform: translateZ(-300px) rotate(-10deg) scale(1.2); }
+      #room-8 .moon-scenery { opacity: 0; top: -50%; transition: all 1.5s ease; }
+      #room-8.night-mode .stars-container { opacity: 1; }
+      
+      /* Toggle Button Fixed */
+      .toggle-switch {
+          position: fixed; 
+          top: 20px; right: 20px; 
+          z-index: 10000;
+          cursor: pointer;
+          background: rgba(255,255,255,0.7);
+          padding: 8px 16px;
+          border-radius: 50px;
+          border: 2px solid rgba(0,0,0,0.1);
+          backdrop-filter: blur(5px);
+          font-family: 'Gochi Hand', cursive;
+          font-size: 16px;
+          color: #333;
+          display: flex; gap: 8px; align-items: center;
+          transition: all 0.3s;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          pointer-events: auto;
+      }
+      .toggle-switch:hover { transform: scale(1.05); background: rgba(255,255,255,0.9); }
+      #room-8.night-mode .toggle-switch { color: #fff; background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.4); }
+
+      .wall { 
+          position: absolute; 
+          backface-visibility: visible;
+          pointer-events: none !important; 
+      }
+      
+      .wall-back {
+          width: 100vw; height: 100vh;
+          background: var(--room-bg); 
+          transform: translateZ(-500px); 
+          display: flex;
+          align-items: center; justify-content: center;
+          box-shadow: inset 0 0 150px rgba(0,0,0,0.2);
+          border: 1px solid rgba(255,255,255,0.2);
+          transform-style: preserve-3d; 
+      }
+
+      .wall-left {
+          width: 2000px; height: 100vh;
+          left: 0; top: 0;
+          transform-origin: left center;
+          transform: rotateY(90deg) translateX(0);
+          background: linear-gradient(to right, #ffffff 0%, var(--room-tint) 100%);
+          opacity: 0.3;
+      }
+
+      .wall-right {
+          width: 2000px; height: 100vh;
+          right: 0; top: 0;
+          transform-origin: right center;
+          transform: rotateY(-90deg) translateX(0);
+          background: linear-gradient(to left, #ffffff 0%, var(--room-tint) 100%);
+          opacity: 0.3;
+      }
+
+      .wall-floor {
+          width: 100vw; height: 2000px;
+          left: 0; bottom: 0;
+          transform-origin: bottom center;
+          transform: rotateX(90deg) translateY(0);
+          background-color: #f0f0f0; 
+          background-image: 
+            linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+          background-size: 100px 100px;
+          mask-image: linear-gradient(to bottom, transparent 0%, white 60%);
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 60%);
+      }
+
+      .wall-ceiling {
+          width: 100vw; height: 2000px;
+          left: 0; top: 0;
+          transform-origin: top center;
+          transform: rotateX(-90deg) translateY(0);
+          background: #ffffff; 
+          opacity: 0.9;
+      }
+      
+      .wall-content-wrapper {
+          position: absolute; 
+          left: 15vw; 
+          top: 30vh; 
+          width: 35vw;
+          text-align: left; 
+          z-index: 20;
+          transform: translateZ(60px); 
+          text-shadow: 0 4px 20px rgba(255,255,255,0.8);
+          pointer-events: none;
+      }
+      
+      .wall-content-wrapper h2.title {
+          font-family: 'Playfair Display', serif;
+          font-size: 3.5vw; 
+          margin-bottom: 1.5rem; 
+          color: var(--ink);
+          opacity: 0;
+          animation: fadeUp 1s ease forwards 0.5s;
+      }
+      
+      .wall-content-wrapper .underline { 
+          display: block; width: 80px; height: 4px; 
+          background: var(--ink-soft);
+          margin-bottom: 2rem; 
+          opacity: 0;
+          animation: growLine 1s ease forwards 0.8s;
+      }
+
+      .wall-content-wrapper p.lead {
+          font-family: 'Inter', sans-serif; 
+          font-weight: 300; 
+          font-size: 1.2vw;
+          line-height: 1.8; 
+          color: var(--ink-soft);
+          border-left: 2px solid var(--ink-soft); 
+          padding-left: 2rem;
+          opacity: 0;
+          animation: fadeUp 1s ease forwards 1s;
+      }
+
+      .wall-content-wrapper p.punch {
+          font-family: 'Gochi Hand', cursive; 
+          color: var(--accent);
+          font-size: 1.8vw; 
+          margin-top: 2.5rem;
+          opacity: 0;
+          transform: none; 
+          animation: fadeUp 1s ease forwards 1.2s;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      }
+
+      .desktop-door-wrapper {
+        display: block !important; 
+        position: absolute;
+        right: 20vw; 
+        bottom: 0; 
+        width: 24vw; 
+        height: 28vw; 
+        perspective: 800px; 
+        cursor: pointer; 
+        z-index: 1000; 
+        transform: translateZ(-490px); 
+        transform-style: preserve-3d;
+        pointer-events: auto !important; 
+        transition: transform 0.3s ease;
+      }
+      
+      .desktop-door-wrapper .click-layer {
+          position: absolute; 
+          inset: -50px; 
+          z-index: 9999;
+          cursor: pointer;
+          pointer-events: auto !important; 
+          transform: translateZ(50px); 
+          background: rgba(255,0,0,0.0); 
+      }
+      
+      .desktop-door-wrapper:hover {
+          transform: translateZ(-475px) scale(1.02);
+      }
+      
+      .desktop-door-frame {
+          width: 100%; height: 100%; 
+          border: 15px solid #e0e0e0; 
+          border-bottom: none; 
+          background: #f0f0f0; 
+          box-shadow: 0 0 50px rgba(255,255,255,0.5); 
+          position: relative;
+          transform-style: preserve-3d;
+          pointer-events: auto !important;
+          
+          display: flex; 
+      }
+
+      .desktop-door {
+          width: 50%; 
+          height: 100%; 
+          background: #ffffff; 
+          border: 1px solid #e0e0e0; 
+          display: flex; 
+          flex-direction: column; 
+          box-shadow: inset 0 0 40px rgba(0,0,0,0.05); 
+          pointer-events: auto !important;
+          transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+          
+          position: relative; 
+      }
+      
+      .desktop-door.left {
+          transform-origin: left;
+          border-right: 1px solid #e0e0e0;
+      }
+      .desktop-door.right {
+          transform-origin: right;
+          border-left: 1px solid #e0e0e0;
+      }
+      
+      .desktop-door-wrapper:hover .desktop-door.left { 
+          transform: rotateY(-25deg); 
+      }
+      .desktop-door-wrapper:hover .desktop-door.right { 
+          transform: rotateY(25deg); 
+      }
+      
+      .door-panel {
+          flex: 1; margin: 12%; 
+          border: 2px solid rgba(0,0,0,0.1);
+          background: linear-gradient(135deg, #ffffff, #f0f0f0); 
+          box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+          pointer-events: auto !important;
+      }
+      
+      .door-handle {
+          position: absolute; top: 50%;
+          width: 12px; height: 12px;
+          border-radius: 50%; 
+          background: var(--accent);
+          box-shadow: 0 0 10px var(--accent);
+          pointer-events: auto !important;
+          z-index: 9999;
+          transform: translateY(-50%) translateZ(5px);
+          cursor: pointer;
+      }
+      
+      .desktop-door.left .door-handle {
+          right: 6px;
+      }
+      .desktop-door.right .door-handle {
+          left: 6px;
+      }
+      
+      .door-handle::after {
+          content: '';
+          position: absolute;
+          inset: -40px; 
+          border-radius: 50%;
+          cursor: pointer;
+          background: transparent;
+      }
+      
+      .door-label {
+          position: absolute; top: -60px; left: 50%; 
+          transform: translateX(-50%);
+          color: var(--ink); 
+          font-size: 14px; letter-spacing: 4px;
+          opacity: 0.5; transition: opacity 0.3s;
+          text-transform: uppercase;
+          font-family: 'Inter', sans-serif;
+          pointer-events: none;
+      }
+      .desktop-door-wrapper:hover .door-label { opacity: 1; text-shadow: 0 0 10px white; }
+
+      .room-3d-wrap.zoom-active { 
+          transform: translateZ(1200px); 
+      }
+      .room-3d-wrap.zoom-active .desktop-door.left { 
+          transform: rotateY(-110deg) !important; 
+          transition: transform 0.5s ease !important;
+      }
+      .room-3d-wrap.zoom-active .desktop-door.right { 
+          transform: rotateY(110deg) !important; 
+          transition: transform 0.5s ease !important;
+      }
+  }
+
+  @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes growLine {
+      from { width: 0; opacity: 0; }
+      to { width: 80px; opacity: 0.8; }
+  }
+
+  #doorOverlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: #fff; opacity: 0; visibility: hidden;
+      transition: opacity 1s ease; pointer-events: none;
+  }
+  #doorOverlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+  @media (max-width:420px){ .inner{ padding: 18px; } }
+  @media (max-width: 640px) { .festive-text { font-size: 1.0rem; } }
+
+  .noscript{
+    position:fixed; inset:0; display:grid; place-items:center;
+    background:#111; color:#fff; padding:24px; text-align:center;
+  }
+  
+  .sidebar-panel {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 100%; max-width: 360px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(0,0,0,0.1);
+      z-index: 150;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-direction: column;
+      box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+  }
+  .sidebar-panel.open {
+      transform: translateX(0);
+  }
+  .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+  }
+  .nav-grid::-webkit-scrollbar { width: 4px; }
+  .nav-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+  
+  .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 12px 8px; border-radius: 12px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(0,0,0,0.05);
+      color: #333; font-family: 'Gochi Hand', cursive; font-size: 1.1rem;
+      text-decoration: none; transition: all 0.2s ease; text-align: center;
+  }
+  .nav-btn:hover {
+      background: rgba(255,255,255,0.9); transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); color: #000;
+  }
+  .sidebar-header {
+      padding: 24px 20px 10px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .sidebar-title { font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #333; }
+  
+  .nav-panel {
+      background: rgba(255,255,255,.6); backdrop-filter: blur(var(--blur));
+      border: 1px solid rgba(0,0,0,.1); color: var(--ink-soft);
+      transition: all 0.3s ease-in-out;
+  }
+  .nav-panel .nav-link { 
+      font-family: 'Gochi Hand', cursive; font-size: 1rem; color: #111; 
+      padding: 8px 12px; white-space: nowrap; display: block;
+      border-radius: 8px; transition: all 0.2s;
+  }
+  .nav-panel .nav-link:hover { background-color: rgba(0,0,0,.1); font-weight: 700; }
+  
+  .nav-panel::-webkit-scrollbar { display: none; }
+  .nav-panel { -ms-overflow-style: none; scrollbar-width: none; }
+
+  #navToggle {
+      background: rgba(255,255,255,.6); color: #111;
+      border: 1px solid rgba(0,0,0,.2); backdrop-filter: blur(var(--blur));
+      transition: all 0.3s ease;
+  }
+  #navToggle:hover { background: rgba(255,255,255,.9); transform: scale(1.05); }
+
+  button { user-select: none; }
+</style>
+</head>
+<body>
+
+<noscript>
+  <div class="noscript">
+    <div>
+      <h1 style="margin:0 0 8px">The 8 Invisible Rooms</h1>
+      <p style="margin:0;opacity:.8">Please enable JavaScript for animations and scroll transitions.</p>
+    </div>
+  </div>
+</noscript>
+
+<div id="doorOverlay"></div>
+
+<button id="navToggle" class="fixed top-6 left-6 z-[160] p-3 rounded-full shadow-xl focus:outline-none hover:shadow-2xl">
+    <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+    <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+</button>
+
+<nav id="mainSidebar" class="sidebar-panel hidden lg:flex">
+    <div class="sidebar-header">
+        <span class="sidebar-title">Menu</span>
+    </div>
+    <div class="nav-grid">
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="Cake.html" class="nav-btn">Cake</a>
+        <a href="21_Wish.html" class="nav-btn">21 Doors</a>
+        <a href="chat.html" class="nav-btn">Heaven</a>
+        <a href="Diary.html" class="nav-btn">Diary</a>
+        <a href="anatomy.html" class="nav-btn">Anatomy</a>
+        <a href="Box.html" class="nav-btn">Box</a>
+        <a href="Special.html" class="nav-btn">Special</a>
+        <a href="color.html" class="nav-btn">Color</a>
+        <a href="you.html" class="nav-btn">You</a>
+        <a href="Teacher.html" class="nav-btn">Teacher</a>
+        <a href="Universe.html" class="nav-btn">Universe</a>
+        <a href="The_River.html" class="nav-btn">River</a>
+        <a href="Mountain.html" class="nav-btn">Mountain</a>
+        <a href="Skill.html" class="nav-btn">Skill</a>
+        <a href="Paper_Star.html" class="nav-btn">Paper Star</a>
+        <a href="Carttoon.html" class="nav-btn">Cartoon</a>
+        <a href="Periodik_table.html" class="nav-btn">Elements</a>
+        <a href="Concept.html" class="nav-btn">Concept</a>
+        <a href="Calender.html" class="nav-btn">Calender</a>
+        <a href="Perspective.html" class="nav-btn">Perspective</a>
+        <a href="Santa.html" class="nav-btn">Santa</a>
+        <a href="Presence.html" class="nav-btn">Presence</a>
+        <a href="Cloud.html" class="nav-btn">Cloud</a>
+        <a href="Ink.html" class="nav-btn">Paint</a>
+        <a href="Butterfly.html" class="nav-btn">Butterfly</a>
+        <a href="Weather.html" class="nav-btn">Weather</a>
+        <a href="Spotlight.html" class="nav-btn">Spotlight</a>
+        <a href="Room.html" class="nav-btn bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Room</a>
+        <a href="Radio.html" class="nav-btn">Radio</a>
+        <a href="Food.html" class="nav-btn">Food</a>
+        <a href="Music.html" class="nav-btn">Music</a>
+        <a href="letter.html" class="nav-btn">Letter</a>
+        <a href="Msg.html" class="nav-btn">Message</a>
+    </div>
+</nav>
+
+<nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[120] h-16 shadow-md flex items-center justify-center space-x-2 px-4 overflow-x-auto -translate-y-full lg:hidden">
+    <a href="Msg.html" class="nav-link">Message</a>
+    <a href="letter.html" class="nav-link">Letter</a>
+    <a href="Music.html" class="nav-link">Music</a>
+</nav>
+
+<nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[120] h-16 shadow-md flex items-center justify-center space-x-2 px-4 overflow-x-auto translate-y-full lg:hidden">
+    <a href="Skill.html" class="nav-link">Skill</a>
+    <a href="Paper_Star.html" class="nav-link">Paper Star</a>
+    <a href="Carttoon.html" class="nav-link">Cartoon</a>
+</nav>
+
+<nav id="leftNav" class="nav-panel fixed left-0 top-16 bottom-16 z-[120] w-24 shadow-md flex flex-col items-center space-y-1.9 py-4 overflow-y-auto -translate-x-full lg:hidden">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="Cake.html" class="nav-link">Cake</a>
+    <a href="21_Wish.html" class="nav-link">21 Doors</a>
+    <a href="chat.html" class="nav-link">Heaven</a>
+    <a href="Diary.html" class="nav-link">Diary</a>
+    <a href="anatomy.html" class="nav-link">Anatomy</a>
+    <a href="Box.html" class="nav-link">Box</a>
+    <a href="Special.html" class="nav-link">Special</a>
+    <a href="color.html" class="nav-link">Color</a>
+    <a href="you.html" class="nav-link">You</a>
+    <a href="Teacher.html" class="nav-link">Teacher</a>
+    <a href="Universe.html" class="nav-link">Universe</a>
+    <a href="The_River.html" class="nav-link">River</a>
+    <a href="Mountain.html" class="nav-link">Mountain</a>
+</nav>
+
+<nav id="rightNav" class="nav-panel fixed right-0 top-16 bottom-16 z-[120] w-24 shadow-md flex flex-col items-center space-y-1.9 py-4 overflow-y-auto translate-x-full lg:hidden">
+    <a href="Periodik_table.html" class="nav-link">Elements</a>
+    <a href="Concept.html" class="nav-link">Concept</a>
+    <a href="Calender.html" class="nav-link">Calender</a>
+    <a href="Perspective.html" class="nav-link">Perspective</a>
+    <a href="Santa.html" class="nav-link">Santa</a>
+    <a href="Presence.html" class="nav-link">Presence</a>
+    <a href="Cloud.html" class="nav-link">Cloud</a>
+    <a href="Ink.html" class="nav-link">Paint</a>
+    <a href="Butterfly.html" class="nav-link">Butterfly</a>
+    <a href="Weather.html" class="nav-link">Weather</a>
+    <a href="Spotlight.html" class="nav-link">Spotlight</a>
+    <a href="Room.html" class="nav-link">Room</a>
+    <a href="Radio.html" class="nav-link">Radio</a>
+    <a href="Food.html" class="nav-link">Food</a>
+</nav>
+
+
+<div class="progress" id="progress"></div>
+
+<button id="mobileNextBtn" class="mobile-next-btn lg:hidden">
+    Next Room 
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+</button>
+
+<main id="scroller" tabindex="0" aria-live="polite">
+
+  <section class="room" id="room-1" style="--room-bg: var(--g1); --room-tint: #ffd17a; --accent: var(--c1);">
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Listening Room</h2><div class="underline"></div>
+              <p class="lead">In your Listening Room, This room is where your unspoken thoughts finally slow down enough to be understood. You arrive carrying questions, concerns, and quiet worries, but you never bring them alone. Each problem sits beside its possible answer, examined calmly, patiently. As sound fills the space, your mind begins to sort instead of spiral. You replay moments, adjust perspectives, and find clarity without forcing it. Feelings are allowed their place, but they don’t overpower your thinking.</p>
+              <p class="punch">You hear the quiet parts of people.</p>
+            </article>
+        </div>
+        
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" aria-label="Enter next room" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left">
+                    <div class="door-panel top"></div>
+                    <div class="door-panel bottom"></div>
+                    <div class="door-handle" onclick="goToNextRoom()"></div>
+                </div>
+                <div class="desktop-door right">
+                    <div class="door-panel top"></div>
+                    <div class="door-panel bottom"></div>
+                    <div class="door-handle" onclick="goToNextRoom()"></div>
+                </div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg1);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner">
+        <h2 class="title">✨The Listening Room✨</h2><div class="underline"></div>
+        <p class="lead">In your Listening Room, silence isn’t empty, it feels understood. You don’t just hear people, you hold their words with care, like they matter. There’s a patience in the way you listen, a gentle space you create without effort a space where feelings settle, fears soften, and hearts breathe a little easier. Some people take in sound, you take in the emotions behind it.</p>
+        <p class="punch">You hear the quiet parts of people that they never say out loud.</p>
+    </div></article>
+  </section>
+
+  <section class="room" id="room-2" style="--room-bg: var(--g2); --room-tint: #b7ff7a; --accent: var(--c2);">
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Patience Room</h2><div class="underline"></div>
+              <p class="lead">This room is built around how you know how to wait. Not with restlessness, not with complaint, but with quiet control. You understand that not everything moves at your pace, and you don’t force it to. Here, patience is not silence, it is awareness. You observe, you think, you allow time to do its work while you stay steady within it. Even when things test you, even when answers take longer than expected, you don’t let impatience change who you are. The Patient Room reflects that part of you, calm on the surface, composed underneath, trusting that what is meant to arrive will do so at the right moment.</p>
+              <p class="punch">You turn waiting into something peaceful.</p>
+            </article>
+        </div>
+        <div class="room-decor">
+            <div class="decor-shape orb" style="--t:20%; --l:15%; --z:-100px;"></div>
+            <div class="decor-shape orb" style="--t:60%; --l:85%; --z:-250px;"></div>
+            <div class="decor-shape orb" style="--t:30%; --l:70%; --z:-50px;"></div>
+        </div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+                <div class="desktop-door right"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg2);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨The Patience Room✨</h2><div class="underline"></div><p class="lead">In your Patience Room, time moves differently softer, slower, almost as if it learns its rhythm from you. You hold moments the way a still lake holds reflections: gently, without rushing them to settle. Your patience isn’t silent waiting; it’s a quiet strength that turns uncertainty into something steady. Here, even the most restless thoughts find a place to breathe, because your presence feels like a calm horizon no storm can touch.</p><p class="punch">You turn waiting into something peaceful, as if time enjoys slowing down for you.</p></div></article>
+  </section>
+
+  <section class="room" id="room-3" style="--room-bg: var(--g3); --room-tint: #7ad3ff; --accent: var(--c3);">
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Clarity Room</h2><div class="underline"></div>
+              <p class="lead">This room reflects how clearly you see beyond words. You sense intentions before they are spoken, understand moods before they are explained. While others react, you anticipate. You notice pauses, shifts in tone, small changes in behavior, and from them you already know what the next person is thinking, what they need, and where they are headed next. This clarity isn’t loud or intrusive, it’s precise and intuitive. You don’t use it to control situations, but to move through them smoothly, avoiding unnecessary conflict and choosing the right response at the right moment. </p>
+              <p class="punch">You bring clarity naturally.</p>
+            </article>
+        </div>
+        <div class="room-decor">
+            <div class="decor-shape cube-frame" style="--t:20%; --r:15%;"></div>
+            <div class="decor-shape cube-frame" style="--t:70%; --r:80%;"></div>
+        </div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+                <div class="desktop-door right"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg3);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨The Clarity Room✨</h2><div class="underline"></div><p class="lead">In your Clarity Room, things that feel confusing slowly start to make sense. It’s like your presence makes the noise settle down on its own. You don’t push for answers or rush anything somehow understanding just shows up around you, the way fog quietly moves when the light changes. There’s something steady in the way you look at things, something that helps thoughts fall into the right place. With you, even the truths people are scared to say feel safe to come forward.</p><p class="punch">You bring clarity the way sunrise brings light naturally, without trying.</p></div></article>
+  </section>
+
+  <section class="room" id="room-4" style="--room-bg: var(--g4); --room-tint: #ffa1de; --accent: var(--c4);">
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Softness Room</h2><div class="underline"></div>
+              <p class="lead">This room reflects how carefully you move through people’s lives. You choose your words slowly, your actions even more so, always aware of how they might land. You don’t want to hurt anyone, even unintentionally. You carry empathy ahead of impulse, and restraint ahead of reaction. In this space, softness becomes consideration, the quiet effort to protect feelings, to avoid leaving marks that can’t be seen. And even when it costs you, you still choose gentleness, every single time.</p>
+              <p class="punch">Your softness is courage.</p>
+            </article>
+        </div>
+        <div class="room-decor">
+            <div class="decor-shape cloud" style="--t:10%; --l:10%;"></div>
+            <div class="decor-shape cloud" style="--t:60%; --l:80%;"></div>
+            <div class="decor-shape cloud" style="--t:30%; --l:60%;"></div>
+        </div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+                <div class="desktop-door right"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg4);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24l-8.49 8.49a2 2 0 0 1-2.83 0L3.51 15.51a2 2 0 0 1 0-2.83L12 3.51a2 2 0 0 1 2.83 0l6.7 6.7a2 2 0 0 1 0 2.83z"></path><path d="M12 3.5l6.7 6.7"></path></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨The Softness Room✨</h2><div class="underline"></div><p class="lead">Your Softness Room is built from the little things you do without noticing the gentle way you speak, the way your thoughts stay considerate even when life gets loud, the way your heart chooses understanding over urgency. Your softness shows in your patience, in the quiet strength behind your choices, and in the sincerity of your intentions. It’s in the way you hold your emotions with honesty, the way you handle moments with care, and the way you stay true to your gentle nature even when the world doesn’t make it easy.</p><p class="punch">Your softness is the quiet courage you carry every day.</p></div></article>
+  </section>
+
+  <section class="room" id="room-5" style="--room-bg: var(--g5); --room-tint: #b07aff; --accent: var(--c5);">
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Perspective Room</h2><div class="underline"></div>
+              <p class="lead">This room reflects how naturally you shift viewpoints. You don’t lock yourself into a single version of the truth. You pause, step back, and let the full picture reveal itself. You notice motives, timing, and unspoken context, things others rush past. Because of this, your responses carry depth rather than impulse. In the Perspective Room, you don’t rush to conclusions or cling to certainty. You allow understanding to form quietly, and your decisions emerge calm, balanced, and thoughtful.</p>
+              <p class="punch">Your thoughts move with depth.</p>
+            </article>
+        </div>
+        <div class="room-decor">
+            <div class="decor-shape plane" style="--l:15%; --r:15deg;"></div>
+            <div class="decor-shape plane" style="--l:85%; --r:-15deg;"></div>
+        </div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+                <div class="desktop-door right"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg5);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨The Perspective Room✨</h2><div class="underline"></div><p class="lead">Your Perspective Room is shaped by the way you notice things that most people overlook. You see details with intention the small shifts, the hidden meanings, the parts that actually matter. Your thoughts don’t rush, they choose direction with purpose. You understand situations from angles that aren’t obvious, and you carry a way of thinking that stays balanced even when life becomes uneven. Your perspective isn’t loud or dramatic it’s thoughtful, grounded, and quietly wise.</p><p class="punch">Your thoughts move with depth, not speed.</p></div></article>
+  </section>
+
+  <section class="room" id="room-6" style="--room-bg: var(--g6); --room-tint: #ffffff; --accent: var(--c6);">
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Grace Room</h2><div class="underline"></div>
+              <p class="lead">This room mirrors the ease with which you handle moments that could easily turn heavy. You choose calm when reactions would be simpler, and composure when situations try to unsettle you. Grace appears in the way you let go without resentment, in how you move forward without keeping score. There is restraint in your behavior, a quiet confidence that doesn’t need acknowledgment. In this space, grace is not performance, it is habit, something so natural to you that it follows you even when no one is watching. Your Grace is woven from the way you move through life.</p>
+              <p class="punch">Your elegance is simply the truth.</p>
+            </article>
+        </div>
+        <div class="room-decor">
+            <div class="decor-shape sparkle" style="--l:20%; --d:0s;"></div>
+            <div class="decor-shape sparkle" style="--l:50%; --d:1s;"></div>
+            <div class="decor-shape sparkle" style="--l:80%; --d:2s;"></div>
+        </div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+                <div class="desktop-door right"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg6);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.32 0z"></path></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨The Grace Room✨</h2><div class="underline"></div><p class="lead">Your Grace Room is woven from the way you move through life with steadiness and intention. It’s in the way you choose your words, the way you carry yourself even on difficult days, and the way your presence stays composed without needing attention. Your grace isn’t about perfection — it’s about the quiet discipline in your actions, the calm in your choices, and the natural elegance that shows up even when you’re not trying to be elegant. There is a dignity in you that stays steady, no matter what the moment asks of you.</p><p class="punch">Your elegance is simply the truth of how you choose to move through the world.</p></div></article>
+  </section>
+
+  <section class="room" id="room-7" style="--room-bg: var(--g7); --room-tint: #ffe27a; --accent: var(--c7);">
+     <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title">The Daylight Room</h2><div class="underline"></div>
+              <p class="lead">This room is filled with the light you earned. Not borrowed, not given, but built slowly through everything you faced and carried forward. Every problem left its mark, and you learned from each one without letting them harden you. You adapted, adjusted, and kept moving until clarity replaced confusion. In daylight, nothing hides anymore, and you don’t need it to. You stand visible, composed, and whole. You shine not because life was easy, but because you chose to rise through it. Like a star seen clearly after a long night, your light feels steady, honest, and unmistakably yours.</p>
+              <p class="punch">Your clarity is the quiet sun.</p>
+            </article>
+        </div>
+        <div class="room-decor">
+            <div class="decor-shape sun-glow"></div>
+        </div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+        <div class="desktop-door-wrapper" role="button" onclick="goToNextRoom()">
+            <div class="click-layer"></div>
+            <div class="desktop-door-frame">
+                <div class="desktop-door left"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+                <div class="desktop-door right"><div class="door-panel top"></div><div class="door-panel bottom"></div><div class="door-handle" onclick="goToNextRoom()"></div></div>
+            </div>
+            <span class="door-label">Enter</span>
+        </div>
+    </div>
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg7);"></div><div class="room-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨The Daylight Room✨</h2><div class="underline"></div><p class="lead">Your Daylight Room comes from the way you naturally bring clarity into any moment. It’s in how your presence feels steady, how your thoughts stay hopeful even when life feels uncertain, and how your energy carries a quiet brightness that doesn’t fade. You have a way of bringing direction to your own days choosing clarity over confusion, purpose over noise, and light over heaviness. Your daylight isn’t loud or dramatic it’s the type that grows slowly, honestly, and stays with you no matter what the day becomes.</p><p class="punch">Your clarity is the quiet sun in your own sky.</p></div></article>
+  </section>
+
+  <!-- NEW ROOM 8: THE HOME ROOM -> HAPPY BIRTHDAY -->
+  <section class="room" id="room-8" style="--room-bg: var(--g8); --room-tint: #ffc0cb; --accent: var(--c8);">
+    <!-- Toggle Button MOVED OUTSIDE of 3D Wrapper for better clicking -->
+    <button class="toggle-switch" onclick="toggleDayNight()">
+        <span>☀️ / 🌙</span> Mode
+    </button>
+    
+    <div class="stars-container">
+        <div class="star" style="top:10%; left:20%; width:3px; height:3px; animation-delay:0s;"></div>
+        <div class="star" style="top:25%; left:60%; width:2px; height:2px; animation-delay:1s;"></div>
+        <div class="star" style="top:15%; left:85%; width:4px; height:4px; animation-delay:2s;"></div>
+        <div class="star" style="top:40%; left:10%; width:2px; height:2px; animation-delay:0.5s;"></div>
+        <div class="star" style="top:30%; left:40%; width:3px; height:3px; animation-delay:1.5s;"></div>
+        <div class="star" style="top:5%; left:50%; width:2px; height:2px; animation-delay:2.5s;"></div>
+        <div class="star" style="top:20%; left:90%; width:3px; height:3px; animation-delay:0.2s;"></div>
+        <div class="star" style="top:12%; left:5%; width:2px; height:2px; animation-delay:1.2s;"></div>
+        <div class="star" style="top:35%; left:75%; width:2px; height:2px; animation-delay:2.2s;"></div>
+    </div>
+
+    <div class="room-3d-wrap">
+        <div class="wall wall-back">
+            <article class="wall-content-wrapper">
+              <h2 class="title" style="font-size: 5vw; color: #d63384; text-shadow: 0 4px 10px rgba(214, 51, 132, 0.2);">Happy Birthday!</h2>
+              <div class="underline" style="margin: 0 auto 2rem; background: linear-gradient(90deg, #ff9a9e, #fad0c4);"></div>
+              <p class="lead">May your year be as warm as this home, as steady as the rails, and filled with the magic you give to everyone else.</p>
+              <p class="punch" style="font-size: 2vw;">Welcome home to your best year yet.</p>
+            </article>
+        </div>
+        
+        <div class="sun-scenery"></div>
+        <div class="moon-scenery"></div>
+
+        <!-- 2D SVG Illustration of House -->
+        <div class="house-container-2d">
+            <svg class="house-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- House Shadow -->
+                <ellipse cx="150" cy="280" rx="140" ry="20" fill="rgba(0,0,0,0.2)"/>
+                
+                <!-- Chimney -->
+                <rect x="200" y="80" width="40" height="80" fill="#795548" stroke="#3e2723" stroke-width="2"/>
+                <rect x="195" y="70" width="50" height="15" fill="#5d4037" stroke="#3e2723" stroke-width="2"/>
+                
+                <!-- Main Body -->
+                <rect x="50" y="140" width="200" height="140" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/>
+                
+                <!-- Roof -->
+                <path d="M40 140 L150 40 L260 140 Z" fill="#ff7043" stroke="#e64a19" stroke-width="2"/>
+                <path d="M150 70 L150 90" stroke="#fff" stroke-width="2" opacity="0.5"/>
+                
+                <!-- Window -->
+                <rect x="70" y="180" width="60" height="60" fill="#b3e5fc" stroke="#0288d1" stroke-width="2"/>
+                <line x1="100" y1="180" x2="100" y2="240" stroke="#0288d1" stroke-width="2"/>
+                <line x1="70" y1="210" x2="130" y2="210" stroke="#0288d1" stroke-width="2"/>
+                
+                <!-- Door Area (Clickable Restart) -->
+                <rect x="170" y="180" width="50" height="100" fill="#8d6e63" stroke="#5d4037" stroke-width="2"/>
+                <circle cx="210" cy="230" r="3" fill="#ffd54f"/>
+                
+                <!-- Decor Plants -->
+                <circle cx="40" cy="280" r="20" fill="#4caf50"/>
+                <circle cx="260" cy="280" r="20" fill="#4caf50"/>
+            </svg>
+            <!-- Invisible click trigger over door -->
+            <div class="door-trigger" onclick="location.reload()" title="Restart"></div>
+        </div>
+
+        <!-- Classic Yellow Station Board -->
+        <div class="station-sign-wrap">
+            <div class="station-pole left"></div>
+            <div class="station-pole right"></div>
+            <div class="station-board">
+                <div class="station-text">KOLKATA</div>
+                <div class="station-subtext">কলকাতা</div>
+            </div>
+            <div class="station-board-back"></div>
+        </div>
+
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-floor"></div>
+        <div class="wall wall-ceiling"></div>
+    </div>
+    
+    <!-- Mobile Card View -->
+    <div class="room-art"><div class="room-window"><div class="bg" style="background: var(--mg8);"></div><div class="room-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>
+    </div></div></div>
+    <div class="room-shelf"></div>
+    <article class="card"><div class="inner"><h2 class="title">✨Happy Birthday!✨</h2><div class="underline"></div><p class="lead">May your year be as warm as this home, as steady as the rails, and filled with the magic you give to everyone else. You’ve walked through the rooms of your soul, now rest in the joy of simply being.</p><p class="punch">Welcome home to your best year yet.</p></div></article>
+  </section>
+
+</main>
+
+<script>
+  const scroller = document.getElementById('scroller');
+  const rooms = Array.from(document.querySelectorAll('section.room'));
+  const doorOverlay = document.getElementById('doorOverlay');
+  
+  const mobileNextBtn = document.getElementById('mobileNextBtn');
+
+  const ZOOM_DURATION = 1500; 
+
+  scroller.addEventListener('wheel', (evt) => {
+    if (window.innerWidth >= 1024) {
+        evt.preventDefault();
+    }
+  }, { passive: false });
+
+  function goToNextRoom() {
+    const currentIndex = rooms.findIndex(r => r.classList.contains('active'));
+    if (currentIndex >= rooms.length - 1) return;
+
+    const currentRoom = rooms[currentIndex];
+    
+    if (window.innerWidth >= 1024) {
+        const wrap = currentRoom.querySelector('.room-3d-wrap');
+        
+        if(wrap) wrap.classList.add('zoom-active');
+        
+        setTimeout(() => {
+              doorOverlay.classList.add('active'); 
+        }, 800); 
+
+        setTimeout(() => {
+            currentRoom.classList.remove('active');
+            rooms[currentIndex + 1].classList.add('active');
+
+            setTimeout(() => {
+                doorOverlay.classList.remove('active');
+                if(wrap) wrap.classList.remove('zoom-active');
+            }, 100);
+            
+        }, ZOOM_DURATION); 
+        
+    } else {
+        const nextIndex = currentIndex + 1;
+        rooms[nextIndex].scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  document.querySelectorAll('.desktop-door-wrapper').forEach(door => {
+      door.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Check if it's the restart door (has onclick attribute inline)
+          if(door.getAttribute('onclick').includes('reload')) return;
+          goToNextRoom();
+      });
+  });
+  
+  document.querySelectorAll('.door-handle').forEach(handle => {
+      handle.addEventListener('click', (e) => {
+          e.stopPropagation();
+           // Check parent door wrapper for restart logic
+          const wrapper = handle.closest('.desktop-door-wrapper');
+          if(wrapper && wrapper.getAttribute('onclick').includes('reload')) return;
+          goToNextRoom();
+      });
+  });
+
+  if(mobileNextBtn) {
+      mobileNextBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          goToNextRoom();
+      });
+  }
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        if (window.innerWidth < 1024) {
+            rooms.forEach(room => room.classList.remove('active'));
+            entry.target.classList.add('active');
+        }
+        
+        if (mobileNextBtn) {
+            const idx = rooms.indexOf(entry.target);
+            if (idx === rooms.length - 1) {
+                mobileNextBtn.style.opacity = '0';
+                mobileNextBtn.style.pointerEvents = 'none';
+            } else {
+                mobileNextBtn.style.opacity = '1';
+                mobileNextBtn.style.pointerEvents = 'auto';
+            }
+        }
+      }
+    });
+  }, { root: scroller, threshold: 0.6 });
+
+  rooms.forEach(r=> io.observe(r));
+
+  scroller.addEventListener('keydown', (e)=>{
+    if(window.innerWidth >= 1024) return;
+
+    const currentIndex = rooms.findIndex(r => r.classList.contains('active')); 
+    if(['ArrowDown','PageDown',' ','ArrowRight'].includes(e.key)){
+      e.preventDefault();
+      goToNextRoom(); 
+    }
+    if(['ArrowUp','PageUp', 'ArrowLeft'].includes(e.key)){
+      e.preventDefault();
+      const prevIndex = Math.max(0, currentIndex - 1);
+      rooms[prevIndex].scrollIntoView({behavior:'smooth'});
+    }
+  });
+
+  window.addEventListener('load', ()=>{
+    rooms[0].classList.add('active');
+  }, {once:true});
+
+  function toggleDayNight() {
+      document.getElementById('room-8').classList.toggle('night-mode');
+  }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const mainSidebar = document.getElementById('mainSidebar');
+      const topNav = document.getElementById('topNav');
+      const bottomNav = document.getElementById('bottomNav');
+      const leftNav = document.getElementById('leftNav');
+      const rightNav = document.getElementById('rightNav');
+
+      const navToggle = document.getElementById('navToggle');
+      const navToggleIcon = document.getElementById('navToggleIcon');
+      const navToggleX = document.getElementById('navToggleX');
+      const mainContent = document.getElementById('scroller');
+      const doorOverlay = document.getElementById('doorOverlay');
+
+      let isNavOpen = false;
+
+      function openNav() {
+          if (mainSidebar) mainSidebar.classList.add('open');
+          
+          if (topNav) topNav.classList.remove('-translate-y-full');
+          if (bottomNav) bottomNav.classList.add('translate-y-full');
+          if (leftNav) leftNav.classList.add('-translate-x-full');
+          if (rightNav) rightNav.classList.remove('translate-x-full');
+
+          navToggleIcon.classList.add('hidden');
+          navToggleX.classList.remove('hidden');
+          isNavOpen = true;
+      }
+
+      function closeNav() {
+          if (mainSidebar) mainSidebar.classList.remove('open');
+          
+          if (topNav) topNav.classList.add('-translate-y-full');
+          if (bottomNav) bottomNav.classList.add('translate-y-full');
+          if (leftNav) leftNav.classList.add('-translate-x-full');
+          if (rightNav) rightNav.classList.add('translate-x-full');
+
+          navToggleIcon.classList.remove('hidden');
+          navToggleX.classList.add('hidden');
+          isNavOpen = false;
+      }
+
+      function toggleNav() {
+          if (isNavOpen) {
+              closeNav();
+          } else {
+              openNav();
+          }
+      }
+
+      navToggle.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          toggleNav();
+      });
+      
+      mainContent.addEventListener('click', () => {
+          if (isNavOpen) {
+              closeNav();
+          }
+      });
+      
+      if(doorOverlay) {
+          doorOverlay.addEventListener('click', () => {
+              if (isNavOpen) closeNav();
+          });
+      }
+      
+      const allNavLinks = document.querySelectorAll('.nav-btn, .nav-link');
+      allNavLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+                if (isNavOpen) {
+                    setTimeout(closeNav, 150); 
+                }
+          });
+      });
+  });
+</script>
+
+</body>
+</html>

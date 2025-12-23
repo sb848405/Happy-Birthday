@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Presence Room of Echoes</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
+        
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Hide default cursor on desktop to show custom one */
+        @media (min-width: 768px) {
+            * {
+                cursor: none !important;
+            }
+        }
+
+        .room-transition {
+            transition: background-color 1s ease, color 1s ease, fill 1s ease, stroke 1s ease;
+        }
+        
+        .dialog-enter { transform: translateY(110%); }
+        .dialog-enter-active { transform: translateY(0); }
+        .dialog-exit { transform: translateY(0); }
+        .dialog-exit-active { transform: translateY(110%); }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes float-particle {
+            0%, 100% { transform: translate(0, 0); opacity: 0; }
+            25% { opacity: 0.8; }
+            50% { transform: translate(20px, -40px); opacity: 0.4; }
+            75% { opacity: 0.8; }
+        }
+
+        @keyframes spotlight-sweep {
+            0% { transform: rotate(-10deg) translateX(-20px); opacity: 0.1; }
+            50% { transform: rotate(10deg) translateX(20px); opacity: 0.2; }
+            100% { transform: rotate(-10deg) translateX(-20px); opacity: 0.1; }
+        }
+
+        @keyframes confetti-explosion {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(var(--rot)); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="m-0 overflow-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const IconX = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>
+        );
+
+        const IconMenu = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        );
+
+        const IconSparkles = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 5H5"/><path d="M19 19v4"/><path d="M23 21h-4"/></svg>
+        );
+
+        const IconHeart = ({ size = 24, className = "", fill = "none" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        );
+
+        const IconSun = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="5"/><path d="M12 1v2"/><path d="M12 21v2"/><path d="M4.22 4.22l1.42 1.42"/><path d="M18.36 18.36l1.42 1.42"/><path d="M1 12h2"/><path d="M21 12h2"/><path d="M4.22 19.78l1.42-1.42"/><path d="M18.36 5.64l1.42-1.42"/></svg>
+        );
+
+        const IconMoon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        );
+
+        const CustomCursor = () => {
+            const [position, setPosition] = useState({ x: -100, y: -100 });
+            const [isHovering, setIsHovering] = useState(false);
+
+            useEffect(() => {
+                const moveCursor = (e) => {
+                    setPosition({ x: e.clientX, y: e.clientY });
+                    
+                    const target = e.target;
+                    // Detect if pointer is over a clickable element
+                    const isClickable = window.getComputedStyle(target).cursor === 'pointer' || 
+                                      target.closest('a') || 
+                                      target.closest('button') ||
+                                      target.classList.contains('cursor-pointer');
+                    
+                    setIsHovering(!!isClickable);
+                };
+
+                window.addEventListener('mousemove', moveCursor);
+                return () => window.removeEventListener('mousemove', moveCursor);
+            }, []);
+
+            return (
+                <div 
+                    className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-exclusion text-white"
+                    style={{ 
+                        transform: `translate(${position.x}px, ${position.y}px)` 
+                    }}
+                >
+                    <div 
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-current transition-all duration-300 ease-out ${isHovering ? 'w-10 h-10 border-2' : 'w-5 h-5 border-1 opacity-60'}`}
+                    />
+                    <div 
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 bg-current rounded-full transition-all duration-200 ease-out ${isHovering ? 'w-2 h-2' : 'w-1 h-1'}`} 
+                    />
+                </div>
+            );
+        };
+
+        const RoomOfEchoes = () => {
+            const [activeObject, setActiveObject] = useState(null);
+            const [displayedText, setDisplayedText] = useState('');
+            const [isTyping, setIsTyping] = useState(false);
+            const [isNight, setIsNight] = useState(false);
+            const [isNavOpen, setIsNavOpen] = useState(false);
+            const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+            const [showConfetti, setShowConfetti] = useState(false);
+            
+            const audioRef = useRef(null);
+
+            const navLinks = [
+                { href: "index.html", label: "Home" },
+                { href: "Special.html", label: "Special" },
+                { href: "letter.html", label: "Letter" },
+                { href: "anatomy.html", label: "Anatomy" },
+                { href: "chat.html", label: "Heaven" },
+                { href: "you.html", label: "You" },
+                { href: "Diary.html", label: "Diary" },
+                { href: "Universe.html", label: "Uni" },
+                { href: "Box.html", label: "Box" },
+                { href: "color.html", label: "Color" },
+                { href: "Teacher.html", label: "Teacher" },
+                { href: "The_River.html", label: "River" },
+                { href: "Mountain.html", label: "Mtn" },
+                { href: "Paper_Star.html", label: "Star" },
+                { href: "Carttoon.html", label: "Cartoon" },
+                { href: "Santa.html", label: "Santa" },
+                { href: "Cloud.html", label: "Cloud" },
+                { href: "Ink.html", label: "Paint" },
+                { href: "Butterfly.html", label: "Fly" },
+                { href: "Weather.html", label: "Weather" },
+                { href: "Skill.html", label: "Skill" },
+                { href: "Msg.html", label: "Msg" },
+                { href: "21_Wish.html", label: "21" },
+                { href: "Cake.html", label: "Cake" },
+                { href: "Periodik_table.html", label: "Table" },
+                { href: "Presence.html", label: "Here" },
+                { href: "Concept.html", label: "Concept" },
+                { href: "Calender.html", label: "Date" },
+                { href: "Perspective.html", label: "View" },
+                { href: "Spotlight.html", label: "Light" },
+                { href: "Room.html", label: "Room" },
+                { href: "Radio.html", label: "Radio" },
+                { href: "Food.html", label: "Food" },
+                { href: "Music.html", label: "Music" }
+            ];
+
+            const leftGroup = ["Home", "Cake", "21", "Heaven", "Diary", "Anatomy", "Box", "Special", "Color", "You", "Teacher", "Uni", "River", "Mtn"];
+            const bottomGroup = ["Skill", "Star", "Cartoon"];
+            const rightGroup = ["Table", "Date", "View", "Santa", "Here", "Cloud", "Paint", "Fly", "Weather", "Light", "Room", "Radio", "Food", "Concept"];
+            const topGroup = ["Music", "Letter", "Msg"];
+
+            const getLinks = (labels) => labels.map(label => navLinks.find(l => l.label === label)).filter(Boolean);
+
+            const desktopLinks = [
+                ...getLinks(leftGroup),
+                ...getLinks(bottomGroup),
+                ...getLinks(rightGroup),
+                ...getLinks(topGroup)
+            ];
+
+            useEffect(() => {
+                const handleResize = () => {
+                    setIsMobile(window.innerWidth < 768);
+                };
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, []);
+
+            useEffect(() => {
+                if (isNight) {
+                    setShowConfetti(true);
+                    const timer = setTimeout(() => setShowConfetti(false), 2000);
+                    return () => clearTimeout(timer);
+                }
+            }, [isNight]);
+
+            const memories = {
+                lamp: {
+                    title: "The Old Floor Lamp",
+                    night: { 
+                        text: "Whenever you sit near me, your glow touches mine. I don’t just light your room… you light the whole moment. There’s a quiet power in you the kind that heals plants, hearts, and even the air around you.",
+                        desktopText: "Whenever you sit near me, your glow touches mine. I don’t just light your room; I witness the quiet magic of your solitude. You light the whole moment with a power that heals plants and hearts alike. Even the air around you seems to settle into a peaceful rhythm when we are together. You are the true source of warmth here.",
+                        color: "text-yellow-200" 
+                    },
+                    day: { 
+                        text: "In the morning light, your calmness fills the room. The sun touches your face, and for a moment, everything around you feels softer, almost enchanted.",
+                        desktopText: "In the morning light, your calmness fills the room like a soft melody. The sun touches your face, blending with my own light, making everything feel enchanted. I watch you start your day with a grace that is rare and beautiful. Shadows flee not just from my bulb, but from your very spirit. You turn the ordinary into something golden.",
+                        color: "text-amber-600" 
+                    }
+                },
+                sofa: {
+                    title: "The Velvet Sofa",
+                    night: { 
+                        text: "You rest in my cushions after karate or yoga, and I feel the softness behind your strength. You move like someone who could fight storms, but chooses peace every time.",
+                        desktopText: "You rest in my cushions after the battles of the day, be it karate or the chaos of the world. I feel the softness that hides behind your immense strength. You move like a warrior who could command storms, yet you choose peace every single time. Here, in the quiet dark, you let your guard down, and it is an honor to hold you. Rest now, the world can wait.",
+                        color: "text-indigo-200" 
+                    },
+                    day: { 
+                        text: "You settle into me like a quiet spell balanced, gentle, present. Even in stillness, you carry a strength that feels magical. Thinks about the day.",
+                        desktopText: "You settle into me like a quiet spell balanced, gentle, and fully present in the moment. Even in stillness, you carry a strength that feels magical, vibrating through my frame. You sit here and think about the day ahead, plotting kindness and creativity. I am your throne of comfort, supporting you as you prepare to weave your magic into the world. Your presence makes this corner the heart of the room.",
+                        color: "text-indigo-600" 
+                    }
+                },
+                mirror: {
+                    title: "The Wall Mirror",
+                    night: { 
+                        text: "When you stand before me, I see more than your reflection. I see someone who creates medicines from leaves, colors from paint, and happiness from small moments. You are magic without even trying.",
+                        desktopText: "When you stand before me, I see so much more than just a reflection in glass. I see a sorceress who creates medicines from leaves and happiness from thin air. You look into your own eyes and see the depth of a soul that creates colors from paint. You are magic without even trying, a mystery I am lucky to witness. If i clould i would say without looking at you my heart could not beat.",
+                        color: "text-blue-200" 
+                    },
+                    day: { 
+                        text: "The morning sun frames your reflection beautifully. You look at yourself with quiet confidence, and the whole room brightens with you. You make the day better just by looking",
+                        desktopText: "The morning sun frames your reflection, creating a halo around your silhouette. You look at yourself with a quiet confidence that commands the day to be good. The whole room brightens simply because you are standing there, acknowledging your own worth. You make the day better just by looking at it, and I am the first to see it happen. You are the fairest, not just in face, but in spirit. When you live its feels like a arrow straight to the heart.",
+                        color: "text-sky-600" 
+                    }
+                },
+                plant: {
+                    title: "The Corner Monstera",
+                    night: { 
+                        text: "Your fingers brush my leaves with the same care you give your herbs. You don’t just make medicine… you are medicine. Everything in you carries healing.",
+                        desktopText: "Your fingers brush my leaves with the tender care of a healer. You don't just make medicine, you are the medicine that this world needs. Everything in you carries a healing energy that revitalizes the air I breathe. I grow not just from water and soil, but from the kindness you radiate in the dark. You are the moon that pulls my tides of life.",
+                        color: "text-green-200" 
+                    },
+                    day: { 
+                        text: "When you pass by, you leave behind a warmth even sunlight can’t match. You help things grow even without noticing.",
+                        desktopText: "When you pass by, you leave behind a warmth that even the direct sunlight cannot match. You help things grow without even noticing, simply by existing near them. My leaves turn towards you as if you are the sun itself. Your energy is a fertilizer for the soul, making everything vibrant and alive. You are the gardener of joy in this space.",
+                        color: "text-green-600" 
+                    }
+                },
+                cup: {
+                    title: "The Coffee Mug",
+                    night: { 
+                        text: "You hold me with both hands, humming soft melodies only you know. You don’t wait for happiness you create it in the quiet corners of your night.",
+                        desktopText: "You hold me with both hands, warming your palms as you hum soft melodies. You don't wait for happiness to find you; you create it in the steam rising from my rim. In the quiet corners of the night, we share secrets in every sip. You stir your dreams into the liquid, drinking in the peace of the moment. I am your vessel of comfort when the world sleeps.",
+                        color: "text-orange-200" 
+                    },
+                    day: { 
+                        text: "You take slow sips as gentle thoughts cross your mind. Even your silence feels warm, like sunlight steeping in a cup.",
+                        desktopText: "You take slow, deliberate sips as gentle thoughts cross your mind like drifting clouds. Even your silence feels warm, like sunlight steeping in tea. You prepare for the world with me in your hand, grounding yourself before the rush. Each sip is a small pause, a breath of mindfulness in your morning routine. I hold the fuel for your magic.",
+                        color: "text-orange-600" 
+                    }
+                },
+                window: {
+                    title: isNight ? "The Rainy Window" : "The Sunny Window",
+                    night: { 
+                        text: "When you trace raindrops on my glass, the night listens to you. The world outside moves fast, but your touch brings a stillness only magic can make.",
+                        desktopText: "When you trace raindrops on my glass, the night stops to listen to your heartbeat. The world outside moves fast and chaotic, but your touch brings a stillness only magic can make. You look out at the dark, seeing lights and stories where others see nothing. I am your shield from the storm, yet your connection to the vast universe. We watch the rain wash the world clean together.",
+                        color: "text-gray-200" 
+                    },
+                    day: { 
+                        text: "The sunlight warms the place where you once stood, singing softly. Even the breeze seems to remember your voice.",
+                        desktopText: "The sunlight warms the place where you once stood, singing softly to the morning. Even the breeze seems to remember your voice and lingers on the sill. You look out at the horizon with eyes full of possibility and hope. I frame the world for you, but you are the most beautiful view I have. The light dances specifically to reach you.",
+                        color: "text-blue-600" 
+                    }
+                },
+                pen: {
+                    title: "The Forgotten Pen",
+                    night: { 
+                        text: "You twirl me before sketching your dreams. Every line you draw carries a bit of your spiritsoft, bright, and beautifully alive.",
+                        desktopText: "You twirl me between your fingers before sketching the dreams that keep you awake. Every line you draw carries a bit of your spirit—soft, bright, and beautifully alive. I am the conduit for your inner world, bleeding ink into reality. In the silence, the scratching of my tip is the loudest sound, writing your legacy. You turn blank pages into universes.",
+                        color: "text-cyan-200" 
+                    },
+                    day: { 
+                        text: "Your fingertips move with a gentle rhythm when you hold me. You turn thoughts into shapes, and shapes into tiny worlds.",
+                        desktopText: "Your fingertips move with a gentle rhythm when you hold me, conducting a symphony of words. You turn fleeting thoughts into concrete shapes, and shapes into tiny worlds. I feel the pulse of your creativity flowing through me. You are writing your story one day at a time, and it is a masterpiece. I am humbled to be your tool.",
+                        color: "text-teal-600" 
+                    }
+                },
+                photoFrame: {
+                    title: "The Empty Frame",
+                    night: { 
+                        text: "You pause when you look at me, as if imagining something beautiful. Whatever you choose to place here one day will become a memory touched by your magic.",
+                        desktopText: "You pause when you look at me, your eyes softening as if imagining something beautiful. Whatever you choose to place here one day will become a memory touched by your magic. I hold a space for the past, but you fill it with the warmth of the present. In the dim light, memories seem to glow with a life of their own. I guard the moments you cherish most.",
+                        color: "text-rose-200" 
+                    },
+                    day: { 
+                        text: "You gaze at my empty space with quiet anticipation. One day, your paintings or your happiest moments will live inside me.",
+                        desktopText: "You gaze at my space with quiet anticipation, honoring the timeline of your life. One day, your paintings or your happiest moments will live inside my borders. You value the journey you are on, respecting where you came from. I am a window to yesterday, kept polished by your attention today. Every glance you give me is a tribute to love.",
+                        color: "text-rose-600" 
+                    }
+                },
+                mobile: {
+                    title: isNight ? "The Glowing Phone" : "The Silent Phone",
+                    night: { 
+                        text: "Your phone lights up, but you place it face down gently. You choose peace, calm, and your own inner worldand that choice is its own kind of spell.",
+                        desktopText: "Your phone lights up with the world's demands, but you place it face down gently. You choose peace, calm, and your own inner world over the noise—and that choice is its own kind of spell. You disconnect to reconnect with yourself, finding sanctuary in silence. The screen goes dark, but your mind lights up with dreams. You are the master of your attention.",
+                        color: "text-purple-200" 
+                    },
+                    day: { 
+                        text: "Your phone rests quietly nearby. The stillness around you feels intentional, like you’re letting your soul breathe.",
+                        desktopText: "Your phone rests quietly nearby, a dormant link to the outside. The stillness around you feels intentional, like you’re letting your soul breathe before engaging. You balance the digital noise with analogue grace. It waits for you, but you do not rush to it. You command your time with an elegance that is inspiring.",
+                        color: "text-purple-600" 
+                    }
+                },
+                box: {
+                    title: "The Keepsake Box",
+                    night: { 
+                        text: "You place small notes and treasures inside me with careful hands. Every little thing you tuck away carries a softness only you can give.",
+                        desktopText: "You place small notes and treasures inside me with hands that tremble with care. Every little thing you tuck away carries a softness only you can give. I am the keeper of your secrets, the guardian of your small wonders. In the dark, I hold your history safe, waiting for you to rediscover it. I am the physical weight of your precious memories.",
+                        color: "text-amber-200" 
+                    },
+                    day: { 
+                        text: "The note you placed inside still rests beneath my lining, glowing with the warmth of your touch.",
+                        desktopText: "The note you placed inside still rests beneath my lining, glowing with the warmth of your touch. I sit here on the shelf, a treasure chest in plain sight. You know what lies within, and that knowledge brings a smile to your lips. I preserve the fragments of time you wish to keep forever. I am full of your hidden joy.",
+                        color: "text-amber-700" 
+                    }
+                },
+                fan: {
+                    title: "The Ceiling Fan",
+                    night: { 
+                        text: "I turn slowly above you as your presence fills the room with calm. Even the air follows your rhythm.",
+                        desktopText: "I turn slowly above you, slicing the air as your presence fills the room with calm. Even the air follows your rhythm, circulating peace into every corner. The steady hum I make is a lullaby for your restless thoughts. I watch over you from above, keeping the atmosphere light and breathable. We spin together in the quiet dance of the night.",
+                        color: "text-slate-200" 
+                    },
+                    day: { 
+                        text: "In the morning light, I remember the softness of your laughter rising toward me like a melody.",
+                        desktopText: "In the morning light, I remember the softness of your laughter rising toward me like a melody. I stir the dust motes dancing in the sunbeams you let in. My breeze plays with your hair, a playful interaction in the heat. I am the silent engine of the room's comfort. Even the air feels stagnant without you here.",
+                        color: "text-slate-500" 
+                    }
+                },
+                purse: {
+                    title: "Her Leather Purse",
+                    night: { 
+                        text: "You search through me with a playful laugh, leaving behind the familiar warmth of your perfume. Even your smallest actions carry grace.",
+                        desktopText: "You search through me with a playful laugh, leaving behind the familiar warmth of your perfume. Even your smallest actions carry a grace that lingers on leather. I hold the tools of your daily life, resting now after a long journey. We are ready to face tomorrow, but for now, we simply exist in the quiet. I am your companion in every adventure.",
+                        color: "text-pink-200" 
+                    },
+                    day: { 
+                        text: "I stay by your side as you help, work, and care. You carry responsibility as if it’s a feather. I am slowy becoming your extended part.",
+                        desktopText: "I stay by your side as you help, work, and care for those around you. You carry responsibility as if it’s a feather, making the heavy seem light. I am slowly becoming an extended part of you, holding your secrets and your necessities. You pick me up with purpose, ready to conquer the world again. We are a team, you and I.",
+                        color: "text-pink-600" 
+                    }
+                },
+                laptop: {
+                    title: "The Open Laptop",
+                    night: { 
+                        text: "My screen glows softly across your face as you work. Even in the quietest hours, your dedication shines brighter than any pixel of light.",
+                        desktopText: "My screen glows softly across your face, illuminating the focus in your eyes. Even in the quietest hours, your dedication shines brighter than any pixel of light. You build bridges and castles with your mind while the world sleeps. The click of my keys is the rhythm of your persistence. I am the canvas for your modern intellect.",
+                        color: "text-cyan-200" 
+                    },
+                    day: { 
+                        text: "I stay open as you create, think, and focus. You bring meaning to the silence around you. Doing work ",
+                        desktopText: "I stay open as you create, think, and focus on the tasks at hand. You bring meaning to the silence around you, filling the digital void with your essence. Doing work is not a chore for you, but an expression of your capability. I hum with the energy of your thoughts. Together, we solve the puzzles of the day.",
+                        color: "text-cyan-700" 
+                    }
+                },
+                tv: {
+                    title: "The Wall TV",
+                    night: { 
+                        text: "I hum softly while you speak or sing to yourself. Your voice fills the room with a warmth no soundtrack could replace.",
+                        desktopText: "I hum softly while you speak or sing to yourself, providing a backdrop to your life. Your voice fills the room with a warmth no soundtrack could ever replace. I may show stories, but the best one is happening right in front of me. The blue light fades in comparison to your vibrancy. I am just a spectator to your brilliance.",
+                        color: "text-blue-300" 
+                    },
+                    day: { 
+                        text: "Now I rest quietly, remembering the glow you bring into the room even without switching me on. Hope someone make a movie on your life.",
+                        desktopText: "Now I rest quietly, a black mirror remembering the glow you bring into the room. Even without switching me on, the room is full of entertainment and life because of you. I hope someone makes a movie on your life one day; it would be a beautiful story. I wait for the moments we relax together. You are the star of this show.",
+                        color: "text-slate-600" 
+                    }
+                },
+                cake: {
+                    title: "The Birthday Cake",
+                    night: { 
+                        text: "The candles flicker, waiting for your wish. Another year of you making the world brighter. Close your eyes, breathe, and let the magic begin.",
+                        desktopText: "The candles flicker, dancing in the dark, waiting for your secret wish. Another year of you making the world brighter has passed, and we celebrate you. Close your eyes, breathe in the moment, and let the magic begin. This sweetness is but a shadow of the sweetness you bring to others. Happy Birthday to the light of this room.",
+                        color: "text-pink-300" 
+                    },
+                    day: { 
+                        text: "Frosted with joy and ready for celebration. Today the room tastes like sugar and happiness just because you are here.",
+                        desktopText: "Frosted with joy and ready for celebration, I sit here waiting for you. Today the room tastes like sugar and happiness just because you are here. Every slice is a memory of laughter shared and love given. I am the centerpiece of your milestone. Let us feast on the joy of your existence.",
+                        color: "text-pink-600" 
+                    }
+                },
+                balloons: {
+                    title: "Floating Balloons",
+                    night: { 
+                        text: "We drift near the ceiling, holding onto the echoes of laughter. We are here to remind you that life can be light, colorful, and free.",
+                        desktopText: "We drift near the ceiling, holding onto the echoes of laughter that filled the air. We are here to remind you that life can be light, colorful, and free. In the shadows, we are silent guardians of the party spirit. We bob gently, nodding in agreement with your dreams. Let your heart float as high as we do.",
+                        color: "text-purple-300" 
+                    },
+                    day: { 
+                        text: "Dancing in the daylight, we celebrate the color you bring to everyone's life. Happy Birthday",
+                        desktopText: "Dancing in the daylight, we celebrate the spectrum of color you bring to everyone's life. We are the visual shouts of 'Happy Birthday' that fill the space. Even as we deflate, the memory of this joy will remain full. We are lighter than air, just like your spirit today. Look up and smile.",
+                        color: "text-purple-600" 
+                    }
+                },
+                banner: {
+                    title: "The 21st Birthday Banner",
+                    night: { 
+                        text: "Twenty-one years of light, laughter, and becoming. The banner sways gently, marking the start of a beautiful new chapter.",
+                        desktopText: "Twenty-one years of light, laughter, and becoming the amazing person you are. The banner sways gently in the draft, marking the start of a beautiful new chapter. The letters glint in the dim light, spelling out a promise of adulthood. It is a bridge between the girl you were and the woman you are becoming. Wear this age like a crown.",
+                        color: "text-yellow-300" 
+                    },
+                    day: { 
+                        text: "Bold letters shout 'Happy 21st' across the room. It’s a milestone woven with dreams and the promise of adulthood.",
+                        desktopText: "Bold letters shout 'Happy 21st' across the room for all to see. It’s a milestone woven with dreams and the promise of a bright adulthood. The colors pop in the sunlight, declaring your special day to the world. It is a banner of victory for making it this far with such grace. This is your headline.",
+                        color: "text-yellow-600" 
+                    }
+                },
+                gifts: {
+                    title: "The Pile of Gifts",
+                    night: { 
+                        text: "Wrapped in mystery and ribbons. But the greatest gift in this room isn't in a box it's the person standing before us.",
+                        desktopText: "Wrapped in mystery and ribbons, we sit in a pile of anticipation. But the greatest gift in this room isn't in a box—it's the person standing before us. We contain material things, but you contain the universe. Open us to find love packaged in paper. We are small tokens of the immense love surrounding you.",
+                        color: "text-red-300" 
+                    },
+                    day: { 
+                        text: "Bright paper and shiny bows, waiting to be opened. Surprises are just around the corner.",
+                        desktopText: "Bright paper and shiny bows, waiting to be opened by your hands. Surprises are just around the corner, ready to bring a smile to your face. We are the physical manifestations of the affection people hold for you. Tear us open and let the love spill out. You deserve every single one.",
+                        color: "text-red-600" 
+                    }
+                },
+                trophies: {
+                    title: "The Trophy Shelf",
+                    night: { 
+                        text: "They gleam faintly in the dark, echoes of your victories. Not just the ones with applause, but the silent battles you won when no one was watching.",
+                        desktopText: "They gleam faintly in the dark, echoes of your hard-won victories. Not just the ones with applause, but the silent battles you won when no one was watching. They stand as sentinels of your perseverance through the tough times. In the shadows, gold still shines, just like your resolve. You are a champion in more ways than one.",
+                        color: "text-yellow-200" 
+                    },
+                    day: { 
+                        text: "Golden and bright, these stand as proof of your dedication. Every medal tells a story of sweat, persistence, and the will to keep going.",
+                        desktopText: "Golden and bright, these stand as proof of your dedication and talent. Every medal tells a story of sweat, persistence, and the will to keep going. They catch the sunlight and throw it back, celebrating your achievements. You have climbed mountains to put these here. Be proud of the reflection you see in them.",
+                        color: "text-yellow-600" 
+                    }
+                }
+            };
+
+            const toggleTheme = () => {
+                setIsNight(!isNight);
+            };
+
+            const toggleNav = () => {
+                setIsNavOpen(!isNavOpen);
+            };
+
+            useEffect(() => {
+                const audio = audioRef.current;
+                if (!audio) return;
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        const enableAudio = () => {
+                            audio.play();
+                            window.removeEventListener('click', enableAudio);
+                            window.removeEventListener('touchstart', enableAudio);
+                        };
+                        window.addEventListener('click', enableAudio);
+                        window.addEventListener('touchstart', enableAudio);
+                    });
+                }
+            }, []);
+
+            useEffect(() => {
+                if (activeObject) {
+                    setDisplayedText('');
+                    setIsTyping(true);
+                    const mode = isNight ? 'night' : 'day';
+                    const memoryItem = memories[activeObject][mode];
+                    const fullText = (!isMobile && memoryItem.desktopText) ? memoryItem.desktopText : memoryItem.text;
+                    let index = 0;
+
+                    const timer = setInterval(() => {
+                        index++;
+                        if (index <= fullText.length) {
+                            setDisplayedText(fullText.slice(0, index));
+                        } else {
+                            setIsTyping(false);
+                            clearInterval(timer);
+                        }
+                    }, 30);
+                    return () => clearInterval(timer);
+                }
+            }, [activeObject, isNight, isMobile]);
+
+            const handleObjectClick = (key) => {
+                setActiveObject(key);
+            };
+
+            const closeDialog = () => {
+                setActiveObject(null);
+                setDisplayedText('');
+            };
+
+            const themeClass = isNight ? 'bg-slate-900 text-slate-100' : 'bg-sky-50 text-slate-800';
+            const buttonClass = isNight ? 'bg-slate-800 text-yellow-300 hover:bg-slate-700' : 'bg-white text-orange-500 hover:bg-orange-50';
+            
+            const navPanelClass = isNight 
+                ? 'bg-slate-800/95 text-slate-200 border-slate-700 backdrop-blur-md' 
+                : 'bg-white/90 text-slate-700 border-slate-200 backdrop-blur-md';
+            
+            const navLinkClass = isNight 
+                ? 'hover:bg-slate-700 hover:text-white transition-colors duration-200'
+                : 'hover:bg-sky-100 hover:text-sky-700 transition-colors duration-200';
+
+            return (
+                <div className={`relative w-full h-screen overflow-hidden flex flex-col items-center justify-center font-sans select-none room-transition ${themeClass}`}>
+                    
+                    {!isMobile && <CustomCursor />}
+
+                    {isMobile && (
+                        <>
+                             {isNavOpen && (
+                                <div 
+                                    className="fixed inset-0 z-[55]" 
+                                    onClick={() => setIsNavOpen(false)}
+                                />
+                            )}
+                            <button 
+                                onClick={toggleNav}
+                                className={`fixed top-6 left-6 z-[70] p-3 rounded-full shadow-sm hover:shadow-md transition-shadow focus:outline-none ${buttonClass}`}
+                            >
+                                {isNavOpen ? <IconX size={20} /> : <IconMenu size={20} />}
+                            </button>
+
+                            <nav className={`fixed top-0 left-0 right-0 z-[65] h-16 flex items-center justify-center space-x-1 shadow-sm border-b transition-transform duration-300 ${navPanelClass} ${isNavOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+                                <a href="Msg.html" className={`p-2 text-center w-full ${navLinkClass}`}>Msg</a>
+                                <a href="letter.html" className={`px-3 py-2 rounded-md ${navLinkClass}`}>Letter</a>
+                                <a href="Music.html" className={`p-2 text-center w-full ${navLinkClass}`}>Music</a>
+                                </nav>
+                                
+                                <nav className={`fixed bottom-0 left-0 right-0 z-[65] h-16 flex items-center justify-center space-x-1 shadow-sm border-t transition-transform duration-300 ${navPanelClass} ${isNavOpen ? 'translate-y-0' : 'translate-y-full'}`}>
+                                    <a href="Skill.html" className={`p-2 text-center w-full ${navLinkClass}`}>Skill</a>
+                                    <a href="Paper_Star.html" className={`p-2 text-center w-full ${navLinkClass}`}>Star</a>
+                                    <a href="Carttoon.html" className={`p-2 text-center w-full ${navLinkClass}`}>Cartoon</a>
+                                    </nav>
+                                    
+                                    <nav className={`fixed left-0 top-0 bottom-0 z-[60] w-24 flex flex-col items-center space-y-1 overflow-y-auto py-20 shadow-sm border-r no-scrollbar transition-transform duration-300 ${navPanelClass} ${isNavOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                                        <a href="index.html" className={`px-3 py-2 rounded-md ${navLinkClass}`}>Home</a>
+                                        <a href="Cake.html" className={`p-2 text-center w-full ${navLinkClass}`}>Cake</a>
+                                        <a href="21_Wish.html" className={`p-2 text-center w-full ${navLinkClass}`}>21</a>
+                                        <a href="chat.html" className={`px-3 py-2 rounded-md ${navLinkClass}`}>Heaven</a>
+                                        <a href="Diary.html" className={`p-2 text-center w-full ${navLinkClass}`}>Diary</a>
+                                        <a href="anatomy.html" className={`px-3 py-2 rounded-md ${navLinkClass}`}>Anatomy</a>
+                                        <a href="Box.html" className={`p-2 text-center w-full ${navLinkClass}`}>Box</a>
+                                        <a href="Special.html" className={`px-3 py-2 rounded-md ${navLinkClass}`}>Special</a>
+                                        <a href="color.html" className={`p-2 text-center w-full ${navLinkClass}`}>Color</a>
+                                        <a href="you.html" className={`px-3 py-2 rounded-md ${navLinkClass}`}>You</a>
+                                        <a href="Teacher.html" className={`p-2 text-center w-full ${navLinkClass}`}>Teacher</a>
+                                        <a href="Universe.html" className={`p-2 text-center w-full ${navLinkClass}`}>Uni</a>
+                                        <a href="The_River.html" className={`p-2 text-center w-full ${navLinkClass}`}>River</a>
+                                        <a href="Mountain.html" className={`p-2 text-center w-full ${navLinkClass}`}>Mtn</a>
+                                        </nav>
+                                        
+                                        <nav className={`fixed right-0 top-0 bottom-0 z-[60] w-24 flex flex-col items-center space-y-1 overflow-y-auto py-20 shadow-sm border-l no-scrollbar transition-transform duration-300 ${navPanelClass} ${isNavOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                                            <a href="Periodik_table.html" className={`p-2 text-center w-full ${navLinkClass}`}>Table</a>
+                                            <a href="Calender.html" className={`p-2 text-center w-full ${navLinkClass}`}>Date</a>
+                                            <a href="Perspective.html" className={`p-2 text-center w-full bg-yellow-500/10 text-yellow-200 border-yellow-500/30 ${navLinkClass}`}>View</a>
+                                            <a href="Santa.html" className={`p-2 text-center w-full ${navLinkClass}`}>Santa</a>
+                                            <a href="Presence.html" className={`p-2 text-center w-full ${navLinkClass}`}>Here</a>
+                                            <a href="Cloud.html" className={`p-2 text-center w-full ${navLinkClass}`}>Cloud</a>
+                                            <a href="Ink.html" className={`p-2 text-center w-full ${navLinkClass}`}>Paint</a>
+                                            <a href="Butterfly.html" className={`p-2 text-center w-full ${navLinkClass}`}>Fly</a>
+                                            <a href="Weather.html" className={`p-2 text-center w-full ${navLinkClass}`}>Weather</a>
+                                            <a href="Spotlight.html" className={`p-2 text-center w-full ${navLinkClass}`}>Light</a>
+                                            <a href="Room.html" className={`p-2 text-center w-full ${navLinkClass}`}>Room</a>
+                                            <a href="Radio.html" className={`p-2 text-center w-full ${navLinkClass}`}>Radio</a>
+                                            <a href="Food.html" className={`p-2 text-center w-full ${navLinkClass}`}>Food</a>
+                                            <a href="Concept.html" className={`p-2 text-center w-full ${navLinkClass}`}>Concept</a>
+                                     </nav>
+                        </>
+                    )}
+
+                    {!isMobile && (
+                        <>
+                             <button 
+                                onClick={toggleNav}
+                                className={`fixed top-6 left-6 z-[70] p-3 rounded-full shadow-lg transition-all hover:scale-105 focus:outline-none ${buttonClass}`}
+                            >
+                                {isNavOpen ? <IconX size={24} /> : <IconMenu size={24} />}
+                            </button>
+
+                            {isNavOpen && (
+                                <div 
+                                    className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm transition-opacity"
+                                    onClick={() => setIsNavOpen(false)}
+                                />
+                            )}
+
+                            <div className={`fixed top-0 left-0 bottom-0 w-80 z-[65] shadow-2xl transition-transform duration-500 ease-in-out border-r ${navPanelClass} ${isNavOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                                <div className="h-full overflow-y-auto no-scrollbar pt-24 pb-10 px-6">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {desktopLinks.map((link, index) => {
+                                            const isPerspective = link.label === "View";
+                                            const standardStyle = isNight ? 'border-slate-700 bg-slate-800/50' : 'border-slate-100 bg-white/50';
+                                            const glowStyle = isNight 
+                                                ? 'border-yellow-500/60 bg-yellow-500/10 text-yellow-200 shadow-[0_0_12px_rgba(253,224,71,0.25)] hover:bg-yellow-500/20 hover:shadow-[0_0_18px_rgba(253,224,71,0.4)]' 
+                                                : 'border-amber-400/60 bg-amber-50 text-amber-700 shadow-[0_0_12px_rgba(245,158,11,0.3)] hover:bg-amber-100 hover:shadow-[0_0_18px_rgba(245,158,11,0.45)]';
+
+                                            return (
+                                                <a 
+                                                    key={index} 
+                                                    href={link.href} 
+                                                    className={`flex items-center justify-center p-3 text-sm font-medium rounded-lg text-center transition-all duration-300 hover:scale-105 shadow-sm border ${isPerspective ? glowStyle : `${standardStyle} ${navLinkClass}`}`}
+                                                >
+                                                    {link.label}
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="mt-8 text-center opacity-50 text-xs">
+                                        <p>Room of Echoes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+
+                    <div className="absolute top-6 right-6 z-50 flex gap-3">
+                        <button 
+                            onClick={toggleTheme}
+                            className={`p-3 rounded-full shadow-lg transition-all duration-300 ${buttonClass}`}
+                            title="Toggle Day/Night"
+                        >
+                            {isNight ? <IconSun size={24} /> : <IconMoon size={24} />}
+                        </button>
+                    </div>
+
+                    <audio ref={audioRef} loop>
+                        <source src="hbd.mp3" type="audio/mpeg" />
+                    </audio>
+
+                    <div className={`absolute inset-0 transition-opacity duration-1000 bg-gradient-to-b pointer-events-none ${isNight ? 'from-slate-900 via-indigo-950 to-slate-900' : 'from-sky-200 via-white to-amber-50'}`} />
+                    
+                    <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000">
+                        <div className={`absolute top-10 left-10 w-1 h-1 rounded-full animate-pulse ${isNight ? 'bg-white opacity-30' : 'bg-yellow-400 opacity-60'}`} />
+                        <div className={`absolute top-1/4 right-1/4 w-1 h-1 rounded-full animate-pulse delay-700 ${isNight ? 'bg-white opacity-30' : 'bg-yellow-400 opacity-60'}`} />
+                        <div className={`absolute bottom-1/3 left-1/2 w-1 h-1 rounded-full animate-pulse delay-300 ${isNight ? 'bg-white opacity-30' : 'bg-yellow-400 opacity-60'}`} />
+                    </div>
+
+                    <div className={`absolute top-8 z-10 transition-opacity duration-500 ${activeObject ? 'opacity-0' : 'opacity-100'}`}>
+                        <h1 className={`text-3xl md:text-5xl font-light tracking-widest text-center transition-colors duration-1000 ${isNight ? 'text-indigo-200' : 'text-slate-600'}`}>
+                            HER <span className={`font-bold transition-colors duration-1000 ${isNight ? 'text-white' : 'text-sky-600'}`}>PRESENCE</span>
+                        </h1>
+                        <p className={`text-xs md:text-sm text-center mt-2 tracking-widest uppercase opacity-70 transition-colors duration-1000 ${isNight ? 'text-indigo-300' : 'text-slate-500'}`}>
+                            {isMobile ? "Tap the objects to hear their secrets" : "A Birthday Celebration Room"}
+                        </p>
+                    </div>
+
+                    <div className="relative w-full h-full flex items-center justify-center p-0 md:p-8">
+                        {isMobile ? (
+                            <svg 
+                                viewBox="0 0 800 600" 
+                                className="w-full h-full drop-shadow-2xl transition-transform duration-700 ease-out max-h-[100vh]"
+                                style={{ transform: activeObject ? 'scale(1.05)' : 'scale(1)' }}
+                            >
+                                <defs>
+                                    <radialGradient id="lampGlow" cx="0.5" cy="0.5" r="0.5">
+                                        <stop offset="0%" stopColor="#FDE68A" stopOpacity={isNight ? 0.6 : 0.2} />
+                                        <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+                                    </radialGradient>
+                                    <filter id="glow">
+                                        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                    <path id="monstera-leaf" d="M0 0 C-15 -25 -35 -50 -5 -85 C10 -100 30 -85 35 -50 C40 -20 15 -10 0 0 Z M-12 -45 Q-20 -55 -10 -65 Q-5 -55 -12 -45 Z M15 -35 Q25 -45 18 -55 Q8 -45 15 -35 Z" />
+                                    <clipPath id="frame-clip-mobile">
+                                        <rect x="510" y="190" width="60" height="80" />
+                                    </clipPath>
+                                </defs>
+
+                                <path d="M100 100 L700 100 L700 500 L100 500 Z" className="transition-all duration-1000" fill={isNight ? "#1E1B4B" : "#F1F5F9"} /> 
+                                <path d="M100 500 L700 500 L800 600 L0 600 Z" className="transition-all duration-1000" fill={isNight ? "#312E81" : "#E2E8F0"} />    
+                                <path d="M0 0 L100 100 L100 500 L0 600 Z" className="transition-all duration-1000" fill={isNight ? "#111827" : "#CBD5E1"} />        
+                                <path d="M800 0 L700 100 L700 500 L800 600 Z" className="transition-all duration-1000" fill={isNight ? "#111827" : "#CBD5E1"} />    
+
+                                <path d="M250 150 L550 150 L750 600 L150 600 Z" fill="white" className={`pointer-events-none transition-opacity duration-1000 ${isNight ? 'opacity-0' : 'opacity-10'}`} />
+
+                                <g onClick={() => handleObjectClick('tv')} className="cursor-pointer hover:opacity-90 transition-opacity" style={{ filter: activeObject === 'tv' ? 'url(#glow)' : 'none' }}>
+                                    <path d="M20 200 L80 220 L80 360 L20 380 Z" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#334155"} stroke={isNight ? "#374151" : "#475569"} strokeWidth="2" />
+                                    <path d="M24 205 L76 224 L76 356 L24 375 Z" className="transition-all duration-1000" fill={isNight ? "#111827" : "#0F172A"} />
+                                    {isNight ? (<path d="M24 205 L76 224 L76 356 L24 375 Z" fill="#3B82F6" opacity="0.1" className="animate-pulse" />) : (<path d="M30 210 L50 225 L50 350 L30 370" fill="white" opacity="0.1" />)}
+                                </g>
+
+                                <g onClick={() => handleObjectClick('window')} className="cursor-pointer hover:opacity-90 transition-opacity duration-300" style={{ filter: activeObject === 'window' ? 'url(#glow)' : 'none' }}>
+                                    <rect x="250" y="150" width="300" height="200" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#E2E8F0"} stroke={isNight ? "#4B5563" : "#94A3B8"} strokeWidth="8" />
+                                    <rect x="260" y="160" width="135" height="180" className="transition-all duration-1000" fill={isNight ? "#0F172A" : "#BAE6FD"} fillOpacity={isNight ? 0.8 : 0.9} />
+                                    <rect x="405" y="160" width="135" height="180" className="transition-all duration-1000" fill={isNight ? "#0F172A" : "#BAE6FD"} fillOpacity={isNight ? 0.8 : 0.9} />
+                                    <circle cx="300" cy="190" r="15" fill="#FDE047" className={`transition-opacity duration-1000 ${isNight ? 'opacity-0' : 'opacity-80'}`} />
+                                    <circle cx="300" cy="190" r="12" fill="#E2E8F0" className={`transition-opacity duration-1000 ${isNight ? 'opacity-80' : 'opacity-0'}`} />
+                                    {isNight ? (
+                                        <g className="transition-opacity duration-1000">
+                                            <line x1="280" y1="170" x2="280" y2="190" stroke="#60A5FA" strokeWidth="2" opacity="0.5" />
+                                            <line x1="320" y1="200" x2="320" y2="230" stroke="#60A5FA" strokeWidth="2" opacity="0.5" />
+                                            <line x1="450" y1="180" x2="450" y2="200" stroke="#60A5FA" strokeWidth="2" opacity="0.5" />
+                                        </g>
+                                    ) : (
+                                        <circle cx="300" cy="190" r="15" fill="#FDE047" opacity="0.8" className="transition-opacity duration-1000" />
+                                    )}
+                                </g>
+
+                                <g onClick={() => handleObjectClick('fan')} className="cursor-pointer hover:opacity-90 transition-opacity" style={{ filter: activeObject === 'fan' ? 'url(#glow)' : 'none' }}>
+                                    <rect x="395" y="0" width="10" height="60" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#475569"} />
+                                    <g className={`origin-[400px_60px] ${isNight ? 'animate-spin' : ''}`} style={{ animationDuration: isNight ? '4s' : '0s' }}>
+                                        <ellipse cx="400" cy="60" rx="120" ry="15" className="transition-all duration-1000" fill={isNight ? "#374151" : "#64748B"} transform="rotate(0 400 60)" />
+                                        <ellipse cx="400" cy="60" rx="120" ry="15" className="transition-all duration-1000" fill={isNight ? "#374151" : "#64748B"} transform="rotate(120 400 60)" />
+                                        <ellipse cx="400" cy="60" rx="120" ry="15" className="transition-all duration-1000" fill={isNight ? "#374151" : "#64748B"} transform="rotate(240 400 60)" />
+                                        <circle cx="400" cy="60" r="20" className="transition-all duration-1000" fill={isNight ? "#111827" : "#334155"} />
+                                    </g>
+                                </g>
+
+                                <g onClick={() => handleObjectClick('photoFrame')} className="cursor-pointer hover:scale-105 transition-transform origin-center" style={{ filter: activeObject === 'photoFrame' ? 'url(#glow)' : 'none' }}>
+                                    <rect x="500" y="180" width="80" height="100" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#94A3B8"} stroke={isNight ? "#D1D5DB" : "#E2E8F0"} strokeWidth="4" />
+                                    <rect x="510" y="190" width="60" height="80" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#475569"} />
+                                    <image href="Frame.png" x="510" y="190" width="60" height="80" clipPath="url(#frame-clip-mobile)" className="transition-all duration-1000" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('plant')} className="cursor-pointer hover:scale-105 transition-transform origin-bottom" style={{ filter: activeObject === 'plant' ? 'url(#glow)' : 'none' }}>
+                                    <path d="M590 520 L630 520 L625 460 L595 460 Z" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#92400E"} />
+                                    <rect x="585" y="460" width="50" height="8" rx="2" className="transition-all duration-1000" fill={isNight ? "#374151" : "#B45309"} />
+
+                                    <g transform="translate(610, 465)">
+                                        <path d="M0 0 Q-10 -30 -20 -60" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="3" fill="none" />
+                                        <path d="M0 0 Q5 -40 15 -80" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="3" fill="none" />
+                                        <path d="M0 0 Q15 -25 35 -50" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="3" fill="none" />
+
+                                        <use href="#monstera-leaf" transform="translate(-20, -60) rotate(-30) scale(0.8)" className="transition-all duration-1000" fill={isNight ? "#047857" : "#10B981"} />
+                                        <use href="#monstera-leaf" transform="translate(15, -80) rotate(10) scale(0.9)" className="transition-all duration-1000" fill={isNight ? "#065F46" : "#16A34A"} />
+                                        <use href="#monstera-leaf" transform="translate(35, -50) rotate(45) scale(0.7)" className="transition-all duration-1000" fill={isNight ? "#10B981" : "#22C55E"} />
+                                        <use href="#monstera-leaf" transform="translate(0, -30) rotate(-10) scale(0.6)" className="transition-all duration-1000" fill={isNight ? "#059669" : "#16A34A"} />
+                                        <use href="#monstera-leaf" transform="translate(-10, -20) rotate(-60) scale(0.5)" className="transition-all duration-1000" fill={isNight ? "#064E3B" : "#15803D"} />
+                                    </g>
+                                </g>
+
+                                <g onClick={() => handleObjectClick('box')} className="cursor-pointer hover:translate-y-[-2px] transition-transform" style={{ filter: activeObject === 'box' ? 'url(#glow)' : 'none' }}>
+                                    <path d="M560 520 L610 520 L610 550 L560 550 Z" className="transition-all duration-1000" fill={isNight ? "#78350F" : "#92400E"} />
+                                    <path d="M555 520 L615 520 L605 510 L565 510 Z" className="transition-all duration-1000" fill={isNight ? "#92400E" : "#B45309"} />
+                                    <rect x="582" y="525" width="6" height="8" className="transition-all duration-1000" fill={isNight ? "#FBBF24" : "#FCD34D"} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('lamp')} className="cursor-pointer">
+                                    <rect x="150" y="480" width="10" height="40" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#64748B"} />
+                                    <path d="M130 520 L180 520 L170 480 L140 480 Z" className="transition-all duration-1000" fill={isNight ? "#374151" : "#475569"} />
+                                    <path d="M155 480 L155 250" className="transition-all duration-1000" stroke={isNight ? "#4B5563" : "#64748B"} strokeWidth="4" />
+                                    <path d="M110 250 L200 250 L220 330 L90 330 Z" fill={isNight ? "#FDE68A" : "#FEF3C7"} className="transition-colors duration-1000" opacity="0.9" />
+                                    <ellipse cx="155" cy="330" rx="80" ry="20" fill="url(#lampGlow)" className={`transition-opacity duration-1000 ${isNight ? 'opacity-100' : 'opacity-30'}`} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('mirror')} className="cursor-pointer hover:opacity-90 transition-opacity" style={{ filter: activeObject === 'mirror' ? 'url(#glow)' : 'none' }}>
+                                    <path d="M720 220 L780 200 L780 400 L720 380 Z" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#94A3B8"} stroke={isNight ? "#D1D5DB" : "#E2E8F0"} strokeWidth="2" />
+                                    <path d="M725 225 L775 208 L775 392 L725 375 Z" className="transition-all duration-1000" fill={isNight ? "#93C5FD" : "#E0F2FE"} fillOpacity={isNight ? 0.3 : 0.6} />
+                                    <path d="M730 240 L750 230" stroke="white" strokeWidth="2" opacity={isNight ? 0.4 : 0.8} />
+                                    <path d="M740 370 L770 360" stroke="white" strokeWidth="2" opacity={isNight ? 0.2 : 0.4} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('sofa')} className="cursor-pointer hover:translate-y-[-2px] transition-transform duration-300" style={{ filter: activeObject === 'sofa' ? 'url(#glow)' : 'none' }}>
+                                    <rect x="250" y="380" width="300" height="80" rx="10" fill="#4338CA" />
+                                    <rect x="250" y="450" width="300" height="50" rx="5" fill="#3730A3" />
+                                    <path d="M230 420 L260 420 L260 500 L230 500 Z" fill="#312E81" />
+                                    <path d="M540 420 L570 420 L570 500 L540 500 Z" fill="#312E81" />
+                                    <rect x="270" y="400" width="80" height="60" rx="5" className="transition-all duration-1000" fill={isNight ? "#4F46E5" : "#6366F1"} fillOpacity={isNight ? 0.8 : 0.9} />
+                                    <rect x="450" y="400" width="80" height="60" rx="5" className="transition-all duration-1000" fill={isNight ? "#4F46E5" : "#6366F1"} fillOpacity={isNight ? 0.8 : 0.9} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('purse')} className="cursor-pointer hover:scale-105 transition-transform origin-center" style={{ filter: activeObject === 'purse' ? 'url(#glow)' : 'none' }}>
+                                    <path d="M300 420 Q290 450 310 455 L350 450 Q360 440 350 415 Z" className="transition-all duration-1000" fill={isNight ? "#831843" : "#BE185D"} />
+                                    <path d="M305 420 L345 418 L335 440 L315 442 Z" className="transition-all duration-1000" fill={isNight ? "#9D174D" : "#DB2777"} />
+                                    <path d="M300 420 Q290 380 330 380 Q350 380 350 415" fill="none" stroke={isNight ? "#500724" : "#831843"} strokeWidth="3" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('laptop')} className="cursor-pointer hover:scale-105 transition-transform origin-center" style={{ filter: activeObject === 'laptop' ? 'url(#glow)' : 'none' }}>
+                                    <path d="M460 440 L520 440 L530 450 L450 450 Z" className="transition-all duration-1000" fill={isNight ? "#374151" : "#94A3B8"} />
+                                    <path d="M460 440 L520 440 L520 400 L460 400 Z" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#64748B"} />
+                                    <rect x="465" y="405" width="50" height="30" className="transition-all duration-1000" fill={isNight ? "#60A5FA" : "#E2E8F0"} fillOpacity={isNight ? 0.6 : 0.9} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('mobile')} className="cursor-pointer hover:scale-110 transition-transform origin-center" style={{ filter: activeObject === 'mobile' ? 'url(#glow)' : 'none' }}>
+                                    <rect x="470" y="420" width="25" height="40" rx="2" fill="#1F2937" transform="rotate(-10 482.5 440)" />
+                                    <rect x="472" y="422" width="21" height="36" rx="1" fill={isNight ? (activeObject === 'mobile' ? "#A855F7" : "#111827") : (activeObject === 'mobile' ? "#C084FC" : "#374151")} transform="rotate(-10 482.5 440)" className="transition-colors duration-500">
+                                        <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
+                                    </rect>
+                                </g>
+
+                                <g>
+                                    <ellipse cx="400" cy="540" rx="80" ry="20" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#334155"} /> 
+                                    <rect x="390" y="540" width="20" height="40" className="transition-all duration-1000" fill={isNight ? "#111827" : "#1E293B"} /> 
+                                    <g onClick={() => handleObjectClick('cup')} className="cursor-pointer hover:scale-110 transition-transform origin-bottom" style={{ filter: activeObject === 'cup' ? 'url(#glow)' : 'none' }}>
+                                        <path d="M380 520 L400 520 L395 535 L385 535 Z" fill="#F97316" />
+                                        <path d="M400 525 Q405 525 405 530 T400 532" stroke="#F97316" fill="none" strokeWidth="2" />
+                                        <path d="M385 515 Q390 510 385 505" stroke={isNight ? "white" : "#94A3B8"} strokeWidth="1" opacity={isNight ? 0.4 : 0.6} className="animate-pulse" />
+                                        <path d="M395 515 Q400 510 395 505" stroke={isNight ? "white" : "#94A3B8"} strokeWidth="1" opacity={isNight ? 0.4 : 0.6} className="animate-pulse delay-100" />
+                                    </g>
+                                    <g onClick={() => handleObjectClick('pen')} className="cursor-pointer hover:rotate-12 transition-transform origin-center" style={{ filter: activeObject === 'pen' ? 'url(#glow)' : 'none' }}>
+                                        <rect x="400" y="520" width="60" height="30" fill="white" opacity="0" transform="rotate(15 430 532)" />
+                                        <rect x="410" y="530" width="40" height="4" rx="2" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#64748B"} transform="rotate(15 430 532)" />
+                                        <rect x="410" y="530" width="10" height="4" rx="2" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#334155"} transform="rotate(15 430 532)" />
+                                    </g>
+                                </g>
+
+                                {!activeObject && (
+                                    <g>
+                                        {[{cx: 155, cy: 300, delay: ""}, {cx: 400, cy: 450, delay: "delay-300"}, {cx: 390, cy: 530, delay: "delay-500"}, {cx: 610, cy: 400, delay: "delay-700"}, {cx: 750, cy: 300, delay: "delay-1000"}, {cx: 400, cy: 200, delay: "delay-100"}, {cx: 430, cy: 532, delay: "delay-200"}, {cx: 540, cy: 230, delay: "delay-600"}, {cx: 480, cy: 435, delay: "delay-400"}, {cx: 585, cy: 530, delay: "delay-800"}, {cx: 400, cy: 60, delay: "delay-200"}, {cx: 50, cy: 290, delay: "delay-400"}, {cx: 325, cy: 430, delay: "delay-600"}, {cx: 490, cy: 420, delay: "delay-800"}].map((dot, i) => (
+                                            <circle key={i} cx={dot.cx} cy={dot.cy} r="5" fill={isNight ? "white" : "#FDE047"} className={`animate-ping transition-colors duration-1000 pointer-events-none ${isNight ? 'opacity-50' : 'opacity-70'} ${dot.delay}`} />
+                                        ))}
+                                    </g>
+                                )}
+
+                                {showConfetti && (
+                                    <g style={{ transform: 'translate(400px, 300px)' }}>
+                                        {[...Array(60)].map((_, i) => {
+                                            const angle = Math.random() * 360;
+                                            const dist = 100 + Math.random() * 400;
+                                            const tx = Math.cos(angle * Math.PI / 180) * dist;
+                                            const ty = Math.sin(angle * Math.PI / 180) * dist;
+                                            const color = ['#F87171', '#60A5FA', '#FBBF24', '#34D399', '#A78BFA'][i % 5];
+                                            const rot = Math.random() * 720 - 360;
+                                            return (
+                                                <rect 
+                                                    key={i}
+                                                    x="-5" y="-5" width="10" height="10"
+                                                    fill={color}
+                                                    style={{
+                                                        '--tx': `${tx}px`,
+                                                        '--ty': `${ty}px`,
+                                                        '--rot': `${rot}deg`,
+                                                        animation: `confetti-explosion ${1 + Math.random()}s ease-out forwards`
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </g>
+                                )}
+                            </svg>
+                        ) : (
+                            <svg 
+                                viewBox="0 0 1400 800" 
+                                className="w-full h-full drop-shadow-2xl transition-transform duration-700 ease-out max-h-[90vh]"
+                                style={{ transform: activeObject ? 'scale(1.02)' : 'scale(1)' }}
+                            >
+                                <defs>
+                                    <radialGradient id="lampGlowDesktop" cx="0.5" cy="0.5" r="0.5">
+                                        <stop offset="0%" stopColor="#FDE68A" stopOpacity={isNight ? 0.7 : 0.3} />
+                                        <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+                                    </radialGradient>
+                                    
+                                    <radialGradient id="cakeGlow" cx="0.5" cy="0.5" r="0.5">
+                                        <stop offset="0%" stopColor="#FCD34D" stopOpacity="0.8" />
+                                        <stop offset="100%" stopColor="#FCD34D" stopOpacity="0" />
+                                    </radialGradient>
+
+                                    <radialGradient id="partyGradient" cx="0.5" cy="0.5" r="0.8">
+                                        <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.3" />
+                                        <stop offset="50%" stopColor="#F472B6" stopOpacity="0.2" />
+                                        <stop offset="100%" stopColor="#60A5FA" stopOpacity="0.1" />
+                                    </radialGradient>
+
+                                    <linearGradient id="trophyBodyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stopColor="#F59E0B" /> 
+                                        <stop offset="50%" stopColor="#FDE68A" /> 
+                                        <stop offset="100%" stopColor="#D97706" /> 
+                                    </linearGradient>
+
+                                    <radialGradient id="trophyRimGradient" cx="0.5" cy="0.5" r="0.5">
+                                        <stop offset="0%" stopColor="#FEF3C7" stopOpacity="0.9" /> 
+                                        <stop offset="80%" stopColor="#FDE68A" stopOpacity="0.6" />
+                                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
+                                    </radialGradient>
+
+                                    <linearGradient id="handleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor="#FDE68A" />
+                                        <stop offset="100%" stopColor="#B45309" />
+                                    </linearGradient>
+
+                                    <linearGradient id="baseGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor={isNight ? "#4B5563" : "#A16207"} />
+                                        <stop offset="100%" stopColor={isNight ? "#1F2937" : "#713F12"} />
+                                    </linearGradient>
+
+                                    <filter id="glowDesktop">
+                                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                    <path id="monstera-leaf-desktop" d="M0 0 C-15 -25 -35 -50 -5 -85 C10 -100 30 -85 35 -50 C40 -20 15 -10 0 0 Z M-12 -45 Q-20 -55 -10 -65 Q-5 -55 -12 -45 Z M15 -35 Q25 -45 18 -55 Q8 -45 15 -35 Z" />
+                                    <clipPath id="frame-clip-desktop">
+                                        <rect x="910" y="210" width="80" height="100" />
+                                    </clipPath>
+                                </defs>
+
+                                <path d="M200 100 L1200 100 L1200 550 L200 550 Z" className="transition-all duration-1000" fill={isNight ? "#1E1B4B" : "#F1F5F9"} />
+                                <path d="M200 550 L1200 550 L1400 800 L0 800 Z" className="transition-all duration-1000" fill={isNight ? "#312E81" : "#E2E8F0"} />
+                                <path d="M0 0 L200 100 L200 550 L0 800 Z" className="transition-all duration-1000" fill={isNight ? "#111827" : "#CBD5E1"} />
+                                <path d="M1400 0 L1200 100 L1200 550 L1400 800 Z" className="transition-all duration-1000" fill={isNight ? "#111827" : "#CBD5E1"} />
+
+                                {isNight && (
+                                    <g className="pointer-events-none">
+                                        <ellipse cx="700" cy="400" rx="600" ry="300" fill="url(#partyGradient)" style={{ animation: 'spotlight-sweep 10s infinite ease-in-out', transformOrigin: 'center' }} />
+                                        
+                                        {[...Array(15)].map((_, i) => (
+                                            <circle 
+                                                key={`particle-${i}`}
+                                                cx={200 + Math.random() * 1000}
+                                                cy={100 + Math.random() * 500}
+                                                r={Math.random() * 3 + 1}
+                                                fill={['#F472B6', '#60A5FA', '#FBBF24', '#34D399'][i % 4]}
+                                                opacity="0.6"
+                                                style={{ 
+                                                    animation: `float-particle ${3 + Math.random() * 4}s infinite ease-in-out`,
+                                                    animationDelay: `${Math.random() * 2}s`
+                                                }}
+                                            />
+                                        ))}
+                                    </g>
+                                )}
+
+                                <g onClick={() => handleObjectClick('balloons')} className="cursor-pointer hover:-translate-y-2 transition-transform duration-1000">
+                                    <line x1="100" y1="400" x2="100" y2="200" stroke="#9CA3AF" strokeWidth="1" />
+                                    <circle cx="100" cy="180" r="40" fill="#F472B6" opacity="0.9" />
+                                    <line x1="140" y1="420" x2="140" y2="220" stroke="#9CA3AF" strokeWidth="1" />
+                                    <circle cx="140" cy="200" r="45" fill="#60A5FA" opacity="0.9" />
+                                    <line x1="60" y1="410" x2="60" y2="210" stroke="#9CA3AF" strokeWidth="1" />
+                                    <circle cx="60" cy="190" r="38" fill="#FBBF24" opacity="0.9" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('balloons')} className="cursor-pointer hover:-translate-y-2 transition-transform duration-1000">
+                                    <line x1="1300" y1="400" x2="1300" y2="200" stroke="#9CA3AF" strokeWidth="1" />
+                                    <circle cx="1300" cy="180" r="40" fill="#34D399" opacity="0.9" />
+                                    <line x1="1260" y1="420" x2="1260" y2="220" stroke="#9CA3AF" strokeWidth="1" />
+                                    <circle cx="1260" cy="200" r="45" fill="#A78BFA" opacity="0.9" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('gifts')} className="cursor-pointer hover:scale-105 transition-transform origin-bottom-left">
+                                    <rect x="250" y="650" width="80" height="60" fill="#EF4444" />
+                                    <rect x="285" y="650" width="10" height="60" fill="#FCD34D" />
+                                    <rect x="250" y="675" width="80" height="10" fill="#FCD34D" />
+                                    
+                                    <rect x="310" y="680" width="70" height="50" fill="#3B82F6" />
+                                    <rect x="340" y="680" width="10" height="50" fill="white" />
+                                    
+                                    <rect x="280" y="610" width="50" height="40" fill="#10B981" />
+                                    <rect x="300" y="610" width="10" height="40" fill="#064E3B" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('window')} className="cursor-pointer hover:opacity-90 transition-opacity duration-300">
+                                    <rect x="350" y="150" width="400" height="250" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#E2E8F0"} stroke={isNight ? "#4B5563" : "#94A3B8"} strokeWidth="8" />
+                                    <rect x="360" y="160" width="185" height="230" className="transition-all duration-1000" fill={isNight ? "#0F172A" : "#BAE6FD"} fillOpacity={isNight ? 0.8 : 0.9} />
+                                    <rect x="555" y="160" width="185" height="230" className="transition-all duration-1000" fill={isNight ? "#0F172A" : "#BAE6FD"} fillOpacity={isNight ? 0.8 : 0.9} />
+                                    <circle cx="450" cy="200" r="25" fill="#FDE047" className={`transition-opacity duration-1000 ${isNight ? 'opacity-0' : 'opacity-80'}`} />
+                                    <circle cx="450" cy="200" r="20" fill="#E2E8F0" className={`transition-opacity duration-1000 ${isNight ? 'opacity-80' : 'opacity-0'}`} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('mirror')} className="cursor-pointer hover:opacity-90 transition-opacity" style={{ filter: activeObject === 'mirror' ? 'url(#glowDesktop)' : 'none' }}>
+                                    <path d="M1250 250 L1350 220 L1350 500 L1250 480 Z" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#94A3B8"} stroke={isNight ? "#D1D5DB" : "#E2E8F0"} strokeWidth="3" />
+                                    <path d="M1260 260 L1340 235 L1340 485 L1260 470 Z" className="transition-all duration-1000" fill={isNight ? "#93C5FD" : "#E0F2FE"} fillOpacity={isNight ? 0.3 : 0.6} />
+                                    <path d="M1270 280 L1300 270" stroke="white" strokeWidth="2" opacity={isNight ? 0.4 : 0.8} />
+                                    <path d="M1280 450 L1320 440" stroke="white" strokeWidth="2" opacity={isNight ? 0.2 : 0.4} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('trophies')} className="cursor-pointer hover:scale-105 transition-transform origin-center">
+                                    <rect x="780" y="280" width="100" height="8" fill="url(#baseGradient)" stroke={isNight ? "#374151" : "#451a03"} strokeWidth="0.5" rx="1" />
+                                    
+                                    <path d="M820 280 L820 260 Q810 260 810 240 Q810 220 830 220 Q850 220 850 240 Q850 260 840 260 L840 280 Z" fill="url(#trophyBodyGradient)" stroke="#FDE047" strokeWidth="0.5" />
+                                    
+                                    <ellipse cx="830" cy="220" rx="20" ry="5" fill="url(#trophyRimGradient)" />
+                                    
+                                    <path d="M810 240 Q800 240 805 255 L808 252 Q805 242 810 242 Z" fill="url(#handleGradient)" stroke="#FDE047" strokeWidth="0.5" />
+                                    <path d="M850 240 Q860 240 855 255 L852 252 Q855 242 850 242 Z" fill="url(#handleGradient)" stroke="#FDE047" strokeWidth="0.5" />
+
+                                    <path d="M820 260 Q830 265 840 260" stroke="none" fill="#78350F" opacity="0.3" />
+
+                                    <line x1="790" y1="288" x2="790" y2="300" stroke={isNight ? "#9CA3AF" : "#4B5563"} />
+                                    <circle cx="790" cy="305" r="5" fill="#FDBA74" stroke="#C2410C" strokeWidth="0.5" />
+                                    <line x1="805" y1="288" x2="805" y2="310" stroke={isNight ? "#9CA3AF" : "#4B5563"} />
+                                    <circle cx="805" cy="315" r="5" fill="#9CA3AF" stroke="#4B5563" strokeWidth="0.5" />
+                                    <line x1="865" y1="288" x2="865" y2="305" stroke={isNight ? "#9CA3AF" : "#4B5563"} />
+                                    <circle cx="865" cy="310" r="5" fill="#FCD34D" stroke="#B45309" strokeWidth="0.5" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('fan')} className="cursor-pointer hover:opacity-90" style={{ filter: activeObject === 'fan' ? 'url(#glowDesktop)' : 'none' }}>
+                                    <ellipse cx="700" cy="50" rx="40" ry="15" fill={isNight ? "#1F2937" : "#334155"} />
+                                    <ellipse cx="700" cy="50" rx="20" ry="8" fill={isNight ? "#111827" : "#1E293B"} />
+                                    
+                                    <rect x="696" y="50" width="8" height="60" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#475569"} />
+                                    
+                                    <g transform="translate(700, 110) scale(1, 0.35)">
+                                        
+                                        <g className={`${isNight ? 'animate-spin' : ''}`} style={{ animationDuration: isNight ? '3s' : '0s', transformOrigin: '0px 0px' }}>
+                                            
+                                            {[0, 120, 240].map((angle) => (
+                                                <g key={angle} transform={`rotate(${angle})`}>
+                                                    <rect x="15" y="-10" width="30" height="20" fill={isNight ? "#111827" : "#334155"} />
+                                                    
+                                                    <path 
+                                                        d="M45 -15 L220 -25 Q240 -25 240 0 Q240 25 220 25 L45 15 Z" 
+                                                        fill={isNight ? "#374151" : "#64748B"} 
+                                                        opacity="0.9"
+                                                    />
+                                                    
+                                                    <path d="M50 0 L200 0" stroke={isNight ? "#4B5563" : "#94A3B8"} strokeWidth="2" opacity="0.3" />
+                                                </g>
+                                            ))}
+                                            
+                                            <circle cx="0" cy="0" r="30" fill={isNight ? "#111827" : "#334155"} />
+                                            <circle cx="0" cy="0" r="25" fill={isNight ? "#1F2937" : "#475569"} />
+                                            <circle cx="0" cy="0" r="8" fill={isNight ? "#4B5563" : "#CBD5E1"} />
+                                            
+                                        </g>
+                                    </g>
+                                </g>
+
+                                <g 
+                                    onClick={() => handleObjectClick('tv')} 
+                                    className="cursor-pointer group"
+                                >
+                                    <g transform="translate(0, 10)">
+                                        <path d="M25 435 L175 395 L175 425 L25 465 Z" fill="black" opacity="0.2" filter="url(#glowDesktop)" />
+                                        
+                                        <path d="M30 430 L170 390 L170 420 L30 460 Z" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#334155"} />
+                                        
+                                        <path d="M30 430 L50 420 L190 380 L170 390 Z" className="transition-all duration-1000" fill={isNight ? "#374151" : "#475569"} />
+                                        
+                                        <path d="M170 390 L190 380 L190 410 L170 420 Z" className="transition-all duration-1000" fill={isNight ? "#111827" : "#1E293B"} />
+                                        
+                                        <path d="M40 445 L160 405" stroke={isNight ? "#4B5563" : "#64748B"} strokeWidth="1" opacity="0.5" />
+                                    </g>
+
+                                    <g 
+                                        className="transition-opacity hover:opacity-90"
+                                        style={{ filter: activeObject === 'tv' ? 'url(#glowDesktop)' : 'none' }}
+                                    >
+                                        <path d="M45 205 L165 220 L165 320 L45 335 Z" fill="black" opacity="0.4" filter="url(#glowDesktop)" />
+
+                                        <path d="M50 200 L170 215 L170 315 L50 330 Z" className="transition-all duration-1000" fill={isNight ? "#000000" : "#0F172A"} />
+
+                                        <path d="M40 200 L160 215 L160 315 L40 330 Z" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#1E293B"} stroke={isNight ? "#374151" : "#334155"} strokeWidth="1" />
+
+                                        <path d="M48 208 L152 221 L152 309 L48 322 Z" className="transition-all duration-1000" fill={isNight ? "#0F172A" : "#020617"} />
+
+                                        {isNight ? (
+                                            <>
+                                                <path d="M48 208 L152 221 L152 309 L48 322 Z" fill="#3B82F6" opacity="0.1" className="animate-pulse" />
+                                                <circle cx="145" cy="312" r="1.5" fill="#EF4444" className="animate-pulse">
+                                                    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+                                                </circle>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <path d="M48 208 L100 215 L80 320 L48 322 Z" fill="white" opacity="0.05" />
+                                                <path d="M120 220 L140 225 L130 250 L110 245 Z" fill="white" opacity="0.03" />
+                                            </>
+                                        )}
+                                    </g>
+                                </g>
+
+                                <g onClick={() => handleObjectClick('sofa')} className="cursor-pointer hover:translate-y-[-2px] transition-transform duration-300">
+                                    <rect x="500" y="450" width="400" height="100" rx="15" fill="#4338CA" />
+                                    <rect x="500" y="520" width="400" height="60" rx="10" fill="#3730A3" />
+                                    <rect x="480" y="480" width="50" height="100" rx="10" fill="#312E81" />
+                                    <rect x="870" y="480" width="50" height="100" rx="10" fill="#312E81" />
+                                    <rect x="540" y="480" width="100" height="80" rx="5" className="transition-all duration-1000" fill={isNight ? "#4F46E5" : "#6366F1"} fillOpacity="0.9" />
+                                    <rect x="760" y="480" width="100" height="80" rx="5" className="transition-all duration-1000" fill={isNight ? "#4F46E5" : "#6366F1"} fillOpacity="0.9" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('laptop')} className="cursor-pointer hover:scale-105 transition-transform origin-center">
+                                    <path d="M580 530 L660 530 L670 540 L570 540 Z" className="transition-all duration-1000" fill={isNight ? "#374151" : "#94A3B8"} />
+                                    <path d="M580 530 L660 530 L660 470 L580 470 Z" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#64748B"} />
+                                    <rect x="590" y="475" width="50" height="45" className="transition-all duration-1000" fill={isNight ? "#60A5FA" : "#E2E8F0"} fillOpacity={isNight ? 0.6 : 0.9} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('purse')} className="cursor-pointer hover:scale-105 transition-transform origin-center">
+                                    <path d="M800 510 Q790 540 810 545 L850 540 Q860 530 850 505 Z" className="transition-all duration-1000" fill={isNight ? "#831843" : "#BE185D"} />
+                                    <path d="M800 510 Q790 470 830 470 Q850 470 850 505" fill="none" stroke={isNight ? "#500724" : "#831843"} strokeWidth="3" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('mobile')} className="cursor-pointer hover:scale-110 transition-transform origin-center">
+                                    <rect x="740" y="535" width="30" height="18" rx="2" fill={isNight ? "#1F2937" : "#334155"} transform="rotate(15 755 544)" />
+                                    <rect x="742" y="536" width="26" height="16" rx="1" fill={isNight ? "#111827" : "#0F172A"} transform="rotate(15 755 544)" />
+                                    <rect x="742" y="536" width="26" height="16" rx="1" fill={isNight ? "#8B5CF6" : "#C4B5FD"} transform="rotate(15 755 544)" opacity="0.4" className="animate-pulse" />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('cake')} className="cursor-pointer hover:scale-105 transition-transform origin-bottom">
+                                    <ellipse cx="700" cy="650" rx="100" ry="30" fill="#78350F" />
+                                    <rect x="650" y="650" width="10" height="100" fill="#78350F" />
+                                    <rect x="740" y="650" width="10" height="100" fill="#78350F" />
+                                    
+                                    <rect x="660" y="600" width="80" height="40" fill="#FBCFE8" />
+                                    <rect x="670" y="570" width="60" height="30" fill="#F9A8D4" />
+                                    <rect x="685" y="550" width="4" height="20" fill="#FDA4AF" />
+                                    <rect x="698" y="550" width="4" height="20" fill="#FDA4AF" />
+                                    <rect x="711" y="550" width="4" height="20" fill="#FDA4AF" />
+                                    
+                                    {isNight && <ellipse cx="700" cy="550" rx="50" ry="30" fill="url(#cakeGlow)" className="animate-pulse" />}
+                                    <circle cx="687" cy="548" r="3" fill="#FCD34D" className="animate-pulse" />
+                                    <circle cx="700" cy="548" r="3" fill="#FCD34D" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
+                                    <circle cx="713" cy="548" r="3" fill="#FCD34D" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('lamp')} className="cursor-pointer">
+                                    <rect x="150" y="550" width="15" height="200" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#64748B"} />
+                                    <path d="M120 750 L180 750 L170 700 L130 700 Z" className="transition-all duration-1000" fill={isNight ? "#374151" : "#475569"} />
+                                    <path d="M100 350 L200 350 L230 480 L70 480 Z" fill={isNight ? "#FDE68A" : "#FEF3C7"} className="transition-colors duration-1000" opacity="0.9" />
+                                    <ellipse cx="150" cy="480" rx="100" ry="30" fill="url(#lampGlowDesktop)" className={`transition-opacity duration-1000 ${isNight ? 'opacity-100' : 'opacity-30'}`} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('box')} className="cursor-pointer hover:translate-y-[-2px] transition-transform" style={{ filter: activeObject === 'box' ? 'url(#glowDesktop)' : 'none' }}>
+                                    <path d="M1080 650 L1150 650 L1150 690 L1080 690 Z" className="transition-all duration-1000" fill={isNight ? "#78350F" : "#92400E"} />
+                                    <path d="M1070 650 L1160 650 L1150 635 L1090 635 Z" className="transition-all duration-1000" fill={isNight ? "#92400E" : "#B45309"} />
+                                    <rect x="1112" y="655" width="6" height="10" className="transition-all duration-1000" fill={isNight ? "#FBBF24" : "#FCD34D"} />
+                                </g>
+
+                                <g onClick={() => handleObjectClick('plant')} className="cursor-pointer hover:scale-105 transition-transform origin-bottom">
+                                    <path d="M1190 700 L1250 700 L1240 600 L1200 600 Z" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#92400E"} />
+                                    <rect x="1185" y="600" width="70" height="12" rx="3" className="transition-all duration-1000" fill={isNight ? "#374151" : "#B45309"} />
+
+                                    <g transform="translate(1220, 605)">
+                                        <path d="M0 0 Q-20 -50 -40 -100" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="4" fill="none" />
+                                        <path d="M0 0 Q10 -60 20 -120" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="4" fill="none" />
+                                        <path d="M0 0 Q30 -40 60 -80" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="4" fill="none" />
+                                        <path d="M0 0 Q-10 -30 -20 -60" stroke={isNight ? "#064E3B" : "#065F46"} strokeWidth="3" fill="none" />
+
+                                        <use href="#monstera-leaf-desktop" transform="translate(-40, -100) rotate(-30) scale(1.2)" className="transition-all duration-1000" fill={isNight ? "#047857" : "#10B981"} />
+                                        <use href="#monstera-leaf-desktop" transform="translate(20, -120) rotate(10) scale(1.3)" className="transition-all duration-1000" fill={isNight ? "#065F46" : "#16A34A"} />
+                                        <use href="#monstera-leaf-desktop" transform="translate(60, -80) rotate(45) scale(1.1)" className="transition-all duration-1000" fill={isNight ? "#10B981" : "#22C55E"} />
+                                        <use href="#monstera-leaf-desktop" transform="translate(-20, -60) rotate(-50) scale(0.9)" className="transition-all duration-1000" fill={isNight ? "#064E3B" : "#15803D"} />
+                                        <use href="#monstera-leaf-desktop" transform="translate(10, -40) rotate(20) scale(0.8)" className="transition-all duration-1000" fill={isNight ? "#059669" : "#16A34A"} />
+                                    </g>
+                                </g>
+
+                                <g onClick={() => handleObjectClick('photoFrame')} className="cursor-pointer hover:scale-105 transition-transform origin-center" style={{ filter: activeObject === 'photoFrame' ? 'url(#glow)' : 'none' }}>
+                                    <rect x="900" y="200" width="100" height="120" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#94A3B8"} stroke={isNight ? "#D1D5DB" : "#E2E8F0"} strokeWidth="5" />
+                                    <rect x="910" y="210" width="80" height="100" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#475569"} />
+                                    <image href="Frame.png" x="910" y="210" width="80" height="100" clipPath="url(#frame-clip-desktop)" className="transition-all duration-1000" />
+                                </g>
+
+                                <g transform="translate(350, -50)">
+                                    <ellipse cx="700" cy="700" rx="80" ry="25" className="transition-all duration-1000" fill={isNight ? "#1F2937" : "#334155"} /> 
+                                    <rect x="680" y="700" width="40" height="60" className="transition-all duration-1000" fill={isNight ? "#111827" : "#1E293B"} /> 
+                                    
+                                    <g onClick={() => handleObjectClick('cup')} className="cursor-pointer hover:scale-110 transition-transform origin-bottom">
+                                        <path d="M670 680 L690 680 L685 695 L675 695 Z" fill="#F97316" />
+                                        <path d="M690 685 Q695 685 695 690 T690 692" stroke="#F97316" fill="none" strokeWidth="2" />
+                                        <path d="M675 675 Q680 670 675 665" stroke={isNight ? "white" : "#94A3B8"} strokeWidth="1" opacity="0.6" className="animate-pulse" />
+                                        <path d="M395 515 Q400 510 395 505" stroke={isNight ? "white" : "#94A3B8"} strokeWidth="1" opacity={isNight ? 0.4 : 0.6} className="animate-pulse delay-100" />
+                                    </g>
+                                    
+                                    <g onClick={() => handleObjectClick('pen')} className="cursor-pointer hover:rotate-12 transition-transform origin-center" style={{ filter: activeObject === 'pen' ? 'url(#glow)' : 'none' }}>
+                                        <rect x="680" y="690" width="40" height="4" rx="2" className="transition-all duration-1000" fill={isNight ? "#4B5563" : "#64748B"} transform="rotate(-15 700 692)" />
+                                    </g>
+                                </g>
+                                
+                                <g onClick={() => handleObjectClick('banner')} className="cursor-pointer hover:opacity-90">
+                                    <path d="M200 100 Q700 200 1200 100" fill="none" stroke={isNight ? "#FCD34D" : "#B45309"} strokeWidth="3" />
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                                        <path key={i} d={`M${200 + i * 90} ${115 + (i < 5 ? i * 8 : (10 - i) * 8)} l20 30 l20 -30 Z`} fill={i % 2 === 0 ? "#EF4444" : "#3B82F6"} className="animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                                    ))}
+                                    <text x="700" y="180" textAnchor="middle" fontSize="60" fontWeight="bold" fill={isNight ? "#FCD34D" : "#B45309"} style={{fontFamily: 'serif'}}>21</text>
+                                </g>
+
+                                {showConfetti && (
+                                    <g style={{ transform: 'translate(700px, 400px)' }}>
+                                        {[...Array(100)].map((_, i) => {
+                                            const angle = Math.random() * 360;
+                                            const dist = 200 + Math.random() * 600;
+                                            const tx = Math.cos(angle * Math.PI / 180) * dist;
+                                            const ty = Math.sin(angle * Math.PI / 180) * dist;
+                                            const color = ['#F87171', '#60A5FA', '#FBBF24', '#34D399', '#A78BFA'][i % 5];
+                                            const rot = Math.random() * 720 - 360;
+                                            return (
+                                                <rect 
+                                                    key={i}
+                                                    x="-6" y="-6" width="12" height="12"
+                                                    fill={color}
+                                                    style={{
+                                                        '--tx': `${tx}px`,
+                                                        '--ty': `${ty}px`,
+                                                        '--rot': `${rot}deg`,
+                                                        animation: `confetti-explosion ${1.5 + Math.random()}s ease-out forwards`
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </g>
+                                )}
+                                
+                            </svg>
+                        )}
+                    </div>
+
+                    <div 
+                        className={`fixed bottom-0 left-0 right-0 backdrop-blur-md rounded-t-3xl border-t p-6 md:p-8 transform transition-transform duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) shadow-2xl z-50 ${activeObject ? 'translate-y-0' : 'translate-y-[110%]'} ${isNight ? 'bg-slate-800/95 border-slate-700' : 'bg-white/95 border-slate-200'}`}
+                    >
+                        <div className="max-w-xl mx-auto relative">
+                        
+                        <button 
+                            onClick={closeDialog}
+                            className={`absolute -top-2 -right-2 p-2 rounded-full transition-colors ${isNight ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-100 hover:bg-slate-200'}`}
+                        >
+                            <IconX size={20} className={isNight ? "text-slate-300" : "text-slate-600"} />
+                        </button>
+
+                        {activeObject && (
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-2">
+                                    <IconSparkles size={16} className={`${memories[activeObject][isNight ? 'night' : 'day'].color}`} />
+                                    <h2 className={`text-lg font-bold tracking-wide uppercase ${memories[activeObject][isNight ? 'night' : 'day'].color}`}>
+                                    {memories[activeObject].title}
+                                    </h2>
+                                </div>
+                                
+                                <div className="min-h-[100px] flex items-start">
+                                    <p className={`text-base md:text-lg leading-relaxed font-serif italic transition-colors duration-500 ${isNight ? 'text-slate-100' : 'text-slate-700'}`}>
+                                    {displayedText}
+                                    {isTyping && <span className={`animate-pulse ml-1 ${isNight ? 'text-slate-400' : 'text-slate-400'}`}>|</span>}
+                                    </p>
+                                </div>
+
+                                <div className="mt-2 flex justify-end">
+                                    <IconHeart size={16} className={`text-pink-500 ${isTyping ? 'opacity-0' : 'opacity-100 transition-opacity duration-1000'}`} fill="currentColor" />
+                                </div>
+                            </div>
+                        )}
+                        </div>
+                    </div>
+
+                    <div className={`absolute bottom-8 text-sm animate-pulse transition-colors duration-1000 ${isNight ? 'text-slate-400' : 'text-slate-600'} ${activeObject ? 'hidden' : 'block'}`}>
+                        {isMobile ? "Tap an object to listen..." : "Explore the room to find secrets..."}
+                    </div>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<RoomOfEchoes />);
+    </script>
+</body>
+</html>

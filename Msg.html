@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Birthday Star ~ Wikipedia</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cinzel:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Serif:wght@400;700&display=swap');
+
+:root {
+    --ink-black: #1a1a1a;
+    --paper-white: #f4f1ea;
+    --accent-red: #8b0000;
+    --wiki-bg: #f6f6f6;
+    --wiki-border: #a7d7f9;
+    --wiki-link: #3366cc;
+    --wiki-text: #202122;
+}
+
+body {
+    transition: background-color 0.5s ease;
+}
+
+@media (max-width: 1023px) {
+    body {
+        font-family: 'Crimson Text', serif;
+        background: url('https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover fixed;
+        min-height: 100vh;
+        color: var(--ink-black);
+        padding-top: 5rem; 
+        overflow-x: hidden;
+    }
+
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.4;
+        mix-blend-mode: multiply;
+    }
+
+    body.navs-open {
+        padding-left: 80px; 
+        padding-right: 80px;
+    }
+}
+
+@media (min-width: 1024px) {
+    body {
+        background-color: var(--wiki-bg);
+        font-family: 'Noto Sans', sans-serif;
+        color: var(--wiki-text);
+        padding: 0;
+        overflow-y: scroll;
+    }
+    body::after { display: none; }
+    .float-symbol { display: none !important; }
+}
+
+.font-newspaper-title { font-family: 'Abril Fatface', cursive; letter-spacing: 0.05em; font-weight: 400; }
+.font-serif-display { font-family: 'Cinzel', serif; font-weight: 700; }
+.font-newspaper-body { font-family: 'Crimson Text', serif; font-size: 1.1rem; line-height: 1.6; }
+.font-typewriter { font-family: 'Special Elite', monospace; }
+
+.mw-body {
+    background-color: #ffffff;
+    border: 1px solid #a7d7f9;
+    border-right-width: 0;
+    margin-top: -1px;
+    padding: 1.25em 1.5em 1.5em 1.5em;
+}
+.firstHeading {
+    border-bottom: 1px solid #a2a9b1;
+    font-family: 'Linux Libertine','Georgia','Times','serif';
+    font-size: 1.8em;
+    font-weight: normal;
+    padding-bottom: 0.25em;
+    margin-bottom: 0.25em;
+}
+.mw-headline {
+    font-family: 'Linux Libertine','Georgia','Times','serif';
+    font-weight: bold;
+    font-size: 1.2em;
+    padding-top: 0.5em;
+    margin-top: 1em;
+    border-bottom: 1px solid #a2a9b1;
+    width: 100%;
+    display: block;
+}
+.toc {
+    background-color: #f8f9fa;
+    border: 1px solid #a2a9b1;
+    padding: 10px;
+    display: inline-block;
+    min-width: 200px;
+    margin-bottom: 1em;
+}
+.toc-title { font-weight: bold; text-align: center; margin-bottom: 0.5em; }
+.toc ul { list-style: none; padding-left: 0; }
+.toc li { font-size: 0.9em; margin-bottom: 0.2em; }
+.toc a { color: #0645ad; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+.bouncy-button {
+    background-color: transparent;
+    color: var(--ink-black);
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid var(--ink-black);
+    box-shadow: 4px 4px 0px var(--ink-black);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+}
+.bouncy-button:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--ink-black); background-color: rgba(26, 26, 26, 0.05); }
+.bouncy-button:active { transform: translate(4px, 4px); box-shadow: none; }
+.bouncy-button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: translate(2px, 2px); }
+
+#tictactoe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 240px; 
+    height: 240px;
+    margin: 2rem auto;
+    border: 3px solid var(--ink-black);
+    gap: 0;
+    background: transparent;
+}
+.cell {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; font-weight: 400; cursor: pointer;
+    border: 1px solid var(--ink-black); transition: background-color 0.2s;
+    color: var(--ink-black); font-family: 'Special Elite', monospace; line-height: 1;
+}
+.cell:hover:not(:empty) { background-color: rgba(0,0,0,0.03); }
+.cell.O { color: var(--accent-red); }
+.cell:nth-child(3n) { border-right: none; }
+.cell:nth-child(n + 7) { border-bottom: none; }
+.cell:nth-child(3n-2) { border-left: none; }
+.cell:nth-child(n + 1):nth-child(-n + 3) { border-top: none; }
+
+@keyframes float-up {
+    0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.6; } 80% { opacity: 0.6; }
+    100% { transform: translateY(-100vh) scale(1.2) rotate(360deg); opacity: 0; }
+}
+.float-symbol {
+    position: fixed; bottom: -50px; font-size: 24px;
+    font-family: 'Special Elite', monospace; color: #2a2a2a; 
+    pointer-events: none; animation: float-up 12s infinite linear;
+    z-index: 10; opacity: 0.7;
+}
+
+.nav-panel { transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: fixed; z-index: 200; }
+#leftNav, #rightNav { width: 60px; }
+.nav-link:hover { background-color: rgba(255, 255, 255, 0.1); transform: scale(1.05); }
+
+.fireworks-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+.final-display-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 101; pointer-events: none; color: white; 
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    opacity: 0; transition: opacity 2s ease-in-out; background-color: rgba(0, 0, 0, 0.95); 
+}
+
+.wiki-sidebar-link { display: block; padding: 6px 10px; color: #0645ad; text-decoration: none; font-size: 0.85rem; }
+.wiki-sidebar-link:hover { text-decoration: underline; }
+
+.wiki-logo {
+    width: 135px; height: 135px;
+    background: url('https://upload.wikimedia.org/wikipedia/en/8/80/Wikipedia-logo-v2.svg') no-repeat center center;
+    background-size: contain; margin: 0 auto 1em auto;
+}
+.wiki-infobox {
+    float: right; clear: right; width: 300px; margin: 0 0 1em 1em;
+    border: 1px solid #a2a9b1; background-color: #f8f9fa;
+    padding: 0.2em; font-size: 88%; line-height: 1.5em;
+}
+.wiki-infobox-header { background-color: #b0c4de; text-align: center; font-weight: bold; padding: 0.2em; }
+.wiki-infobox-image { padding: 10px 0; text-align: center; }
+.wiki-infobox-data { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #eaecf0; }
+
+.wiki-tab {
+    padding: 8px 16px; border: 1px solid #a7d7f9; border-bottom: none;
+    background: #fff; margin-right: 4px; font-size: 0.85rem; color: #0645ad;
+}
+.wiki-tab.active {
+    font-weight: bold; color: #000; background: white;
+    padding-bottom: 9px; margin-bottom: -1px; z-index: 10; position: relative;
+}
+</style>
+</head>
+
+<body>
+
+    <button id="navToggle" class="fixed top-4 left-4 z-[210] p-3 bg-[#1a1a1a] text-[#f4f1ea] rounded-full shadow-xl hover:bg-black transition-transform duration-200 ease-in-out bouncy-button border-none lg:hidden" style="padding: 0.75rem; border-radius: 9999px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    
+    <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 h-16 bg-[#1a1a1a] text-[#f4f1ea] shadow-xl flex items-center justify-center space-x-2 -translate-y-full border-b-2 border-[#f4f1ea]/10 lg:hidden">
+    <a href="Music.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Music</a>
+    <a href="letter.html" class="nav-link px-3 py-2 text-sm font-newspaper-body tracking-widest uppercase">Letter</a>
+    <a href="Msg.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Message</a>
+</nav>
+<nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 h-16 bg-[#1a1a1a] text-[#f4f1ea] shadow-xl flex items-center justify-center space-x-2 translate-y-full border-t-2 border-[#f4f1ea]/10 lg:hidden">
+    <a href="Skill.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Skill</a>
+    <a href="Paper_Star.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Paper Star</a>
+    <a href="Carttoon.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Cartoon</a>
+</nav>
+<nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 bg-[#1a1a1a] text-[#f4f1ea] shadow-xl flex flex-col items-center space-y-2 overflow-y-auto py-20 -translate-x-full border-r-2 border-[#f4f1ea]/10 lg:hidden">
+    <a href="index.html" class="nav-link px-3 py-2 text-sm font-newspaper-body tracking-widest uppercase">Home</a>
+    <a href="Cake.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Cake</a>
+    <a href="21_Wish.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">21 Door</a>
+    <a href="chat.html" class="nav-link px-3 py-2 text-sm font-newspaper-body tracking-widest uppercase">Heaven</a>
+    <a href="Diary.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Diary</a>
+    <a href="anatomy.html" class="nav-link px-3 py-2 text-sm font-newspaper-body tracking-widest uppercase">Anatomy</a>
+    <a href="Box.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Box</a>
+    <a href="Special.html" class="nav-link px-3 py-2 text-sm font-newspaper-body tracking-widest uppercase">Special</a>
+    <a href="color.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Color</a>
+    <a href="you.html" class="nav-link px-3 py-2 text-sm font-newspaper-body tracking-widest uppercase">You</a>
+    <a href="Teacher.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Teacher</a>
+    <a href="Universe.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Universe</a>
+    <a href="The_River.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">River</a>
+    <a href="Mountain.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Mountain</a>
+</nav>
+<nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 bg-[#1a1a1a] text-[#f4f1ea] shadow-xl flex flex-col items-center space-y-2 overflow-y-auto py-20 translate-x-full border-l-2 border-[#f4f1ea]/10 lg:hidden">
+    <a href="Periodik_table.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Table</a>
+    <a href="Concept.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Concept</a>
+    <a href="Calender.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Calender</a>
+    <a href="Perspective.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">View</a>
+    <a href="Santa.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Santa</a>
+    <a href="Presence.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Presence</a>
+    <a href="Cloud.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Cloud</a>
+    <a href="Ink.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Ink</a>
+    <a href="Butterfly.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Butterfly</a>
+    <a href="Weather.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Weather</a>
+    <a href="Spotlight.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Spotlight</a>
+    <a href="Room.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Room</a>
+    <a href="Radio.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Radio</a>
+    <a href="Food.html" class="nav-link p-2 text-xs font-newspaper-body tracking-widest uppercase">Food</a>
+</nav>
+
+<div id="mobile-view-wrapper" class="lg:hidden">
+    <div class="flex items-center justify-center min-h-[80vh] w-full px-4">
+        <div id="main-card" class="w-full max-w-md bg-[#f4f1ea] border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] p-6 text-center z-20 relative transition-all duration-1000 ease-in-out transform scale-100 opacity-100 my-8">
+            <div class="border-b-2 border-black pb-3 mb-6">
+                <h1 class="font-newspaper-title text-4xl text-black">Puzzle Corner</h1>
+                <div class="flex justify-between text-[11px] font-typewriter uppercase tracking-[0.2em] mt-2">
+                    <span>Daily Edition</span>
+                    <span>Vol. 21</span>
+                </div>
+            </div>
+            <h2 id="card-title-header" class="text-3xl font-newspaper-title text-black mb-6 uppercase tracking-wide leading-tight"></h2>
+            <section id="card-content" class="space-y-4 p-1 font-newspaper-body text-lg leading-relaxed text-left text-black">
+            </section>
+            <div class="flex justify-center w-full mt-8 pt-6 border-t border-black"> 
+                <button id="next-button" class="bouncy-button">Start Journey</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="desktop-wiki-view" class="hidden lg:flex w-full min-h-screen bg-[#f6f6f6] text-[#202122]">
+    
+    <aside class="w-44 pt-6 pl-4 pr-2 border-r border-transparent">
+        <div class="wiki-logo"></div>
+        
+        <div class="mb-6">
+            <h3 class="text-xs text-[#54595d] border-b border-[#eaecf0] mb-2 pb-1 font-normal uppercase tracking-wide">Main</h3>
+            <nav class="space-y-1">
+                <a href="index.html" class="wiki-sidebar-link">Home</a>
+                <a href="Cake.html" class="wiki-sidebar-link">Cake</a>
+                <a href="21_Wish.html" class="wiki-sidebar-link">21 Door</a>
+                <a href="chat.html" class="wiki-sidebar-link">Heaven</a>
+                <a href="Diary.html" class="wiki-sidebar-link">Diary</a>
+                <a href="anatomy.html" class="wiki-sidebar-link">Anatomy</a>
+                <a href="Box.html" class="wiki-sidebar-link">Box</a>
+                <a href="Special.html" class="wiki-sidebar-link">Special</a>
+            </nav>
+        </div>
+        
+        <div class="mb-6">
+            <h3 class="text-xs text-[#54595d] border-b border-[#eaecf0] mb-2 pb-1 font-normal uppercase tracking-wide">Chronicles</h3>
+            <nav class="space-y-1">
+                <a href="color.html" class="wiki-sidebar-link">Color</a>
+                <a href="you.html" class="wiki-sidebar-link">You</a>
+                <a href="Teacher.html" class="wiki-sidebar-link">Teacher</a>
+                <a href="Universe.html" class="wiki-sidebar-link">Universe</a>
+                <a href="The_River.html" class="wiki-sidebar-link">River</a>
+                <a href="Mountain.html" class="wiki-sidebar-link">Mountain</a>
+                <a href="Skill.html" class="wiki-sidebar-link">Skill</a>
+                <a href="Paper_Star.html" class="wiki-sidebar-link">Paper Star</a>
+                <a href="Carttoon.html" class="wiki-sidebar-link">Cartoon</a>
+                <a href="Periodik_table.html" class="wiki-sidebar-link">Table</a>
+                <a href="Concept.html" class="wiki-sidebar-link">Concept</a>
+                <a href="Calender.html" class="wiki-sidebar-link">Calender</a>
+                <a href="Perspective.html" class="wiki-sidebar-link">View</a>
+                <a href="Santa.html" class="wiki-sidebar-link">Santa</a>
+                <a href="Presence.html" class="wiki-sidebar-link">Presence</a>
+                <a href="Cloud.html" class="wiki-sidebar-link">Cloud</a>
+                <a href="Ink.html" class="wiki-sidebar-link">Ink</a>
+                <a href="Butterfly.html" class="wiki-sidebar-link">Butterfly</a>
+                <a href="Weather.html" class="wiki-sidebar-link">Weather</a>
+                <a href="Spotlight.html" class="wiki-sidebar-link">Spotlight</a>
+                <a href="Room.html" class="wiki-sidebar-link">Room</a>
+                <a href="Radio.html" class="wiki-sidebar-link">Radio</a>
+                <a href="Food.html" class="wiki-sidebar-link">Food</a>
+            </nav>
+        </div>
+        
+        <div class="mb-6">
+            <h3 class="text-xs text-[#54595d] border-b border-[#eaecf0] mb-2 pb-1 font-normal uppercase tracking-wide">Artifacts</h3>
+            <nav class="space-y-1">
+                <a href="Music.html" class="wiki-sidebar-link">Music</a>
+                <a href="letter.html" class="wiki-sidebar-link">Letter</a>
+                <a href="Msg.html" class="wiki-sidebar-link bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Message</a>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 relative">
+        
+        <div class="flex justify-end border-b border-[#a7d7f9] mb-[-1px]">
+            <div class="flex space-x-1">
+                <span class="text-xs pt-2 px-2">Not logged in</span>
+                <a href="#" class="text-xs text-[#0645ad] pt-2 px-2 hover:underline">Talk</a>
+                <a href="#" class="text-xs text-[#0645ad] pt-2 px-2 hover:underline">Contributions</a>
+                <a href="#" class="text-xs text-[#0645ad] pt-2 px-2 hover:underline">Create account</a>
+                <a href="#" class="text-xs text-[#0645ad] pt-2 px-2 hover:underline">Log in</a>
+            </div>
+        </div>
+
+        <div class="flex mt-8 items-end border-b border-[#a7d7f9]">
+            <div class="wiki-tab active">Article</div>
+            <div class="wiki-tab">Talk</div>
+            <div class="flex-1"></div>
+            <div class="wiki-tab active">Read</div>
+            <div class="wiki-tab">Edit</div>
+            <div class="wiki-tab">View history</div>
+            <div class="relative ml-4 mb-1">
+                <input type="text" placeholder="Search Wikipedia" class="border border-[#a2a9b1] px-2 py-1 text-sm w-48 shadow-inner">
+                <button class="absolute right-0 top-0 h-full px-2 text-[#54595d] font-bold">🔍</button>
+            </div>
+        </div>
+
+        <div class="mw-body shadow-sm">
+            
+            <h1 class="firstHeading">The Birthday Star (2025)</h1>
+            <div class="text-[0.85em] mb-4">From Wikipedia, the free encyclopedia</div>
+
+            <div class="wiki-infobox">
+                <div class="wiki-infobox-header">The Birthday Star</div>
+                <div class="wiki-infobox-image">
+                    <img src="Diwali.jpg" alt="Star Profile" class="w-full h-auto border border-gray-300 p-1">
+                    <div class="text-xs mt-1"> JUHI NASKAR</div>
+                </div>
+                <div class="wiki-infobox-data"><span class="font-bold">Born</span><span>December, 2004</span></div>
+                <div class="wiki-infobox-data"><span class="font-bold">Status</span><span>Most Loved</span></div>
+                <div class="wiki-infobox-data"><span class="font-bold">Occupation</span><span>Being Amazing</span></div>
+                <div class="wiki-infobox-data"><span class="font-bold">Known For</span><span>Kindness, Hardwork</span></div>
+            </div>
+
+            <div id="wiki-full-article" class="pr-4 max-w-4xl text-justify text-[#202122] font-sans text-[0.95rem] leading-[1.6]">
+                <p class="mb-4">
+                    <span class="float-left text-5xl font-newspaper-title mr-2 leading-none mt-[-4px]">J</span>uhi Naskar is a girl from Kolkata, whose life reflects a deep commitment to growth, discipline and exploration, shaped by a rare balance of physical strength, creativity and respect for nature. She is naturally drawn to activities that demand focus and patience, and from an early stage she learned to enjoy challenges rather than avoid them. Her love for the outdoors is central to who she is. Boating gave her a sense of responsibility and calm awareness, teaching her how to stay alert while remaining composed. Hill climbing strengthened not only her body but also her confidence, as she learned to trust her instincts and push forward even when conditions were difficult. This close bond with nature later evolved into an interest in tree medicine, where she studies plants, their traditional uses and their role in maintaining balance between humans and the environment. She approaches this knowledge carefully, with respect for sustainability and tradition, seeing it as both a skill and a responsibility.
+                </p>
+                <p class="mb-4">
+                    Her physical discipline is one of her most defining traits. Yoga is an essential part of her daily life, helping her maintain flexibility, balance and mental clarity. It supports her emotional stability and sharpens her focus, allowing her to approach each day with intention. Alongside yoga, she trains in multiple martial arts, each adding a different layer to her character. Karate instills structure, control and respect for form. Brazilian jiu-jitsu develops her problem-solving ability and adaptability, teaching her how technique and patience can overcome raw strength. Kickboxing builds endurance, power and confidence, pushing her limits and reinforcing her determination. Together, these practices have shaped her into someone who is resilient, disciplined and aware of both her physical and mental capabilities.
+                </p>
+                <p class="mb-4">
+                    Creativity plays an equally important role in her life. Drawing allows her to slow down and observe the world more closely, and she often sketches landscapes, trees and moments from her travels. It is a quiet practice that reflects her thoughtful side. Cooking is another passion, where she enjoys experimenting with flavors and learning dishes from different cultures, treating food as both art and tradition. She also practices recreational shooting with a strong emphasis on safety, precision and concentration, seeing it as a way to refine focus rather than compete.
+                </p>
+                 <p class="mb-4">
+                    Travel is one of the ways Juhi continues to grow. She enjoys experiencing new places, understanding local cultures and testing herself in unfamiliar environments. She keeps memories of these journeys through small but meaningful collections of toys and watches, each item tied to a story or moment in time. People who know her often describe her as calm yet adventurous, disciplined yet curious. She does not rush her growth, choosing instead to build skills steadily and with purpose. Juhi’s life is defined by continuous learning, quiet strength and a genuine appreciation for both the physical world and the inner discipline required to move through it with confidence and respect.
+                </p>
+
+                <div class="toc">
+                    <div class="toc-title">Contents <span class="font-normal text-xs">[<a href="#" class="text-[#0645ad]">hide</a>]</span></div>
+                    <ul>
+                        <li><a href="#section-0">1 Introduction</a></li>
+                        <li><a href="#section-1">2 The Challenge of Destiny</a></li>
+                        <li><a href="#section-2">3 Mathematical Anomalies</a></li>
+                        <li><a href="#section-3">4 Linguistic Analysis</a></li>
+                        <li><a href="#section-4">5 Public Reception</a></li>
+                        <li><a href="#section-5">6 The Manuscript</a></li>
+                        <li><a href="#section-ref">7 References</a></li>
+                    </ul>
+                </div>
+
+                <div id="wiki-sections-container"></div>
+
+                <h2 id="section-ref" class="mw-headline">7. References <span class="text-sm font-normal ml-2">[<a href="#" class="text-[#0645ad]">edit</a>]</span></h2>
+                <div class="text-sm mt-2 mb-8">
+                    1. <i>Metro</i>, 
+                    2. <i>Resturent</i>, 
+                    3. <i>Chats</i>,
+                    4. <i>Tournament</i>,
+                    5. <i>Birthday</i>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<canvas id="fireworks-canvas" class="fireworks-canvas hidden"></canvas>
+<div id="final-display-elements" class="final-display-container hidden">
+    <div class="flex flex-col items-center justify-center gap-6 w-full h-full p-4">
+        <div id="final-photo-container" class="w-60 h-60 md:w-80 md:h-80 bg-gray-200 rounded-none overflow-hidden shadow-[12px_12px_0px_#f4f1ea] border-4 border-[#f4f1ea] flex items-center justify-center text-black text-center text-lg italic font-newspaper-body grayscale contrast-125 sepia-[.2]">
+            YOUR FINAL PHOTO HERE
+        </div>
+        <div id="final-message-box" class="text-center mt-8">
+            <h1 class="font-newspaper-title text-5xl md:text-8xl text-[#f4f1ea] tracking-wider mb-4">HAPPY BIRTHDAY</h1>
+            <h2 class="font-serif-display text-2xl md:text-4xl mt-2 text-[#f4f1ea] italic tracking-wide">You are the whole universe.</h2>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentCardIndex = 0;
+let symbolInterval; 
+let mainCard;
+
+const cards = [
+    { 
+        title: "Editorial Note",
+        desktopTitle: "1. Introduction",
+        mobileHtml: `
+            <div class="space-y-6 text-left">
+                <p class="text-xl font-bold font-serif-display text-black uppercase border-b-2 border-black pb-2 inline-block tracking-widest">A Special Delivery</p>
+                <div class="text-lg text-black font-newspaper-body text-justify leading-relaxed">
+                    <p class="mb-4"><span class="float-left text-6xl font-newspaper-title mr-3 leading-none mt-[-8px]">B</span>efore the grand finale, there are few special cards waiting just for you.</p>
+                    <p>Each card holds a small message, a riddle, or a challenge that you need to complete to unlock the next one. Only when you complete the final card will the surprise be revealed.</p>
+                    <p class="mt-6 italic font-serif text-gray-800 border-l-2 border-black pl-4">Tap below to start your personalized adventure. Shine bright.</p>
+                </div>
+            </div>
+        `,
+        wikiHtml: `
+            <div class="space-y-4 text-left">
+                <p class="text-lg font-newspaper-body text-justify leading-relaxed">
+                    <span class="float-left text-5xl font-newspaper-title mr-2 leading-none mt-[-4px]">J</span>uhi stands as a reminder that true strength is built patiently through discipline, curiosity and the courage to keep moving forward, even when the path feels uncertain. She believes growth comes from consistent effort rather than sudden success, and she lives by choosing progress over comfort every day. Through yoga, martial arts and physical training, she has learned that balance between calm and power is essential, shaping both her body and her mindset. Time spent in nature, whether climbing hills, boating or learning about tree medicine, has taught her patience, awareness and respect for the world around her. Creativity through drawing and cooking allows her to reflect, express and stay grounded, while travel continues to broaden her perspective and test her adaptability. What makes Juhi inspiring is not just her wide range of skills, but her attitude toward life. She embraces challenges as lessons, remains committed even when motivation fades and moves forward with quiet confidence, showing that a strong and meaningful life is built step by step through intention, resilience and self-belief.
+                </p>
+                <p class="italic text-gray-700 border-l-2 border-[#a2a9b1] pl-4">Tap the button below to start your personalized adventure. Shine bright, for the world is watching.</p>
+            </div>
+        `,
+        buttonText: "Turn Page",
+        callback: null 
+    },
+    { 
+        title: "Puzzle: Destiny",
+        desktopTitle: "2. The Challenge of Destiny",
+        mobileHtml: `
+            <div class="flex flex-col items-center">
+                <p class="text-lg font-newspaper-body italic mb-6">You play as 'X'. Win this simple game to open the first door.</p>
+                <div class="relative p-2 border-2 border-black bg-white shadow-lg">
+                    <div id="tictactoe-grid" class="mx-auto my-0">
+                        <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
+                        <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
+                        <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center mt-6">
+                    <p id="game-status" class="text-xl font-bold font-serif-display uppercase tracking-widest">Your move</p>
+                    <button id="restart-game-btn" class="hidden mt-2 bouncy-button px-4 py-2 text-xs" onclick="initializeTicTacToe()">Try Again</button>
+                </div>
+                <p id="card-msg-1" class="text-2xl font-newspaper-body italic mt-4 hidden text-[#8b0000]">"You have won my heart."</p>
+            </div>
+        `,
+        wikiHtml: `
+            <div class="flex flex-col items-start">
+                <p class="mb-4">This section represents the interactive component of the celebration. You play as 'X'.</p>
+                <div class="relative p-2 border border-gray-300 bg-white mb-4">
+                    <div id="tictactoe-grid" class="mx-auto my-0">
+                        <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
+                        <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
+                        <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
+                    </div>
+                </div>
+                <div class="w-full flex flex-col items-center">
+                    <p id="game-status" class="font-bold text-gray-700">Your move</p>
+                    <button id="restart-game-btn" class="hidden mt-2 px-3 py-1 bg-gray-200 border border-gray-400 text-sm hover:bg-gray-300" onclick="initializeTicTacToe()">Try Again</button>
+                </div>
+                <p id="card-msg-1" class="text-lg italic mt-4 hidden text-[#8b0000]">"You have won my heart."</p>
+            </div>
+        `,
+        buttonText: "Next Section",
+        callback: initializeTicTacToe,
+        isLocked: true 
+    },
+    { 
+        title: "The Number Puzzle",
+        desktopTitle: "3. Mathematical Anomalies",
+        mobileHtml: `
+            <div class="space-y-6 text-center">
+                <p class="text-2xl font-bold font-serif-display">What is this called?</p>
+                <p class="text-5xl font-newspaper-title tracking-widest border-y-2 border-black py-4 my-4">(12.99999)</p>
+                <div class="flex justify-center">
+                     <button class="bouncy-button px-6 py-2 text-xs" onclick="document.getElementById('card-msg-2').classList.remove('hidden'); unlockCurrentCard()">Reveal Answer</button>
+                </div>
+                <p id="card-msg-2" class="text-xl font-newspaper-body mt-6 hidden transition-all duration-500">
+                    <span class="text-3xl font-bold font-serif-display block mb-2">13</span> (tera) hone laga huu
+                </p>
+            </div>
+        `,
+        wikiHtml: `
+            <div class="space-y-4">
+                <p>Researchers have discovered a unique numerical anomaly:</p>
+                <div class="p-4 bg-[#f8f9fa] border border-[#eaecf0] text-center font-mono text-xl">
+                    (12.99999)
+                </div>
+                <p>What is this value colloquially known as?</p>
+                <div class="flex justify-start">
+                     <button class="px-4 py-2 bg-[#f8f9fa] border border-[#a2a9b1] text-sm hover:bg-[#e2e2e2]" onclick="document.getElementById('card-msg-2').classList.remove('hidden')">Reveal Answer</button>
+                </div>
+                <p id="card-msg-2" class="text-lg mt-4 hidden">
+                    <span class="font-bold">13</span> (tera) hone laga huu. <span class="italic text-sm text-gray-600">- A common pun involving the number 13 (tera) in Hindi.</span>
+                </p>
+            </div>
+        `,
+        buttonText: "Next Section",
+        callback: null,
+        isLocked: true 
+    },
+    { 
+        title: "The Word Riddle",
+        desktopTitle: "4. Linguistic Analysis",
+        mobileHtml: `
+            <div class="space-y-6 text-center">
+                <p class="text-2xl font-bold font-serif-display">Do you know what will last forever in this world?</p>
+                 <div class="flex justify-center mt-6">
+                    <button class="bouncy-button px-6 py-2 text-xs" onclick="document.getElementById('card-msg-3').classList.remove('hidden'); unlockCurrentCard()">Show Me The Hint</button>
+                </div>
+                <p id="card-msg-3" class="text-xl font-newspaper-body italic mt-8 hidden border-l-4 border-black pl-4 text-left">
+                    On your keyboard look at the letters between Y and O.
+                </p>
+            </div>
+        `,
+        wikiHtml: `
+            <div class="space-y-4">
+                <p>A query regarding permanence in the physical realm:</p>
+                <blockquote class="border-l-4 border-[#eaecf0] pl-4 italic bg-[#f8f9fa] py-2">
+                    "Do you know what will last forever in this world?"
+                </blockquote>
+                 <div class="flex justify-start mt-2">
+                    <button class="px-4 py-2 bg-[#f8f9fa] border border-[#a2a9b1] text-sm hover:bg-[#e2e2e2]" onclick="document.getElementById('card-msg-3').classList.remove('hidden')">Show Hint</button>
+                </div>
+                <p id="card-msg-3" class="text-lg italic mt-4 hidden text-gray-800">
+                    Observation: On standard QWERTY keyboards, the keys between 'Y' and 'O' represent the answer.
+                </p>
+            </div>
+        `,
+        buttonText: "I Know The Answer",
+        callback: null,
+        isLocked: true
+    },
+    { 
+        title: "Opinion Poll",
+        desktopTitle: "5. Public Reception",
+        mobileHtml: `
+            <div class="space-y-6 text-center">
+                <p class="text-xl font-newspaper-body font-bold leading-relaxed">Which one of these single words resonates with your soul today?</p>
+                <div class="flex justify-center gap-6 mt-6">
+                    <button class="bouncy-button px-8 py-3" onclick="chooseWord('serenity')">Serenity</button>
+                    <button class="bouncy-button px-8 py-3" onclick="chooseWord('radiant')">Radiant</button>
+                </div>
+                <p id="word-status" class="text-lg font-newspaper-body italic mt-8 hidden text-gray-800">
+                    A beautiful choice, just like you. The card is now unlocked.
+                </p>
+            </div>
+        `,
+        wikiHtml: `
+            <div class="space-y-4">
+                <p>Which one of these descriptors resonates with the subject's soul today?</p>
+                <div class="flex gap-4 mt-2">
+                    <button class="px-4 py-2 bg-[#f8f9fa] border border-[#a2a9b1] text-sm hover:bg-[#e2e2e2]" onclick="chooseWord('serenity')">Serenity</button>
+                    <button class="px-4 py-2 bg-[#f8f9fa] border border-[#a2a9b1] text-sm hover:bg-[#e2e2e2]" onclick="chooseWord('radiant')">Radiant</button>
+                </div>
+                <p id="word-status" class="text-lg italic mt-4 hidden text-gray-800">
+                    A beautiful choice.
+                </p>
+            </div>
+        `,
+        buttonText: "Almost There",
+        callback: initializeWordCard,
+        isLocked: true 
+    },
+    { 
+        title: "Access Granted",
+        desktopTitle: null, 
+        mobileHtml: `
+            <div class="space-y-6 text-center">
+                <p class="text-5xl font-newspaper-title mb-6">Congratulations</p>
+                <div class="border-t-2 border-b-2 border-black py-8">
+                    <p class="text-xl font-newspaper-body leading-relaxed">You successfully completed all five challenges.</p>
+                    <p class="text-xl font-newspaper-body mt-4 leading-relaxed">You have unlocked the most important message of all, prepared with every ounce of my heart.</p>
+                </div>
+                <p class="text-xs font-typewriter uppercase tracking-[0.2em] mt-6 font-bold">Click below to read the cover story</p>
+            </div>
+        `,
+        wikiHtml: `...`,
+        buttonText: "Read Cover Story",
+        callback: () => { cards[5].isLocked = false; }
+    },
+    { 
+        title: "Cover Story: The Wish",
+        desktopTitle: "6. The Manuscript",
+        mobileHtml: `
+            <div class="space-y-4 text-center h-full flex flex-col">
+                <div class="text-base font-newspaper-body leading-relaxed text-justify p-2 rounded-none pr-4 lg:grid lg:grid-cols-2 lg:gap-10 lg:content-start">
+                    <div class="col-span-2 mb-6 border-b-2 border-black pb-6">
+                        <p class="text-5xl font-newspaper-title text-center mb-4">Happy Birthday</p>
+                        <p class="italic text-center text-lg mb-4 font-serif text-gray-700">To the girl who doesn’t even realise how special she truly is...</p>
+                        <p class="first-letter:text-6xl first-letter:font-newspaper-title first-letter:float-left first-letter:mr-3 first-letter:mt-[-10px]">
+                           Today isn’t just your birthday, it’s the day the universe quietly created someone who would one day change the world without even trying. You don’t have to do anything extraordinary… your smile already does more than you can imagine. My only wish today is simple: May God keep you happy, peaceful and loved today and always.
+                        </p>
+                    </div>
+                    <div class="lg:col-span-1 border-r border-gray-300 pr-6">
+                        <h4 class="font-bold border-b border-black mb-2 uppercase tracking-widest text-sm font-sans">I. Why me?</h4>
+                        <p class="text-sm mb-6">
+                            I saw you with my heart, not my eyes, and trust me, you are the most beautiful person I have ever seen. You matter to me more than you think and more than I show. Every story begins with your smile and ends in your eyes.. I tried to describe you, but every metaphor fell short, even the stars felt ordinary when I looked into your eyes, and the moon hid behind the clouds when you walked through that door. Every poem I wrote ended up sounding like your name, how can I define someone who makes the universe feel small? You are not just beautiful, you are the reason why poetry exists. There may be billions, but none of them are you. If I had to pick between your happiness and mine, I’d choose yours without a second thought, because when you’re happy, I automatically become happy too. My relation with you isn’t like rain that comes and goes, it’s like air, always around you even when silent. You will always be loved by me, no matter what happens, in a world full of doubt, you’re the one I’m sure about. You’re special to me because you’re the only person I genuinely want to see happy from the bottom of my heart, and every time I look at you, something inside me whispers, “God, please keep her happy at any cost.” I’ve never felt this way for anyone before, that’s why you’ll always be special. And I don’t felt this for you by not how you look, talk, or walk, I feel that beacause I saw your heart, your softness, calmness, and silent strength. That’s the part of you I fell for, and that’s the part no one else can replace. I've seen you go quiet many times, your eyes still, thinking deeply, searching for answers. Your eyes speak more than your words ever could. I’ve seen this happen with you more than once. You’ll suddenly stop, almost as if something inside you asks for attention. Your body stays still, and your eyes fix on one point for a while. They’re not empty or distracted, they look focused, as if you’re trying to locate an answer somewhere inside your own thoughts.In those moments, it feels like you’re questioning yourself quietly. Turning the situation around in your mind, checking different angles, replaying possibilities, trying to understand what the right thing might be. It’s not rushed. You give yourself time to think it through properly. Then, slowly, your eyes begin to move again. I can’t tell whether you found clarity, made a decision, or simply decided to step away from a thought you were holding onto. But something shifts. You seem to gather yourself, adjust, and move on. That pause says a lot about you. You don’t ignore confusion. You face it, process it in your own way, and then continue, carrying whatever you’ve understood with you. And if i get a chance to slove it then i will try my best, I will be always with you, If youre busy, Ill wait. If youre sad, Ill listen. If you need help, Ill be there. No matter what happens, youre never alone. I know I may not be perfect, but one thing is certain, I will never leave your side. If you need help, Ill be Doraemon, if you need a smile, Ill be Shinchan, if you need strength, I'll be Chhota Bheem, if youre bored, Ill be Jerry.
+                        </p>
+                        <h4 class="font-bold border-b border-black mb-2 uppercase tracking-widest text-sm font-sans">II. You chose the wrong girl</h4>
+                        <p class="text-sm mb-6"> 
+                            No matter what you think about yourself, you are the sweetest, greatest, and most amazing person in my eyes. I’m glad I found you in this lifetime, in this chaos, in a world full of passing faces. You’re not just someone I met, you’re someone I feel safe with. When you’re near, the noise fades, time slows down, and everything feels right. You are the only one I always mention in my prayers. And if you think you’re the “wrong girl,” let me tell you something… you are not wrong, youre real. Youre genuine. Youre pure hearted. You feel deeply even when you hide it. You care silently even when you pretend you dont. You carry a softness inside you that the world rarely understands. People made you doubt yourself not because youre wrong, but because youre rare, and rare things are often misunderstood. Youre the girl who gives more than you receives, who holds pain but still smiles, who stays strong even when shes tired. You think youre “too much” or “not enough,”. I didnt choose you because youre perfect, I chose you because youre you and thats more than enough. I care about your heart, your soul, your silence, and your softness. Youre not the wrong girl youre the right one… you just dont see it yet. And I know there are days when you question your place, when you wonder if being the way you are is a mistake. It’s not. The world doesn’t always reward kindness immediately, but it never forgets it. Every time you choose empathy over ease, patience over anger, you are quietly shaping something beautiful. You don’t need to harden yourself to survive. The way you love, the way you feel, the way you stay gentle, those are not weaknesses, they are your truth. One day, I hope you’ll see yourself the way I do, not through the doubts others placed in you, but through the light you bring into their lives. Until then, remember this: you don’t walk alone. I’m here, believing in you, and holding space for everything you are, even when you’re still learning to believe in yourself   
+                        </p>
+                    </div>
+                    <div class="lg:col-span-1 pl-2">
+                        <h4 class="font-bold border-b border-black mb-2 uppercase tracking-widest text-sm font-sans">III. You will find someone better?</h4>
+                        <p class="text-sm mb-6"> 
+                            See ‘better’ koi insaan nahi hota ‘better’ ek feeling hoti hai. Aur jo feeling tumhare saath aati hai, woh tumhari personality ki wajah se hai. Tum special isliye ho kyunki tumhari baatein real hoti hain, tumhara nature simple aur grounded rehta hai, aur tum situations ko samajhne ka ek alag hi tarika rakhti ho. Tum woh insaan ho jinke saath baat karke samay ko rokh dene ka man karta hai. Tumhari honesty, tumhara patience, tumhara humor, aur tumhari maturity yeh sab qualities har kisi mein nahi milti. Tum hai mai kisi se compare ya replace nahi kar ne k bare mai soch bhi nahi sakta. Tumhari value tumhari khud ki individuality mein hai jis tarah tum sochti ho, jis tarah tum feel karti ho, aur jis tarah tum dusron ko comfort deti ho, woh sab tumhe naturally alag banata hai. Mujhe sirf itna pata hai ki tum jaisi personality or nahi milti.shayad isi liye tumhare saath cheezein apni jagah par baith jaati hain. Tum kuch extra banne ki koshish nahi karti, phir bhi moments meaningful ho jaate hain. Tumhari baat-cheet mein ek clarity hoti hai jo dikhai nahi deti, par mehsoos hoti hai. Tumhare saath reh kar soch thodi grounded ho jaati hai.Tumhari dosti kisi highlight reel jaisi nahi hoti, balki un palon jaisi hoti hai jo bina camera ke bhi yaad reh jaate hain. Tum judge nahi karti, tum samajhne ka angle rakhti ho. Tumhare saath waqt guzarke apni baaton, apni choices, aur apni direction ko lekar ek naya confidence sa aa jaata hai. Aur shayad isi liye tum naturally alag ho, bina compare ke, bina replacement ke, bas apni jagah par poori. You don’t try to stand out, yet you always do. You listen with real attention, not to reply quickly, but to understand properly, and that makes people feel at ease without you trying. You stay grounded in how you react, choosing clarity over impulse, which naturally builds trust. Your honesty is quiet but solid. You don’t exaggerate or pretend, and that’s why your words carry weight. You understand emotions deeply, yet you handle them with care, never turning feelings into drama. You stay true to yourself in every situation, without comparing or performing. That individuality, calm, sincere, and steady, is what makes your presence feel real and lasting. Tumhari khas baat yahi hai ki tum impress karne ki koshish nahi karti… phir bhi tumhara impact reh jaata hai. Aur jo log naturally yaad reh jaayein, unka koi alternative nahi hota and i am so glad to get you as my friend.
+                        </p>
+
+                        <h4 class="font-bold border-b border-black mb-2 uppercase tracking-widest text-sm font-sans">IV. Why you wait so long?</h4>
+                        <p class="text-sm mb-6">
+                            Waiting is the best part of any story, anticipation makes every moment more meaningful. When you truly love someone or something , you can wait for them without expectations or conditions. If we start expecting then it will be no longer as love , it will become trade. Love always born form without expectation. In love there is no more or less. That's how love works. Love is like a dharma, a duty to care, to do good, and to never think bad, no matter the situation. Have you ever though why your parents don't ask anything for you , if they do, they do it , they wanted the thing for you, to see you happy. Give there all to make you happy & give you comfort . You may have seen your family wait for you for dinner. Because they love you so they wait for you. Your friend wait for you because the love you. Even Lord Krishna had to wait for Radha because krishna love radha . Waiting teaches restraint, faith, and humility. Waiting, for me, has always felt natural.You know, after 4000+ km of flying, Siberian birds reach Banaras, proving that the path of peace is long but always worth the flight. That's why waiting is the best part of any story. Some moments don’t need to be rushed, they make more sense when you let them arrive on their own. I’ve learned that when you slow down, you notice more, you understand better, and you don’t miss what actually matters.
+                        </p>
+
+                        <h4 class="font-bold border-b border-black mb-2 uppercase tracking-widest text-sm font-sans">V. What do I want from you?</h4>
+                        <p class="text-sm mb-6">
+                            Nahi yaar… main tumhe kaise bhool sakta hoon. Tum to mujhe yaad ho chuke ho. Sach kahun toh tum woh insaan ho jo life mein aakar sirf reh nahi jaate, balki kuch na kuch badal hi dete ho. Tumhari baatein, tumhari hasi, aur tumhara cheezon ko samajhne ka tareeka… yeh sab tumhari strength hai, aur yeh strength sirf tum mai hi hai. Kabhi kabhi toh lagta hai ki jitni bhi confusion, stress ya tension hoti hai, tumse baat karke woh thodi halki si ho jaati hai. Tumhari presence, chahe message mein ho ya baat cheet mein, ek ajeeb si simplicity aur comfort le aati hai. Aur haan, ek baat aur… jaise tumne mujhe support diya hai, waise hi main bhi chahta hoon ki kabhi tumhe kuch chahiye ho, koi sunne wala ho, ya tumhare din ko thoda halka karne wala ho, toh main bhi utna hi present rahun. Aur main genuinely tumhare liye woh support banna chahta hoon.I am always with you. Aur jab koi insaan itna comfort de jaaye, itni positivity de jaaye, toh usse bhoolna koi practical baat nahi hoti. Kuch log life mein place lete hain, par tumne place nahi li tumne ek impact chhoda hai. Impact wahi hota hai jo dil aur dimaag dono ko touch kare, aur phir chahe waqt badal jaaye ya situation, woh impact jaata nahi. Isliye agar tum phir se poochho ki main tumhe bhool jaaunga, toh jawab hamesha ek hi rahega: tum sirf yaad nahi, ek ehsaas ban chuki ho. Aur ehsaas kabhi khatam nahi hote… woh saath chalte rehte hain. Aur shayad isi ehsaas ki wajah se main tumhe is tarah dekhta hoon. Tum waqai ek strong insaan ho, par tum apni strength kabhi dikhati nahi. Tum apne achhe pal share karti ho, par apni mehnat, apni struggle, apni thakaan ko chup chaap sambhaal leti ho. Tum mushkil cheezon ko itni aasani se handle kar leti ho ki saamne wale ko kabhi andaaza hi nahi hota ki tumne andar hi andar kitna socha, kitna jhela. Tum apne sawaalon se khud ladti ho, apne doubts ko khud hi samajhne ki koshish karti ho. OrpPhir bhi, jab tum kisi se milte ho tumhara focus hamesha doosron par hota hai, ki kaise saamne wala thoda better feel kare, thoda acha mehsoos kare. Tum chahti ho ki baaki sab khush rahein, chahe uske liye tumhe apni baat thodi der ke liye side mein rakhni pade. Aur chahe time kaisa bhi ho, tum apni muskaan saath rakhti ho taki log samajh hi nahi paate ki tum andar kya carry kar rahi ho. Ye koi chhoti baat nahi hai. Ye ek bahut badi strength hai & Apart from how you look, how you talk, how you meet people, or what you do, what truly defines you is your heart. For me, I know you not by appearances or actions, but by the way your heart works. It’s a heart that feels deeply without making noise, that gives without keeping count, and that understands without needing explanation. Your heart chooses kindness even when it would be easier not to, and care even when no one is watching. It carries empathy, honesty, and quiet courage in equal measure. That’s what makes you rare. That’s what makes you you.
+                        </p>
+
+                        <h4 class="font-bold border-b border-black mb-2 uppercase tracking-widest text-sm font-sans">VI. My promise to you</h4>
+                        <p class="text-sm mb-6">
+                            I’m promising you something simple but honest: I will never change. Whether you’re 21, 40, 60, or 80, I still want to see that same warm smile brightening your face. And if life ever gives me even the smallest chance to bring that smile back on a tough day, I’ll use that chance with all my heart. I’ll always be there for you. If life ever becomes heavy, if the world ever feels overwhelming, I hope you remember that you don’t have to go through everything alone. If I could, I would swap your bad days with my good ones, your rough time with my calm time, your boring moments with my exciting ones, your confusion with my clarity, your tired evenings with my peaceful ones, and your worries with my strength just so your journey feels a little lighter.I want to hold your tired hand , take does sadness, tieredness & handed my energy,fun. And whenever you need help, support, or simply a steady presence beside you, I’ll be there without hesitation. I’ll share your dreams, remind you of the strength you sometimes forget you have, celebrate every quiet victory, and walk with you toward every hope you carry in your heart. You’ll never have to face your challenges alone. I’ll be the calm beside your storm, the voice that lifts you up, and the person who chooses you again and again. People like you carry a softness and honesty that the world doesn’t always protect, and all I want is for life to treat you gently. I’ll cheer for you when you rise, stand by you when you’re unsure, and remind you of your worth when you forget it yourself. You will always have someone who wants to see you win, someone who wants your days to feel lighter. 
+                        </p>
+                        <div class="border-2 border-black p-4 mt-6 bg-[#eae8e0]">
+                            <p class="text-center font-bold italic font-serif-display text-base">
+                                At the end of everything, theres only one truth: Im grateful you exist. I will always pray for your happiness first. Thank you for being someone worth admiring, someone worth waiting for, someone who unknowingly made the world softer. Once again, Happy Birthday. You deserve every gentle, peaceful, beautiful thing in this world.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs font-typewriter uppercase tracking-[0.2em] mt-4 font-bold">Proceed to Grand Finale</p>
+            </div>
+        `,
+        wikiHtml: `
+            <div class="space-y-4 text-justify">
+                <div class="p-4 bg-[#f9f9f9] border border-[#eee] mb-6">
+                    <p class="text-2xl font-serif text-center mb-2">Happy Birthday</p>
+                    <p class="italic text-center text-gray-600 mb-4">To the girl who doesn’t even realise how special she truly is...</p>
+                    <p class="leading-relaxed">
+                        Today isn’t just your birthday, it’s the day the universe quietly created someone who would one day change the world without even trying. You don’t have to do anything extraordinary… your smile already does more than you can imagine. My only wish today is simple: May God keep you happy, peaceful and loved today and always.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold border-b border-[#a2a9b1] mb-2">6.1 Why me?</h4>
+                        <p class="text-sm mb-4">
+                            I saw you with my heart, not my eyes, and trust me, you are the most beautiful person I have ever seen. You matter to me more than you think and more than I show. Every story begins with your smile and ends in your eyes.. I tried to describe you, but every metaphor fell short, even the stars felt ordinary when I looked into your eyes, and the moon hid behind the clouds when you walked through that door. Every poem I wrote ended up sounding like your name, how can I define someone who makes the universe feel small? You are not just beautiful, you are the reason why poetry exists. There may be billions, but none of them are you. If I had to pick between your happiness and mine, I’d choose yours without a second thought, because when you’re happy, I automatically become happy too. My relation with you isn’t like rain that comes and goes, it’s like air, always around you even when silent. You will always be loved by me, no matter what happens, in a world full of doubt, you’re the one I’m sure about. You’re special to me because you’re the only person I genuinely want to see happy from the bottom of my heart, and every time I look at you, something inside me whispers, “God, please keep her happy at any cost.” I’ve never felt this way for anyone before, that’s why you’ll always be special. And I don’t felt this for you by not how you look, talk, or walk, I feel that beacause I saw your heart, your softness, calmness, and silent strength. That’s the part of you I fell for, and that’s the part no one else can replace. I've seen you go quiet many times, your eyes still, thinking deeply, searching for answers. Your eyes speak more than your words ever could. I’ve seen this happen with you more than once. You’ll suddenly stop, almost as if something inside you asks for attention. Your body stays still, and your eyes fix on one point for a while. They’re not empty or distracted, they look focused, as if you’re trying to locate an answer somewhere inside your own thoughts.In those moments, it feels like you’re questioning yourself quietly. Turning the situation around in your mind, checking different angles, replaying possibilities, trying to understand what the right thing might be. It’s not rushed. You give yourself time to think it through properly. Then, slowly, your eyes begin to move again. I can’t tell whether you found clarity, made a decision, or simply decided to step away from a thought you were holding onto. But something shifts. You seem to gather yourself, adjust, and move on. That pause says a lot about you. You don’t ignore confusion. You face it, process it in your own way, and then continue, carrying whatever you’ve understood with you. And if i get a chance to slove it then i will try my best, I will be always with you, If youre busy, Ill wait. If youre sad, Ill listen. If you need help, Ill be there. No matter what happens, youre never alone. I know I may not be perfect, but one thing is certain, I will never leave your side. If you need help, Ill be Doraemon, if you need a smile, Ill be Shinchan, if you need strength, I'll be Chhota Bheem, if youre bored, Ill be Jerry.
+                        </p>
+                        
+                        <h4 class="font-bold border-b border-[#a2a9b1] mb-2">6.2 You choose the wrong girl?</h4>
+                        <p class="text-sm mb-4">
+                            No matter what you think about yourself, you are the sweetest, greatest, and most amazing person in my eyes. I’m glad I found you in this lifetime, in this chaos, in a world full of passing faces. You’re not just someone I met, you’re someone I feel safe with. When you’re near, the noise fades, time slows down, and everything feels right. You are the only one I always mention in my prayers. And if you think you’re the “wrong girl,” let me tell you something… you are not wrong, youre real. Youre genuine. Youre pure hearted. You feel deeply even when you hide it. You care silently even when you pretend you dont. You carry a softness inside you that the world rarely understands. People made you doubt yourself not because youre wrong, but because youre rare, and rare things are often misunderstood. Youre the girl who gives more than you receives, who holds pain but still smiles, who stays strong even when shes tired. You think youre “too much” or “not enough,”. I didnt choose you because youre perfect, I chose you because youre you and thats more than enough. I care about your heart, your soul, your silence, and your softness. Youre not the wrong girl youre the right one… you just dont see it yet. And I know there are days when you question your place, when you wonder if being the way you are is a mistake. It’s not. The world doesn’t always reward kindness immediately, but it never forgets it. Every time you choose empathy over ease, patience over anger, you are quietly shaping something beautiful. You don’t need to harden yourself to survive. The way you love, the way you feel, the way you stay gentle, those are not weaknesses, they are your truth. One day, I hope you’ll see yourself the way I do, not through the doubts others placed in you, but through the light you bring into their lives. Until then, remember this: you don’t walk alone. I’m here, believing in you, and holding space for everything you are, even when you’re still learning to believe in yourself.
+                        </p>
+
+                        <h4 class="font-bold border-b border-[#a2a9b1] mb-2">6.3 You will find someone better?</h4>
+                        <p class="text-sm mb-4">
+                             See ‘better’ koi insaan nahi hota ‘better’ ek feeling hoti hai. Aur jo feeling tumhare saath aati hai, woh tumhari personality ki wajah se hai. Tum special isliye ho kyunki tumhari baatein real hoti hain, tumhara nature simple aur grounded rehta hai, aur tum situations ko samajhne ka ek alag hi tarika rakhti ho. Tum woh insaan ho jinke saath baat karke samay ko rokh dene ka man karta hai. Tumhari honesty, tumhara patience, tumhara humor, aur tumhari maturity yeh sab qualities har kisi mein nahi milti. Tum hai mai kisi se compare ya replace nahi kar ne k bare mai soch bhi nahi sakta. Tumhari value tumhari khud ki individuality mein hai jis tarah tum sochti ho, jis tarah tum feel karti ho, aur jis tarah tum dusron ko comfort deti ho, woh sab tumhe naturally alag banata hai. Mujhe sirf itna pata hai ki tum jaisi personality or nahi milti.shayad isi liye tumhare saath cheezein apni jagah par baith jaati hain. Tum kuch extra banne ki koshish nahi karti, phir bhi moments meaningful ho jaate hain. Tumhari baat-cheet mein ek clarity hoti hai jo dikhai nahi deti, par mehsoos hoti hai. Tumhare saath reh kar soch thodi grounded ho jaati hai.Tumhari dosti kisi highlight reel jaisi nahi hoti, balki un palon jaisi hoti hai jo bina camera ke bhi yaad reh jaate hain. Tum judge nahi karti, tum samajhne ka angle rakhti ho. Tumhare saath waqt guzarke apni baaton, apni choices, aur apni direction ko lekar ek naya confidence sa aa jaata hai. Aur shayad isi liye tum naturally alag ho, bina compare ke, bina replacement ke, bas apni jagah par poori. You don’t try to stand out, yet you always do. You listen with real attention, not to reply quickly, but to understand properly, and that makes people feel at ease without you trying. You stay grounded in how you react, choosing clarity over impulse, which naturally builds trust. Your honesty is quiet but solid. You don’t exaggerate or pretend, and that’s why your words carry weight. You understand emotions deeply, yet you handle them with care, never turning feelings into drama. You stay true to yourself in every situation, without comparing or performing. That individuality, calm, sincere, and steady, is what makes your presence feel real and lasting. Tumhari khas baat yahi hai ki tum impress karne ki koshish nahi karti… phir bhi tumhara impact reh jaata hai. Aur jo log naturally yaad reh jaayein, unka koi alternative nahi hota and i am so glad to get you as my friend.
+
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold border-b border-[#a2a9b1] mb-2">6.4 Why you wait so long?</h4>
+                        <p class="text-sm mb-4">
+                           Waiting is the best part of any story, anticipation makes every moment more meaningful. When you truly love someone or something , you can wait for them without expectations or conditions. If we start expecting then it will be no longer as love , it will become trade. Love always born form without expectation. In love there is no more or less. That's how love works. Love is like a dharma, a duty to care, to do good, and to never think bad, no matter the situation.  Have you ever though why your parents don't ask anything for you , if they do, they do it , they wanted the thing for you, to see you happy. Give there  all to make you happy & give you comfort . You may have seen your family wait for you for dinner. Because they love you so they wait for you.  Your friend wait for you because the love you. Even Lord Krishna had to wait for Radha because krishna love radha . Waiting teaches restraint, faith, and humility. Waiting, for me, has always felt natural. Some moments don’t need to be rushed, they make more sense when you let them arrive on their own. I’ve learned that when you slow down, you notice more, you understand better, and you don’t miss what actually matters.
+                        </p>
+
+                        <h4 class="font-bold border-b border-[#a2a9b1] mb-2">6.5 One day you will forget me.</h4>
+                        <p class="text-sm mb-4">
+                           Nahi yaar… main tumhe kaise bhool sakta hoon. Tum to mujhe yaad ho chuke ho. Sach kahun toh tum woh insaan ho jo life mein aakar sirf reh nahi jaate, balki kuch na kuch badal hi dete ho. Tumhari baatein, tumhari hasi, aur tumhara cheezon ko samajhne ka tareeka… yeh sab tumhari strength hai, aur yeh strength sirf tum mai hi hai. Kabhi kabhi toh lagta hai ki jitni bhi confusion, stress ya tension hoti hai, tumse baat karke woh thodi halki si ho jaati hai. Tumhari presence, chahe message mein ho ya baat cheet mein, ek ajeeb si simplicity aur comfort le aati hai. Aur haan, ek baat aur… jaise tumne mujhe support diya hai, waise hi main bhi chahta hoon ki kabhi tumhe kuch chahiye ho, koi sunne wala ho, ya tumhare din ko thoda halka karne wala ho, toh main bhi utna hi present rahun. Aur main genuinely tumhare liye woh support banna chahta hoon.I am always with you. Aur jab koi insaan itna comfort de jaaye, itni positivity de jaaye, toh usse bhoolna koi practical baat nahi hoti. Kuch log life mein place lete hain, par tumne place nahi li tumne ek impact chhoda hai. Impact wahi hota hai jo dil aur dimaag dono ko touch kare, aur phir chahe waqt badal jaaye ya situation, woh impact jaata nahi. Isliye agar tum phir se poochho ki main tumhe bhool jaaunga, toh jawab hamesha ek hi rahega: tum sirf yaad nahi, ek ehsaas ban chuki ho. Aur ehsaas kabhi khatam nahi hote… woh saath chalte rehte hain. Aur shayad isi ehsaas ki wajah se main tumhe is tarah dekhta hoon. Tum waqai ek strong insaan ho, par tum apni strength kabhi dikhati nahi. Tum apne achhe pal share karti ho, par apni mehnat, apni struggle, apni thakaan ko chup chaap sambhaal leti ho. Tum mushkil cheezon ko itni aasani se handle kar leti ho ki saamne wale ko kabhi andaaza hi nahi hota ki tumne andar hi andar kitna socha, kitna jhela. Tum apne sawaalon se khud ladti ho, apne doubts ko khud hi samajhne ki koshish karti ho. OrpPhir bhi, jab tum kisi se milte ho tumhara focus hamesha doosron par hota hai, ki kaise saamne wala thoda better feel kare, thoda acha mehsoos kare. Tum chahti ho ki baaki sab khush rahein, chahe uske liye tumhe apni baat thodi der ke liye side mein rakhni pade. Aur chahe time kaisa bhi ho, tum apni muskaan saath rakhti ho taki log samajh hi nahi paate ki tum andar kya carry kar rahi ho. Ye koi chhoti baat nahi hai. Ye ek bahut badi strength hai & Apart from how you look, how you talk, how you meet people, or what you do, what truly defines you is your heart. For me, I know you not by appearances or actions, but by the way your heart works. It’s a heart that feels deeply without making noise, that gives without keeping count, and that understands without needing explanation. Your heart chooses kindness even when it would be easier not to, and care even when no one is watching. It carries empathy, honesty, and quiet courage in equal measure. That’s what makes you rare. That’s what makes you you. This theory fits you in a very simple, real way. You don’t walk into someone’s life trying to change anything. You don’t give big speeches or dramatic advice. You just show up as you are. And somehow, that’s enough. Being around you makes things feel easier to think about, easier to deal with. People don’t suddenly have all the answers, but they feel calmer, more sure of themselves. They feel like they don’t need to pretend. &That’s exactly what the Marigold Theory talks about. You’re the kind of presence that quietly helps things grow. You try make there foundation more strong Not by pushing but by creating a space where growth feels natural. Conversations around you feel lighter, minds feel clearer, and people feel a little more like themselves. You don’t try to be that person. You just are. And that’s why the theory blends with you so effortlessly. 
+                        </p>
+
+                        <h4 class="font-bold border-b border-[#a2a9b1] mb-2">6.6 The Promise</h4>
+                        <p class="text-sm mb-4"> I’m promising you something simple but honest: I will never change. Whether you’re 21, 40, 60, or 80, I still want to see that same warm smile brightening your face. And if life ever gives me even the smallest chance to bring that smile back on a tough day, I’ll use that chance with all my heart. I’ll always be there for you. If life ever becomes heavy, if the world ever feels overwhelming, I hope you remember that you don’t have to go through everything alone. If I could, I would swap your bad days with my good ones, your rough time with my calm time, your boring moments with my exciting ones, your confusion with my clarity, your tired evenings with my peaceful ones, and your worries with my strength just so your journey feels a little lighter.I want to hold your tired hand , take does sadness, tieredness & handed my energy,fun. And whenever you need help, support, or simply a steady presence beside you, I’ll be there without hesitation. I’ll share your dreams, remind you of the strength you sometimes forget you have, celebrate every quiet victory, and walk with you toward every hope you carry in your heart. You’ll never have to face your challenges alone. I’ll be the calm beside your storm, the voice that lifts you up, and the person who chooses you again and again. People like you carry a softness and honesty that the world doesn’t always protect, and all I want is for life to treat you gently. I’ll cheer for you when you rise, stand by you when you’re unsure, and remind you of your worth when you forget it yourself. You will always have someone who wants to see you win, someone who wants your days to feel lighter.
+                        </p>
+                        
+                        <div class="border border-[#a2a9b1] bg-[#f8f9fa] p-4 mt-6">
+                            <p class="text-center italic text-sm">
+                                At the end of everything, theres only one truth: Im grateful you exist. I will always pray for your happiness first. Thank you for being someone worth admiring, someone worth waiting for, someone who unknowingly made the world softer. Once again, Happy Birthday. You deserve every gentle, peaceful, beautiful thing in this world.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        buttonText: "See Final Surprise",
+        callback: () => { cards[6].isLocked = false; }
+    },
+];
+
+function unlockCurrentCard() {
+    cards[currentCardIndex].isLocked = false;
+    const button = document.getElementById('next-button');
+    if (button) {
+        button.disabled = false;
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+function renderDesktopWiki() {
+    const container = document.getElementById('wiki-sections-container');
+    container.innerHTML = ''; 
+    cards.forEach((card, index) => {
+        if (card.desktopTitle === null) return;
+
+        const h2 = document.createElement('h2');
+        h2.id = `section-${index}`;
+        h2.className = "mw-headline";
+        h2.innerHTML = `${card.desktopTitle} <span class="text-sm font-normal ml-2">[<a href="#" class="text-[#0645ad]">edit</a>]</span>`;
+        
+        const div = document.createElement('div');
+        div.className = "mt-4 mb-8 text-[#202122]";
+        div.innerHTML = card.wikiHtml;
+
+        container.appendChild(h2);
+        container.appendChild(div);
+    });
+
+    setTimeout(() => {
+        initializeTicTacToe();
+        initializeWordCard();
+    }, 100);
+}
+
+function renderCard(index) {
+    const isDesktop = window.innerWidth >= 1024;
+
+    if (isDesktop) {
+        if(document.getElementById('wiki-sections-container').children.length === 0) {
+            renderDesktopWiki();
+        }
+    } else {
+        const contentDiv = document.getElementById('card-content');
+        const button = document.getElementById('next-button');
+        const mainCard = document.getElementById('main-card');
+        const card = cards[index];
+
+        mainCard.style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('card-title-header').textContent = card.title;
+            contentDiv.innerHTML = card.mobileHtml;
+            button.textContent = card.buttonText;
+            button.onclick = () => handleNext(index);
+            
+            if (card.callback) card.callback();
+            
+            if (card.isLocked) {
+                button.disabled = true;
+                button.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            mainCard.style.opacity = '1';
+        }, 300);
+    }
+}
+
+function handleNext(currentIndex) {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < cards.length) {
+        currentCardIndex = nextIndex;
+        renderCard(currentCardIndex);
+    } else {
+        window.finalShowdown();
+    }
+}
+
+function initializeTicTacToe() {
+    const grid = document.getElementById('tictactoe-grid');
+    if(!grid) return; 
+    
+    const status = document.getElementById('game-status');
+    const message = document.getElementById('card-msg-1');
+    const restartBtn = document.getElementById('restart-game-btn');
+    
+    if(restartBtn) restartBtn.classList.add('hidden');
+    if(message) message.classList.add('hidden');
+    if(status) status.innerHTML = "Your move";
+
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let gameActive = true;
+    const winningConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
+    ];
+
+    const handleCellPlayed = (clickedCell, clickedCellIndex) => {
+        board[clickedCellIndex] = "X";
+        clickedCell.innerHTML = 'X';
+    };
+
+    const handleResultValidation = () => {
+        let roundWon = false;
+        let winningPlayer = '';
+        
+        for (let i = 0; i < winningConditions.length; i++) {
+            const winCondition = winningConditions[i];
+            let a = board[winCondition[0]];
+            let b = board[winCondition[1]];
+            let c = board[winCondition[2]];
+            if (a === '' || b === '' || c === '') continue;
+            if (a === b && b === c) {
+                roundWon = true; 
+                winningPlayer = a;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            gameActive = false;
+            if (winningPlayer === 'X') {
+                status.innerHTML = `You Win!`;
+                if(message) message.classList.remove('hidden');
+                if (window.innerWidth < 1024) unlockCurrentCard();
+            } else {
+                status.innerHTML = `You Lost! Restarting...`;
+                setTimeout(initializeTicTacToe, 1500); 
+            }
+            return true;
+        }
+
+        if (!board.includes("")) {
+            status.innerHTML = `It's a Draw! Restarting...`;
+            gameActive = false;
+            setTimeout(initializeTicTacToe, 1500);
+            return true;
+        }
+        
+        return false;
+    };
+
+    const handleCellClick = (e) => {
+        const clickedCell = e.target;
+        const clickedCellIndex = parseInt(clickedCell.dataset.index);
+        if (board[clickedCellIndex] !== "" || !gameActive) return;
+        handleCellPlayed(clickedCell, clickedCellIndex);
+        if (!handleResultValidation()) {
+            setTimeout(handleAIClick, 500);
+        }
+    };
+    
+    const handleAIClick = () => {
+        if (!gameActive) return;
+        let move = -1;
+        let emptyIndices = board.map((val, idx) => val === "" ? idx : -1).filter(idx => idx !== -1);
+        if (emptyIndices.length > 0) move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+
+        if (move !== -1 && board[move] === "") {
+            const cell = document.querySelector(`.cell[data-index="${move}"]`);
+            board[move] = "O";
+            cell.innerHTML = 'O';
+            cell.classList.add('O'); 
+            handleResultValidation();
+        }
+    }
+
+    grid.querySelectorAll('.cell').forEach(cell => {
+        cell.innerHTML = "";
+        cell.classList.remove('O');
+        cell.replaceWith(cell.cloneNode(true)); 
+    });
+    
+    document.querySelectorAll('#tictactoe-grid .cell').forEach(cell => {
+         cell.addEventListener('click', handleCellClick, { once: true });
+    });
+}
+
+function initializeWordCard() {
+    window.chooseWord = (word) => {
+        const status = document.getElementById('word-status');
+        if(status) {
+            status.textContent = `You chose '${word}'. A beautiful choice, just like you.`;
+            status.classList.remove('hidden');
+        }
+        if (window.innerWidth < 1024) unlockCurrentCard();
+    };
+}
+
+window.finalShowdown = function() {
+    clearInterval(symbolInterval);
+    document.querySelectorAll('.float-symbol').forEach(el => el.remove());
+
+    document.getElementById('mobile-view-wrapper').classList.add('hidden');
+    document.getElementById('desktop-wiki-view').classList.add('hidden');
+    
+    document.body.style.transition = 'background-color 1.5s ease';
+    document.body.style.backgroundColor = '#000000'; 
+    
+    setTimeout(() => {
+        const finalDisplayElements = document.getElementById('final-display-elements');
+        finalDisplayElements.classList.remove('hidden');
+        setTimeout(() => {
+            finalDisplayElements.style.opacity = '1';
+        }, 100); 
+        const fireworksCanvas = document.getElementById('fireworks-canvas');
+        fireworksCanvas.classList.remove('hidden');
+        resizeCanvas();
+        running = true;
+        setTimeout(() => { loop(); }, 1500); 
+    }, 1000); 
+}
+
+function resizeCanvas() {
+    const fireworksCanvas = document.getElementById('fireworks-canvas');
+    fireworksCanvas.width = window.innerWidth;
+    fireworksCanvas.height = window.innerHeight;
+}
+function Particle(x, y, color) {
+    this.x = x; this.y = y; this.color = color;
+    this.velocity = { x: Math.random() * 6 - 3, y: Math.random() * 6 - 3 };
+    this.alpha = 1; this.friction = 0.98; this.gravity = 0.08;
+    this.radius = Math.random() * 3 + 1;
+}
+Particle.prototype.update = function() {
+    this.velocity.x *= this.friction; this.velocity.y *= this.friction;
+    this.velocity.y += this.gravity; this.x += this.velocity.x;
+    this.y += this.velocity.y; this.alpha -= 0.015;
+    if (this.alpha < 0) this.alpha = 0;
+}
+Particle.prototype.draw = function() {
+    const ctx = document.getElementById('fireworks-canvas').getContext('2d');
+    ctx.save(); ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.color; ctx.globalAlpha = this.alpha;
+    ctx.fill(); ctx.restore();
+}
+function createFirework(x, y, color) {
+    for (let i = 0; i < 60; i++) { particles.push(new Particle(x, y, color)); }
+}
+let particles = [];
+let running = false;
+function loop() {
+    if (!running) return;
+    const fireworksCanvas = document.getElementById('fireworks-canvas');
+    const ctx = fireworksCanvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'; 
+    ctx.fillRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i]; p.update(); p.draw();
+        if (p.alpha <= 0 || p.y > fireworksCanvas.height) particles.splice(i, 1);
+    }
+    if (particles.length < 500 && Math.random() < 0.06) { 
+        const x = Math.random() * fireworksCanvas.width;
+        const y = Math.random() * fireworksCanvas.height * 0.7;
+        const color = `hsl(${Math.random() * 360}, 100%, 65%)`;
+        createFirework(x, y, color);
+    }
+    requestAnimationFrame(loop);
+}
+
+let areNavsOpen = false;
+const navPanels = {
+    top: document.getElementById('topNav'),
+    bottom: document.getElementById('bottomNav'),
+    left: document.getElementById('leftNav'),
+    right: document.getElementById('rightNav')
+};
+const navToggle = document.getElementById('navToggle');
+const navToggleIcon = document.getElementById('navToggleIcon');
+const navToggleX = document.getElementById('navToggleX');
+
+function openAllNavs() {
+    navPanels.top.classList.remove('-translate-y-full');
+    navPanels.bottom.classList.remove('translate-y-full');
+    navPanels.left.classList.remove('-translate-x-full');
+    navPanels.right.classList.remove('translate-x-full');
+    document.body.classList.add('navs-open');
+    navToggleIcon.classList.add('hidden');
+    navToggleX.classList.remove('hidden');
+    areNavsOpen = true;
+}
+window.closeAllNavs = function() {
+    navPanels.top.classList.add('-translate-y-full');
+    navPanels.bottom.classList.add('translate-y-full');
+    navPanels.left.classList.add('-translate-x-full');
+    navPanels.right.classList.add('translate-x-full');
+    document.body.classList.remove('navs-open');
+    navToggleIcon.classList.remove('hidden');
+    navToggleX.classList.add('hidden');
+    areNavsOpen = false;
+}
+function toggleAllNavs(e) {
+    if (e) e.stopPropagation(); 
+    if (areNavsOpen) window.closeAllNavs(); else openAllNavs();
+}
+
+function startFloatingSymbols() {
+    if (symbolInterval) return;
+    
+    const symbols = ['*', '†', '‡', '§', '✦', '✧', '•', '·', '+'];
+    const createSymbol = () => {
+        const symbol = document.createElement('div');
+        symbol.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
+        symbol.classList.add('float-symbol');
+        symbol.style.left = `${Math.random() * 100}vw`;
+        const duration = 10 + Math.random() * 5; 
+        symbol.style.animationDuration = `${duration}s`;
+        document.body.appendChild(symbol);
+        setTimeout(() => { symbol.remove(); }, duration * 1000); 
+    };
+    symbolInterval = setInterval(createSymbol, 800);
+}
+
+function stopFloatingSymbols() {
+    if (symbolInterval) {
+        clearInterval(symbolInterval);
+        symbolInterval = null;
+    }
+    document.querySelectorAll('.float-symbol').forEach(el => el.remove());
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth < 1024) {
+        startFloatingSymbols();
+        renderCard(currentCardIndex);
+    } else {
+        renderDesktopWiki();
+    }
+
+    navToggle.addEventListener('click', toggleAllNavs);
+
+    document.addEventListener('click', (e) => {
+        if (areNavsOpen && !e.target.closest('.nav-panel') && !e.target.closest('#navToggle')) {
+            window.closeAllNavs();
+        }
+    });
+    
+    window.addEventListener('resize', () => {
+        const isDesktop = window.innerWidth >= 1024;
+        
+        if (isDesktop) {
+            stopFloatingSymbols();
+            if(document.getElementById('wiki-sections-container').children.length === 0) {
+                renderDesktopWiki();
+            }
+        } else {
+            startFloatingSymbols();
+            renderCard(currentCardIndex);
+        }
+    });
+});
+</script>
+</body>
+</html>

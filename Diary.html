@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Diary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Gochi+Hand&family=Great+Vibes&family=Merriweather:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+                serif: ['Merriweather', 'serif'],
+                display: ['Great Vibes', 'cursive'],
+                caveat: ['Caveat', 'cursive'],
+                gochi: ['Gochi Hand', 'cursive'],
+                pacifico: ['Pacifico', 'cursive'],
+              },
+              colors: {
+                  'wood-dark': '#4a2e1d',
+                  'wood-light': '#6a4a3a',
+                  'card-red': '#a30023',
+                  'card-red-dark': '#7a0019',
+              }
+            }
+          }
+        }
+    </script>
+
+    <style>
+        @media (min-width: 769px) {
+            * {
+                cursor: none !important;
+            }
+        }
+
+        body {
+            background: radial-gradient(circle at center, #f5f0e3 0%, #e0d8c7 50%, #d1c8b3 100%);
+            overflow-x: hidden;
+        }
+        .title-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .book-container {
+            perspective: 2500px;
+        }
+        
+        .page {
+            width: 50%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .page-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
+        }
+        .page-front {
+            transform: rotateY(0deg);
+            z-index: 2;
+            background-color: #fffaf0;
+        }
+        .page-back {
+            transform: rotateY(180deg);
+            z-index: 1;
+            background-color: #fffaf0;
+        }
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+        .diary-text {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem; 
+            line-height: 1.7rem;
+            color: #4a4a4a;
+            background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+            background-size: 100% 1.7rem;
+            background-position: 0 0.5rem;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 769px) {
+            .book {
+                width: 600px;
+                height: 550px;
+                max-width: 1000px;
+                position: relative;
+                transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            .book-container.closed .book {
+                width: 300px;
+            }
+            
+            #nav-buttons {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                transform: translateY(-50%);
+                display: flex;
+                justify-content: space-between;
+                padding: 0 4rem;
+                pointer-events: none;
+                z-index: 40;
+            }
+            #nav-buttons button {
+                pointer-events: auto;
+                background: transparent;
+                color: #4a2e1d;
+                font-size: 4rem;
+                padding: 0;
+                box-shadow: none;
+                transition: transform 0.2s ease;
+            }
+            #nav-buttons button:hover {
+                transform: scale(1.2);
+                background: transparent;
+                color: #6a4a3a;
+            }
+            #nav-buttons button:disabled {
+                opacity: 0.2;
+                cursor: not-allowed;
+            }
+            .btn-text {
+                display: none; 
+            }
+            .btn-arrow {
+                display: inline;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .book-container.closed .book {
+                width: 80vw;
+                height: 38vh;
+            }
+            .book {
+                width: 90vw;
+                height: 40vh;
+                position: relative;
+                transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            
+            #nav-buttons {
+                position: relative;
+                margin-top: 1.5rem;
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                width: 100%;
+                z-index: 40;
+            }
+            #nav-buttons button {
+                background-color: #a30023;
+                color: white;
+                padding: 0.75rem 2rem;
+                border-radius: 9999px;
+                font-weight: 600;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                transition: background-color 0.2s;
+            }
+            #nav-buttons button:hover {
+                background-color: #7a0019;
+            }
+            .btn-text {
+                display: inline;
+            }
+            .btn-arrow {
+                display: none;
+            }
+            
+            .cursor-dot, .cursor-outline {
+                display: none !important;
+            }
+        }
+
+        .book-container.closed .page:not(:first-child) {
+            display: none; 
+        }
+        
+        .book-container.closed .page:first-child {
+            width: 100%; 
+        }
+        
+        .book-container.closed ~ #nav-buttons {
+            display: none !important;
+        }
+
+        .nav-panel, #navToggleIcon, #navToggleX {
+            transition: all 0.3s ease-in-out;
+        }
+        .nav-panel {
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-panel::-webkit-scrollbar {
+            display: none;  
+        }
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+        
+        #desktopNav::-webkit-scrollbar {
+            width: 6px;
+            display: block;
+        }
+        #desktopNav::-webkit-scrollbar-track {
+            background: #3e2617; 
+        }
+        #desktopNav::-webkit-scrollbar-thumb {
+            background: #855c46; 
+            border-radius: 3px;
+        }
+        #desktopNav::-webkit-scrollbar-thumb:hover {
+            background: #a37359; 
+        }
+
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #a30023; 
+            box-shadow: 0 0 5px rgba(163, 0, 35, 0.5);
+        }
+
+        .cursor-outline {
+            width: 35px;
+            height: 35px;
+            border: 1px solid rgba(74, 46, 29, 0.5); 
+        }
+
+        body.hovering .cursor-dot {
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: #7a0019;
+        }
+
+        body.hovering .cursor-outline {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(163, 0, 35, 0.1);
+            border-color: transparent;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <audio id="bgMusic" loop>
+        <source src="Gulbahar.mp3" type="audio/mpeg">
+    </audio>
+    
+    <button id="navToggle" class="fixed top-6 left-6 z-[70] p-2 bg-[#4a2e1d] text-white rounded-full shadow-lg hover:bg-[#6a4a3a] focus:outline-none focus:ring-2 focus:ring-[#6a4a3a] focus:ring-offset-2">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    
+    <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-[#4a2e1d] text-yellow-100 shadow-md flex items-center justify-center space-x-2 -translate-y-full md:hidden">
+        <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Message</a>
+        <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Letter</a>
+        <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Music</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-[#4a2e1d] text-yellow-100 shadow-md flex items-center justify-center space-x-2 translate-y-full md:hidden">
+        <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-[#4a2e1d] text-yellow-100 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20 md:hidden">
+        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Home</a>
+        <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Cake</a>
+        <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">21_Door</a>
+        <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Heaven</a>
+        <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Diary</a>
+        <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Anatomy</a>
+        <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Box</a>
+        <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Special</a>
+        <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Color</a>
+        <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">You</a>
+        <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Teacher</a>
+        <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Universe</a>
+        <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">River</a>
+        <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Mountain</a>
+    </nav>
+    
+    <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 bg-[#4a2e1d] text-yellow-100 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20 md:hidden">
+        <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Periodic Table</a>
+        <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3A] transition-colors duration-200 festive-text">Calendar</a>
+        <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Perspective</a>
+        <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Butterfly</a>
+        <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Room</a>
+        <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Radio</a>
+        <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text">Food</a>
+    </nav>
+
+    <nav id="desktopNav" class="nav-panel hidden md:flex fixed left-0 top-0 bottom-0 z-[60] w-80 bg-[#4a2e1d] text-yellow-100 shadow-2xl flex-col pt-20 -translate-x-full border-r border-[#6a4a3a]">
+        <div class="px-6 pb-4">
+            <h2 class="text-2xl font-display text-yellow-200 border-b border-[#6a4a3a] pb-2 mb-2">Juhi's World</h2>
+        </div>
+        <div class="grid grid-cols-2 gap-2 px-4 pb-10 overflow-y-auto">
+            <a href="index.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">21_Door</a>
+            <a href="chat.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Diary</a>
+            <a href="anatomy.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Box</a>
+            <a href="Special.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Color</a>
+            <a href="you.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Mountain</a>
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Cartoon</a>
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Periodic Table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3A] transition-colors duration-200 festive-text text-center">Calendar</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Food</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Music</a>
+            <a href="letter.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Letter</a>
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#6a4a3a] transition-colors duration-200 festive-text text-center">Message</a>
+        </div>
+    </nav>
+
+
+    <main id="mainContent" class="relative flex flex-col items-center justify-center min-h-screen p-4 w-full max-w-7xl mx-auto">
+        
+        <h1 id="main-title" class="text-5xl md:text-6xl font-display text-[#4a2e1d] mb-6 md:mb-10 title-shadow order-1 md:hidden">Happy Birthday!</h1>
+
+        <div class="hidden md:block absolute bottom-[10%] left-10 lg:left-20 z-0 w-80 h-96 pointer-events-none select-none opacity-90">
+             <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-2xl w-full h-full">
+                <defs>
+                      <linearGradient id="petalGradTop" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#c41e3a"/>
+                        <stop offset="100%" stop-color="#8a0019"/>
+                    </linearGradient>
+                </defs>
+                 
+                 <g transform="translate(0, 0)">
+                    <ellipse cx="150" cy="240" rx="60" ry="15" fill="#000" fill-opacity="0.2" filter="blur(6px)"/>
+                    
+                    <path d="M150 240 C 150 240, 140 180, 155 140" stroke="#2d5a27" stroke-width="5" stroke-linecap="round"/>
+                    
+                    <g fill="#3a7a34" stroke="#1e3a1a" stroke-width="0.5">
+                        <path d="M152 200 C 180 190, 200 160, 210 190 C 190 210, 160 210, 152 200 Z" />
+                        <path d="M152 200 C 170 195, 210 190" stroke="#7ab575" stroke-width="1" fill="none"/> 
+                        
+                        <path d="M148 220 C 110 210, 90 180, 100 210 C 120 230, 140 230, 148 220 Z" />
+                        <path d="M148 220 C 130 215, 100 210" stroke="#7ab575" stroke-width="1" fill="none"/> 
+                    </g>
+                    
+                    <path d="M154 180 L 160 175 L 154 185" fill="#2d5a27"/>
+
+                    <g transform="translate(115, 50) scale(0.8)">
+                        <path d="M30 90 C 10 60, 40 20, 80 20 C 120 20, 150 60, 130 90 C 110 120, 50 120, 30 90 Z" fill="#600010" />
+                        <path d="M20 70 C 10 100, 50 130, 80 130 C 110 130, 150 100, 140 70" fill="#7a0019" opacity="0.9"/>
+
+                        <path d="M40 80 C 30 50, 60 30, 80 40 C 100 30, 130 50, 120 80 C 110 100, 50 100, 40 80" fill="#8a0019"/>
+                        <path d="M50 60 C 40 80, 70 110, 90 110 C 110 110, 120 80, 110 60" fill="#a30023"/>
+                        
+                        <path d="M60 60 C 50 40, 80 30, 100 40 C 110 50, 100 80, 80 90 C 60 80, 70 70, 60 60" fill="url(#petalGradTop)"/>
+                        <path d="M75 55 C 85 45, 95 55, 90 65 C 85 75, 75 65, 75 55" fill="#e62e4d" opacity="0.8"/>
+                        
+                        <path d="M45 85 Q 55 95, 75 95" stroke="#d44d5c" stroke-width="2" fill="none" opacity="0.3" stroke-linecap="round"/>
+                        <path d="M115 85 Q 105 95, 85 95" stroke="#d44d5c" stroke-width="2" fill="none" opacity="0.3" stroke-linecap="round"/>
+                        <path d="M80 40 Q 90 35, 100 45" stroke="#ff8ba0" stroke-width="1" fill="none" opacity="0.4"/>
+                    </g>
+                 </g>
+             </svg>
+        </div>
+
+        <div class="book-container closed order-2 z-30">
+            <div class="book">
+                <div class="page" id="book-cover">
+                    <div class="page-side page-front bg-gradient-to-br from-[#7a0019] to-[#a30023] cursor-pointer">
+                        <div class="flex flex-col items-center justify-center h-full text-white text-center">
+                            <span class="text-5xl font-display text-yellow-100" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3)">Your Memories</span>
+                            <span class="text-lg mt-4 text-yellow-200 opacity-75">(Click to open)</span>
+                        </div>
+                    </div>
+                    <div class="page-side page-back">
+                    </div>
+                </div>
+
+                <div class="page">
+                    <div class="page-side page-front">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0"> ☺️Hello Juhi😇</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Intro.jpg" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Hello+Juhi'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                            <div class="block md:hidden">
+                                <p> Some feelings are better written than spoken.</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <p> This diary is not a collection of days, it’s a reflection of you. Every page holds pieces of your thoughts, your discipline, your care, and the quiet way you keep moving forward. It speaks of dreams you protect silently, of responsibilities you carry without display, of moments where you chose patience, clarity, and kindness even when no one was watching. This diary exists because your life is not loud, but it is deeply intentional. And if someone ever read between these lines, they would understand not just what you did, but who you are, thoughtful, resilient, gentle, and endlessly real.</p>
+                                <p> So here begins a little story, inspired by your kindness.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-side page-back">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0">Family</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Sis.png" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Family'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                             <div class="block md:hidden">
+                                <p>Two amazing people and one unbreakable bond.</p>
+                                <p>The smiles say it all — love, laughter, and pure happiness.</p>
+                             </div>
+                             <div class="hidden md:block">
+                                <p>With your sister, you don’t need to explain yourself. You share comfort, quiet jokes, and understanding that comes without words. You look out for her instinctively, the way you always do, turning ordinary moments into something safe and familiar. Whatever the day brings, this bond stays steady, built on care, trust, and the kind of love that doesn’t ask for attention.</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page">
+                    <div class="page-side page-front">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0">Achievement</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Achivement.jpg" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Achievement'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                            <div class="block md:hidden">
+                                <p>Sometimes it’s not about the trophies or medals, but the journey behind them. Your achievements are proof that hard work pays off.</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <p>Your achievements come from consistency, discipline, and the quiet way you keep showing up. Each one carries hours of effort that most people never see. You never let success change your pace or your values. You treat accomplishments as milestones, not destinations. What makes them meaningful isn’t recognition, it’s the person you became while earning them.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-side page-back">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0">Just a Normal Day</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Angry.png" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Normal+Day'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                            <div class="block md:hidden">
+                                <p>Sometimes you get a little angry — and that’s okay. It just means you care a little too much, and that’s what makes you real.</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <p>When anger reaches you, it doesn’t take over. You hold it. You retreat into yourself, weighing every thought before letting it surface. You feel things deeply, but you refuse to let emotion turn into harm. There is restraint in you even then, a choice to stay composed, to protect relationships, to keep dignity intact. Your anger is not loud, but it is powerful, because it shows how much you care and how carefully you choose who feels the impact of your emotions.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page">
+                    <div class="page-side page-front">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0">Hazy Memories</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Hazy.jpg" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Hazy+Memory'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                            <div class="block md:hidden">
+                                <p>Blurry photo, but still full of meaning. Because real moments aren’t always picture-perfect, they’re felt.</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <p>This is how you look when the world can’t quite define you. Slightly blurred, not because you are unclear, but because you hold more than one version of yourself at once. There are thoughts behind the softness, stories behind the calm. The haze doesn’t hide you, it protects you. It lets people see only what you choose, while the rest stays yours, untouched, quietly beautiful.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-side page-back">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0">That Smile</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Smile.png" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Smile'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                            <div class="block md:hidden">
+                                <p>Some smiles don’t just show happiness, they create it. Yours does exactly that, every single time.</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <p>Your smile isn’t practiced, and that’s why it stays. It appears without warning and changes the mood of a room instantly. It carries reassurance, ease, and a kind of honesty that feels rare. Even when you’re holding more than you show, your smile offers comfort to others first. It’s not about hiding what you feel, it’s about choosing to give warmth anyway, and that choice makes it unforgettable.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="page">
+                    <div class="page-side page-front">
+                        <h3 class="text-lg font-bold font-serif text-gray-700 mb-2 flex-shrink-0">The Look</h3>
+                        <div class="w-full h-1/3 md:h-1/2 rounded-md mb-2 flex-shrink-0 relative">
+                            <img src="Eye.jpg" 
+                                 alt="Memory" 
+                                 class="w-full h-full object-cover rounded-md"
+                                 onerror="this.src='https://placehold.co/400x200/e2e8f0/9ca3af?text=Eyes'; this.onerror=null;">
+                        </div>
+                        <div class="diary-text" contenteditable="true">
+                            <div class="block md:hidden">
+                                <p>Eyes that hold stories, smiles, and a little mystery. They’re the kind you remember even after you look away.</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <p>TYour eyes don’t rush to speak, yet they say everything. They notice details most people miss, hold emotions you never announce, and reflect a depth that feels calm rather than heavy. There is honesty in them, an unguarded awareness that makes people feel seen without being examined. Even in silence, your eyes carry understanding, and once someone notices that, they rarely forget it..</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-side page-back">
+                        <div class="flex flex-col items-center justify-center h-full text-gray-700 text-center">
+                            <h3 class="text-5xl font-display text-[#4a2e1d] mb-2 title-shadow">Thank You!</h3>
+                            <div class="text-4xl text-red-500 mb-2 animate-pulse">❤️</div>
+                            <div class="text-base font-serif px-4 text-gray-600" contenteditable="true">
+                                <div class="block md:hidden">
+                                     <p>for all the little things you do that make a big difference in the lives of those around you.</p>
+                                </div>
+                                <div class="hidden md:block">
+                                     <p>for every small act of kindness, every listening ear, and all the little things you do that ripple out and make a massive difference in the lives of everyone around you. You are appreciated more than you know.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="nav-buttons" class="order-3">
+            <button id="prev-btn">
+                <span class="btn-text">&larr; Previous</span>
+                <span class="btn-arrow">&#10094;</span>
+            </button>
+            <button id="next-btn">
+                <span class="btn-text">Next &rarr;</span>
+                <span class="btn-arrow">&#10095;</span>
+            </button>
+        </div>
+
+        <div class="hidden md:block absolute bottom-[20%] right-5 lg:right-14 z-0 w-72 h-64 pointer-events-none select-none opacity-90">
+            <svg viewBox="0 0 350 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-2xl w-full h-full">
+                <defs>
+                    <linearGradient id="featherGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff8f0"/>
+                        <stop offset="50%" stop-color="#f2e6d5"/>
+                        <stop offset="100%" stop-color="#d6c6b0"/>
+                    </linearGradient>
+                    <linearGradient id="inkGrad" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stop-color="#000000"/>
+                          <stop offset="40%" stop-color="#1a1a1a"/>
+                          <stop offset="100%" stop-color="#2c2c2c"/>
+                    </linearGradient>
+                    <linearGradient id="glassGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="rgba(255,255,255,0.2)"/>
+                        <stop offset="20%" stop-color="rgba(255,255,255,0.1)"/>
+                        <stop offset="50%" stop-color="rgba(255,255,255,0.0)"/>
+                        <stop offset="90%" stop-color="rgba(255,255,255,0.3)"/>
+                        <stop offset="100%" stop-color="rgba(255,255,255,0.5)"/>
+                    </linearGradient>
+                </defs>
+
+                <g transform="translate(-20, 120) scale(1.3)">
+                      <ellipse cx="60" cy="110" rx="35" ry="8" fill="#000" fill-opacity="0.3" filter="blur(4px)"/>
+                      
+                      <path d="M30 100 C 30 100, 25 80, 25 60 L 95 60 C 95 80, 90 100, 90 100 Z" fill="#3a4a5a" opacity="0.3"/> 
+                      <path d="M25 60 C 25 40, 35 20, 60 20 C 85 20, 95 40, 95 60" fill="#e0e8f0" stroke="#a0b0c0" stroke-width="1" opacity="0.5"/> 
+                      
+                      <ellipse cx="60" cy="75" rx="28" ry="6" fill="url(#inkGrad)"/> 
+                      
+                      <path d="M25 60 L 25 100 C 25 110, 35 120, 60 120 C 85 120, 95 110, 95 100 L 95 60" fill="url(#glassGrad)" stroke="#a0b0c0" stroke-width="1"/>
+                      <ellipse cx="60" cy="60" rx="35" ry="8" stroke="#a0b0c0" stroke-width="2" fill="none"/>
+                      
+                      <rect x="35" y="65" width="50" height="30" rx="2" fill="#f5f0e3" stroke="#d6c6b0" stroke-width="0.5" transform="rotate(-2 60 80)"/>
+                      <text x="45" y="85" font-family="serif" font-size="10" fill="#2c1b10" transform="rotate(-2 60 80)">Ink</text>
+                </g>
+
+                <g transform="translate(60, 20) rotate(15)">
+                      <path d="M100 250 Q 80 180 50 100 C 40 70 60 40 80 20 C 70 50 90 150 100 250" fill="url(#featherGrad)" stroke="#d6c6b0" stroke-width="0.5"/>
+                      <path d="M100 250 Q 120 180 150 80 C 160 50 140 30 80 20 C 120 60 110 160 100 250" fill="url(#featherGrad)" stroke="#d6c6b0" stroke-width="0.5"/>
+                      <path d="M100 260 Q 100 150 80 20" stroke="#b0a08a" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      <path d="M100 260 L 96 280 L 104 280 Z" fill="#2c1b10"/>
+                      <path d="M100 260 L 100 280" stroke="#1a0f08" stroke-width="0.5"/>
+                </g>
+            </svg>
+        </div>
+
+    </main>
+
+    <script type="module">
+        let currentPageIndex = 0;
+        let pages;
+        let isDragging = false;
+        let dragPage = null;
+        let startX = 0;
+        
+        const audio = document.getElementById('bgMusic');
+        
+        function initAudio() {
+             if (window.innerWidth >= 769) {
+                audio.play().then(() => {
+                    document.removeEventListener('click', initAudio);
+                }).catch(err => {
+                    console.log("Audio play failed (waiting for interaction):", err);
+                });
+            }
+        }
+        
+        document.addEventListener('click', initAudio);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth < 769) {
+                audio.pause();
+            } else if (!audio.paused || audio.currentTime > 0) { 
+                audio.play().catch(e=>{}); 
+            }
+        });
+
+        function goNextPage() {
+            if (currentPageIndex >= pages.length) return;
+            
+            if (currentPageIndex > 0) {
+                pages[currentPageIndex - 1].style.zIndex = 0;
+            }
+
+            const page = pages[currentPageIndex];
+            page.classList.add('flipped');
+            page.style.transform = ''; 
+            
+            currentPageIndex++;
+            updateButtonStates();
+        }
+
+        function goPrevPage() {
+            if (currentPageIndex <= 0) return;
+
+            currentPageIndex--;
+            const page = pages[currentPageIndex];
+            page.classList.remove('flipped');
+            page.style.transform = ''; 
+            page.style.zIndex = pages.length - currentPageIndex; 
+            
+            updateButtonStates();
+        }
+        
+        function dragStart(e, page) {
+            let dragType = null;
+            if (page === pages[currentPageIndex] && currentPageIndex < pages.length) { 
+                dragType = 'next';
+            } else if (page === pages[currentPageIndex - 1]) { 
+                dragType = 'prev';
+            } else {
+                return; 
+            }
+            
+            e.preventDefault(); 
+            
+            isDragging = dragType;
+            dragPage = page;
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            
+            dragPage.style.transition = 'none'; 
+            dragPage.style.zIndex = pages.length + 1; 
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchmove', dragMove, { passive: false });
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            
+            e.preventDefault(); 
+
+            let currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            let diffX = currentX - startX;
+
+            if (isDragging === 'next') {
+                let pullAmount = -diffX; 
+                let pageClientWidth = dragPage.clientWidth;
+                if (pageClientWidth === 0) return;
+                
+                let percentage = Math.max(0, Math.min(1, pullAmount / (pageClientWidth * 1.2)));
+                let angle = Math.max(-180, Math.min(0, percentage * -180));
+                dragPage.style.transform = `rotateY(${angle}deg)`;
+
+            } else if (isDragging === 'prev') {
+                let pushAmount = diffX;
+                let pageClientWidth = dragPage.clientWidth;
+                if (pageClientWidth === 0) return;
+                
+                let percentage = Math.max(0, Math.min(1, pushAmount / (pageClientWidth * 1.2)));
+                let angle = Math.max(-180, Math.min(0, -180 + (percentage * 180)));
+                dragPage.style.transform = `rotateY(${angle}deg)`;
+            }
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+
+            dragPage.style.transition = ''; 
+
+            let currentX;
+            if (e.type.includes('touch')) {
+                currentX = e.changedTouches[0] ? e.changedTouches[0].clientX : startX;
+            } else {
+                currentX = e.clientX;
+            }
+            
+            let diffX = currentX - startX;
+            const threshold = dragPage.clientWidth / 3;
+
+            if (Math.abs(diffX) < 5) {
+                if (isDragging === 'next') {
+                    goNextPage();
+                } else if (isDragging === 'prev') {
+                    goPrevPage();
+                }
+                dragPage.style.transform = ''; 
+            } else {
+                if (isDragging === 'next') {
+                    if (-diffX > threshold) {
+                        goNextPage(); 
+                    } else {
+                        dragPage.style.transform = 'rotateY(0deg)'; 
+                        dragPage.style.zIndex = pages.length - currentPageIndex;
+                    }
+                } else if (isDragging === 'prev') {
+                    if (diffX > threshold) {
+                        goPrevPage(); 
+                    } else {
+                        dragPage.style.transform = 'rotateY(-180deg)'; 
+                        dragPage.style.zIndex = pages.length - (currentPageIndex - 1);
+                    }
+                }
+            }
+
+            isDragging = false;
+            dragPage = null;
+
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('touchend', dragEnd);
+        }
+
+        function initializeBookInteractions() {
+            pages = document.querySelectorAll('.page');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            pages.forEach((page, index) => {
+                page.style.zIndex = pages.length - index;
+                page.addEventListener('mousedown', (e) => dragStart(e, page));
+                page.addEventListener('touchstart', (e) => dragStart(e, page), { passive: false });
+            });
+
+            if (nextBtn) nextBtn.addEventListener('click', goNextPage);
+            if (prevBtn) prevBtn.addEventListener('click', goPrevPage);
+
+            updateButtonStates();
+        }
+
+        function updateButtonStates() {
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            if (!prevBtn || !nextBtn || !pages) return;
+            prevBtn.disabled = currentPageIndex === 0;
+            nextBtn.disabled = currentPageIndex === pages.length;
+            
+            if (window.innerWidth <= 768) {
+                prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+                nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const bookContainer = document.querySelector('.book-container');
+            const coverPage = document.getElementById('book-cover');
+            
+            function openBook() {
+                if (bookContainer.classList.contains('closed')) {
+                    bookContainer.classList.remove('closed');
+                    
+                    initializeBookInteractions(); 
+                    
+                    const nextBtn = document.getElementById('next-btn');
+                    if (nextBtn) {
+                        setTimeout(() => {
+                            nextBtn.click(); 
+                        }, 800);
+                    }
+                    coverPage.removeEventListener('click', openBook);
+                }
+            }
+            if (coverPage) {
+                coverPage.addEventListener('click', openBook);
+            }
+
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const desktopNav = document.getElementById('desktopNav'); 
+
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            const mainContent = document.getElementById('mainContent');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let areNavsOpen = false;
+
+            function openAllNavs() {
+                topNav.classList.remove('-translate-y-full');
+                bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full');
+                rightNav.classList.remove('translate-x-full');
+                
+                desktopNav.classList.remove('-translate-x-full');
+
+                navToggleIcon.classList.add('hidden');
+                navToggleX.classList.remove('hidden');
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                rightNav.classList.add('translate-x-full');
+
+                desktopNav.classList.add('-translate-x-full');
+
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                toggleAllNavs();
+            });
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+
+                    if (href.startsWith('#')) {
+                        e.preventDefault(); 
+                    }
+                    
+                    if (areNavsOpen) {
+                        closeAllNavs();
+                    }
+                });
+            });
+
+            mainContent.addEventListener('click', () => {
+                 if (areNavsOpen) {
+                     closeAllNavs();
+                 }
+            });
+            
+            const cursorDot = document.createElement('div');
+            cursorDot.classList.add('cursor-dot');
+            const cursorOutline = document.createElement('div');
+            cursorOutline.classList.add('cursor-outline');
+            document.body.appendChild(cursorDot);
+            document.body.appendChild(cursorOutline);
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let cursorX = 0;
+            let cursorY = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                cursorDot.style.left = `${mouseX}px`;
+                cursorDot.style.top = `${mouseY}px`;
+            });
+
+            function animateCursor() {
+                const speed = 0.2; 
+                
+                cursorX += (mouseX - cursorX) * speed;
+                cursorY += (mouseY - cursorY) * speed;
+                
+                cursorOutline.style.left = `${cursorX}px`;
+                cursorOutline.style.top = `${cursorY}px`;
+                
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+            
+            const interactiveElements = document.querySelectorAll('a, button, .page');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+
+            window.addEventListener('resize', updateButtonStates);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;600;800&family=Pacifico&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg: #f9f7f0;
+        --paper: #fffcf5;
+        --ink: #1a1a1a;
+        --ink-dim: #5c5c5c;
+        --line: #c4b59d;
+        --accent-rich: #800020; 
+        --accent-gold: #c5a059; 
+        
+        --radius: 2px;
+        --shadow-book: 0 50px 100px -20px rgba(0,0,0,0.8);
+        --spine-gradient: linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0) 100%);
+        
+        --speed:.3s ease-out;
+      }
+
+      @media (prefers-reduced-motion: reduce){
+        *{ animation:none !important; transition:none !important; }
+      }
+
+      html,body{
+        margin:0; padding:0; height:100%;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Cormorant Garamond', serif; 
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      .subtitle-the {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.85rem;
+          color: var(--accent-gold);
+          text-transform: uppercase;
+          letter-spacing: 4px;
+          margin: 0;
+          font-weight: 600;
+          text-align: center;
+      }
+      
+      h1{
+        font-family: 'Playfair Display', serif; 
+        font-size: 3.8rem; 
+        color: var(--accent-rich);
+        margin: 0;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+      
+      .menu-section-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 2.2rem;
+          color: var(--ink);
+          margin-top: 50px;
+          margin-bottom: 25px;
+          padding-bottom: 15px;
+          text-align: center;
+          font-weight: 700;
+          text-transform: uppercase;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+      
+      .menu-section-title::after {
+          content: '';
+          display: block;
+          width: 80px;
+          height: 15px;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 15 Q 65 15 75 10 T 100 10 L 100 12 Q 75 18 50 18 Q 25 18 0 12 L 0 10 Q 25 15 50 15 Z' fill='%23c5a059'/%3E%3Ccircle cx='50' cy='5' r='3' fill='%23800020'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: center;
+          margin-top: 10px;
+          opacity: 0.8;
+      }
+
+      .menu-item{
+        background: transparent;
+        border: none;
+        padding: 10px 0;
+        cursor:pointer;
+        display: block;
+        position: relative;
+        overflow: visible; 
+        margin-bottom: 15px;
+      }
+      
+      .menu-item:hover .dish-name {
+          color: var(--accent-rich);
+      }
+      
+      .menu-content-wrapper {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          position: relative;
+          z-index: 2;
+          width: 100%;
+      }
+      
+      .menu-content-wrapper::after {
+          content: "";
+          flex-grow: 1;
+          order: 2;
+          border-bottom: 1px dotted var(--line);
+          margin: 0 10px;
+          position: relative;
+          top: -4px;
+      }
+      
+      .dish-name{
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        margin:0;
+        order: 1;
+        color: var(--ink);
+        transition: color var(--speed);
+      }
+      
+      .indicator {
+        font-size: 1.2rem;
+        color: var(--accent-gold);
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 600;
+        order: 3;
+      }
+
+      .dish-tags{
+        font-family: 'Inter', sans-serif;
+        font-size: 0.7rem;
+        color: var(--ink-dim);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-style: italic;
+      }
+      
+      @media (max-width: 1023px) {
+          .wrap{
+            min-height:100dvh;
+            display:flex; flex-direction:column;
+          }
+
+          main{
+            background: #fffcf5;
+            border: 1px solid #e0dacc;
+            outline: 4px double var(--line);
+            outline-offset: -10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 50px 30px 60px;
+            max-width: 550px; 
+            width: 92%;
+            margin: 80px auto 50px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+          }
+
+          .menu-list{
+            display:flex;
+            flex-direction:column;
+            gap: 8px; /* Reduced from 15px */
+            margin-top: 15px; /* Reduced from 20px */
+          }
+          
+          /* Compact Dish Cards for Mobile */
+          .menu-item {
+              padding: 4px 0; /* Tight padding */
+              margin-bottom: 5px; /* Reduced margin */
+          }
+          
+          .dish-name {
+              font-size: 1.15rem; /* Smaller font for dish name */
+          }
+          
+          .menu-section-title {
+              font-size: 1.7rem; /* Smaller section title */
+              margin-top: 25px;
+              margin-bottom: 12px;
+          }
+
+          .main-title-wrapper {
+              margin-bottom: 40px;
+              padding-bottom: 15px;
+          }
+          
+          .main-title-wrapper .subtitle-the { display: block; }
+          .main-title-wrapper h1 { display: block; }
+
+          .nav-panel {
+              background: #fffcf5;
+              color: var(--ink);
+              border-color: var(--accent-gold);
+          }
+          /* Updated nav-link for mobile specific look - Increased size & padding */
+          .nav-link {
+              color: var(--ink);
+              font-family: 'Inter', sans-serif;
+              text-decoration: none;
+              display: block;
+              font-weight: 600; /* Bolder */
+              font-size: 1.15rem; /* Increased size */
+              padding-top: 0.25rem; 
+              padding-bottom: 0.25rem;
+          }
+          
+          #mainContent {
+              position: absolute;
+              inset: 0;
+              min-height: 100vh;
+              overflow-y: auto; 
+              padding-top: 5rem;
+              background-color: #f2efe6; 
+          }
+          
+          .desktop-only { display: none !important; }
+          .bookmark, .corner-ornament, .stamp, .leaf-shadow, .spine-texture { display: none !important; }
+      }
+
+      @media (min-width: 1024px) {
+          body {
+              background-color: #262220; 
+              background-image: 
+                  radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 40%),
+                  url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23332d2a' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden; 
+              /* Custom Butter Knife Cursor */
+              cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cfilter id='shadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='1' dy='1' stdDeviation='1' flood-opacity='0.4'/%3E%3C/filter%3E%3Cpath d='M2 2 C 1 4, 4 8, 10 14 L 18 22 L 24 28 C 26 30, 28 28, 26 26 L 20 20 L 12 12 C 8 8, 4 1, 2 2 Z' fill='%23fffcf5' stroke='%23800020' stroke-width='1.5' filter='url(%23shadow)'/%3E%3Cpath d='M14 18 L 22 26' stroke='%23c5a059' stroke-width='4' stroke-linecap='round' filter='url(%23shadow)'/%3E%3C/svg%3E") 0 0, auto;
+          }
+          
+          /* Ensure cursor persists on clickable elements */
+          a, button, .menu-item {
+              cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cfilter id='shadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='1' dy='1' stdDeviation='1' flood-opacity='0.4'/%3E%3C/filter%3E%3Cpath d='M2 2 C 1 4, 4 8, 10 14 L 18 22 L 24 28 C 26 30, 28 28, 26 26 L 20 20 L 12 12 C 8 8, 4 1, 2 2 Z' fill='%23fffcf5' stroke='%23c5a059' stroke-width='1.5' filter='url(%23shadow)'/%3E%3Cpath d='M14 18 L 22 26' stroke='%23800020' stroke-width='4' stroke-linecap='round' filter='url(%23shadow)'/%3E%3C/svg%3E") 0 0, pointer;
+          }
+
+          /* Hide mobile navs */
+          #navToggle, #topNav, #bottomNav, #leftNav, #rightNav { display: none !important; }
+          
+          .leaf-shadow {
+              position: absolute;
+              top: -50px; left: -50px; right: -50px; bottom: -50px; 
+              pointer-events: none;
+              background-image: 
+                  radial-gradient(ellipse at 10% 20%, rgba(0,0,0,0.4) 0%, transparent 40%),
+                  radial-gradient(ellipse at 90% 80%, rgba(0,0,0,0.3) 0%, transparent 50%),
+                  url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='blur'%3E%3CfeGaussianBlur in='SourceGraphic' stdDeviation='10'/%3E%3C/filter%3E%3Cg filter='url(%23blur)' fill='rgba(0,0,0,0.15)'%3E%3Cpath d='M-50 -50 L200 100 L100 300 Z' /%3E%3Ccircle cx='400' cy='100' r='100' /%3E%3Cpath d='M300 400 L550 550 L500 300 Z' /%3E%3C/g%3E%3C/svg%3E");
+              background-size: cover;
+              mix-blend-mode: multiply;
+              z-index: 5;
+              transition: transform 0.1s ease-out; 
+          }
+          
+          #mainContent {
+              position: relative;
+              inset: auto;
+              width: 100%;
+              height: 100vh;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              overflow: hidden;
+              z-index: 10;
+          }
+
+          .wrap {
+              display: flex;
+              flex-direction: row;
+              width: 95%;
+              max-width: 1400px; 
+              height: 90vh; 
+              background: var(--paper);
+              box-shadow: var(--shadow-book);
+              border-radius: 4px;
+              position: relative;
+              background-image: 
+                  url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' opacity='0.03'%3E%3Cg fill='%23800020'%3E%3Cpath d='M50 0 C 60 20 80 40 100 50 C 80 60 60 80 50 100 C 40 80 20 60 0 50 C 20 40 40 20 50 0 Z' /%3E%3C/g%3E%3C/svg%3E"),
+                  url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+              background-size: 200px 200px, auto; 
+          }
+          
+          .wrap::after {
+              content: "";
+              position: absolute;
+              top: 0; bottom: 0; left: 60px; /* Shifted spine to left edge since no sidebar */
+              width: 40px;
+              background: var(--spine-gradient);
+              pointer-events: none;
+              z-index: 20;
+              mix-blend-mode: multiply;
+          }
+
+          .bookmark {
+            position: absolute;
+            top: -15px; 
+            left: 100px; 
+            width: 45px;
+            height: 150px;
+            background: #900020;
+            background-image: linear-gradient(to right, #600010, #a00028 40%, #600010);
+            box-shadow: 4px 5px 15px rgba(0,0,0,0.5);
+            z-index: 30;
+            transform-origin: top center;
+            transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+          }
+          .bookmark::after {
+            content: "";
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 22.5px solid transparent;
+            border-right: 22.5px solid transparent;
+            border-top: 22px solid #600010; 
+          }
+          .bookmark::before {
+              content: "";
+              position: absolute;
+              bottom: 10px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 2px;
+              height: 40px;
+              background: #d4af37;
+              box-shadow: 0 0 2px rgba(212, 175, 55, 0.5);
+          }
+          .bookmark:hover {
+             height: 180px;
+          }
+
+          main {
+              flex-grow: 1;
+              background: transparent;
+              padding: 70px 100px; 
+              height: 100%;
+              overflow-y: auto; 
+              position: relative;
+              outline: 2px solid var(--accent-gold);
+              outline-offset: -35px;
+              margin-left: 50px; 
+              
+              min-height: 0; 
+              display: block;
+          }
+          
+          main::-webkit-scrollbar { width: 8px; }
+          main::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+          main::-webkit-scrollbar-thumb { background-color: var(--accent-gold); border-radius: 4px; border: 2px solid var(--paper); }
+
+          .corner-ornament {
+              position: absolute;
+              width: 50px;
+              height: 50px;
+              border: 2px solid var(--accent-rich);
+              z-index: 5;
+              pointer-events: none;
+              opacity: 0.6;
+          }
+          .corner-ornament::after {
+              content: '';
+              position: absolute;
+              width: 10px; height: 10px;
+              background: var(--accent-gold);
+              border-radius: 50%;
+          }
+          
+          .co-tl { top: 35px; left: 85px; border-right: none; border-bottom: none; border-top-left-radius: 10px; }
+          .co-tl::after { top: -6px; left: -6px; }
+          
+          .co-tr { top: 35px; right: 35px; border-left: none; border-bottom: none; border-top-right-radius: 10px; }
+          .co-tr::after { top: -6px; right: -6px; }
+          
+          .co-bl { bottom: 35px; left: 85px; border-right: none; border-top: none; border-bottom-left-radius: 10px; }
+          .co-bl::after { bottom: -6px; left: -6px; }
+          
+          .co-br { bottom: 35px; right: 35px; border-left: none; border-top: none; border-bottom-right-radius: 10px; }
+          .co-br::after { bottom: -6px; right: -6px; }
+
+          .main-title-wrapper {
+              text-align: center;
+              margin-bottom: 50px;
+              margin-top: 10px; 
+              display: block !important; 
+          }
+          
+          .menu-list {
+              column-count: 2; 
+              column-gap: 6rem; 
+              display: block; 
+              margin-top: 40px; 
+          }
+
+          @media (min-width: 1600px) {
+              .menu-list { column-count: 3; }
+          }
+
+          .menu-section-title {
+              break-after: avoid; 
+              column-span: all; 
+              font-size: 2rem;
+              margin-top: 40px; 
+              padding-top: 20px;
+          }
+          
+          .menu-item {
+             break-inside: avoid;
+             margin-bottom: 1.5rem;
+             padding: 10px 15px; 
+             transition: all 0.3s ease;
+             border-radius: 4px;
+          }
+          
+          .menu-item:hover {
+              transform: translateX(5px);
+              background: linear-gradient(to right, rgba(255, 215, 0, 0.1), transparent);
+              box-shadow: -5px 0 10px -5px rgba(212, 175, 55, 0.2);
+          }
+          
+          .menu-item::before {
+              content: "❧";
+              position: absolute;
+              left: -8px;
+              top: 12px;
+              font-size: 1.2rem;
+              color: var(--accent-rich);
+              opacity: 0;
+              transition: opacity 0.2s;
+          }
+          .menu-item:hover::before { opacity: 1; }
+      }
+
+      .modal-overlay {
+        background-color: rgba(20, 15, 10, 0.85);
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-overlay.open {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background: #fffcf5;
+        border: 1px solid var(--accent-gold);
+        outline: 3px double var(--accent-rich);
+        outline-offset: -8px;
+        padding: 50px 40px;
+        max-width: 90%;
+        width: 500px; 
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        transform: scale(0.95);
+        transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+        text-align: center;
+      }
+      .modal-overlay.open .modal-content {
+        transform: scale(1);
+      }
+      
+      .modal-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        color: var(--accent-rich);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--line);
+        display: inline-block;
+        padding-bottom: 10px;
+      }
+      
+      .modal-joke {
+        font-family: 'Gochi Hand', cursive;
+        font-size: 1.4rem;
+        color: var(--ink);
+        margin-bottom: 2rem;
+        padding: 10px;
+        background: rgba(197, 160, 89, 0.1); 
+        border-radius: 4px;
+      }
+      
+      .modal-specialty {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.3rem;
+        line-height: 1.4;
+        color: var(--ink-dim);
+        font-style: italic;
+      }
+
+      .modal-compliment {
+        font-family: 'Gochi Hand', cursive;
+        font-size: 1.2rem;
+        color: var(--accent-gold);
+        margin-top: 2rem;
+        padding: 1rem;
+        border-top: 1px dotted var(--line);
+        border-bottom: 1px dotted var(--line);
+      }
+
+      .modal-divider {
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to right, transparent, var(--accent-gold), transparent);
+        margin: 2rem auto;
+        width: 40%;
+      }
+      
+      .close-btn {
+        position: absolute;
+        top: 15px; right: 15px;
+        background: transparent;
+        border: none;
+        color: var(--accent-rich);
+        font-size: 2rem;
+        cursor: pointer;
+        opacity: 0.6;
+        line-height: 1;
+        transition: 0.2s;
+      }
+      .close-btn:hover { opacity: 1; transform: scale(1.1); }
+      
+      /* Mobile Specific Modal Adjustments for Shorter Card */
+      @media (max-width: 768px) {
+          .modal-content {
+              padding: 20px 15px; /* Much smaller padding */
+              width: 90%;
+              outline-offset: -4px; /* Adjust outline offset for smaller padding */
+          }
+          .modal-title {
+              font-size: 1.8rem;
+              margin-bottom: 10px;
+              padding-bottom: 5px;
+          }
+          .modal-joke {
+              font-size: 1.1rem;
+              margin-bottom: 15px;
+              padding: 8px;
+          }
+          .modal-divider {
+              margin: 15px auto;
+          }
+          .modal-specialty {
+              font-size: 1.1rem;
+          }
+          .modal-compliment {
+              margin-top: 15px;
+              padding: 10px;
+              font-size: 1rem;
+          }
+          .close-btn {
+              top: 5px;
+              right: 10px;
+              font-size: 1.8rem;
+          }
+      }
+      
+      .festive-text {
+          font-family: 'Gochi Hand', cursive;
+          font-size: 1.2rem;
+      }
+      
+      .nav-panel h1, .nav-panel h2, .nav-panel h3 {
+          font-family: 'Pacifico', cursive;
+      }
+
+      @media (min-width: 1024px) {
+          #desktopNavOverlay {
+              position: fixed;
+              top: 0; left: 0; right: 0; bottom: 0;
+              background: rgba(0,0,0,0.5);
+              z-index: 998;
+              backdrop-filter: blur(2px);
+              opacity: 0;
+              visibility: hidden;
+              transition: all 0.3s ease;
+          }
+          #desktopNavOverlay.open {
+              opacity: 1;
+              visibility: visible;
+          }
+          
+          #desktopNavPanel {
+              position: fixed;
+              top: 0; left: 0; bottom: 0;
+              width: 500px;
+              background: #fffcf5;
+              z-index: 999;
+              transform: translateX(-100%);
+              transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+              box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+              border-right: 4px solid var(--accent-gold);
+              display: flex;
+              flex-direction: column;
+              padding: 60px 40px;
+              overflow-y: auto;
+              background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+          }
+          
+          #desktopNavPanel.open {
+              transform: translateX(0);
+          }
+          
+          .desktop-nav-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 15px 30px;
+              margin-top: 30px;
+          }
+          
+          .desktop-menu-link {
+              font-family: 'Cormorant Garamond', serif;
+              font-size: 1.4rem;
+              color: var(--ink);
+              text-decoration: none;
+              font-weight: 600;
+              padding: 5px 10px;
+              border-bottom: 1px dotted rgba(196, 181, 157, 0.5);
+              transition: all 0.2s;
+              display: block;
+          }
+          
+          .desktop-menu-link:hover {
+              color: var(--accent-rich);
+              transform: translateX(5px);
+              border-bottom-color: var(--accent-gold);
+          }
+
+          /* GLOWING EFFECT FOR FOOD BUTTON */
+          .food-highlight {
+              animation: pulseGlow 1.5s infinite alternate;
+              font-weight: 800 !important;
+          }
+
+          @keyframes pulseGlow {
+              0% {
+                  text-shadow: 0 0 2px var(--accent-gold);
+                  color: var(--accent-rich);
+                  border-bottom-color: var(--accent-gold);
+              }
+              100% {
+                  text-shadow: 0 0 15px var(--accent-gold), 0 0 5px var(--accent-rich);
+                  color: #d62828;
+                  border-bottom-color: var(--accent-rich);
+                  letter-spacing: 1px;
+              }
+          }
+          
+          .desktop-nav-header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid var(--accent-rich);
+              padding-bottom: 20px;
+          }
+          
+          .desktop-nav-header h2 {
+              font-family: 'Playfair Display', serif;
+              font-size: 2.5rem;
+              color: var(--accent-rich);
+              margin: 0;
+          }
+          .desktop-nav-header p {
+              font-family: 'Inter', sans-serif;
+              font-size: 0.8rem;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              color: var(--accent-gold);
+              margin-top: 5px;
+          }
+
+          #desktopNavToggle {
+              position: fixed;
+              top: 30px;
+              left: 30px;
+              z-index: 900;
+              background: var(--accent-rich);
+              color: #fff;
+              border: 2px solid #fff;
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+              transition: transform 0.2s;
+          }
+          #desktopNavToggle:hover {
+              transform: scale(1.1);
+              background: #600010;
+          }
+      }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="leaf-shadow hidden lg:block" id="leafShadow"></div>
+
+    <button id="navToggle" class="fixed top-4 left-4 z-[70] w-12 h-12 rounded-full shadow-lg transition-all bg-white text-[var(--accent-gold)] flex items-center justify-center hover:scale-110 focus:outline-none lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="#ea580c" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    
+    <button id="desktopNavToggle" class="hidden lg:flex">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    
+    <div id="desktopNavOverlay" class="hidden lg:block"></div>
+    <div id="desktopNavPanel" class="hidden lg:flex">
+        <button class="close-btn" id="desktopNavClose" style="top: 20px; right: 20px;">&times;</button>
+        
+        <div class="desktop-nav-header">
+            <h2>Navigation</h2>
+            <p>Explore the Collection</p>
+        </div>
+        
+        <div class="desktop-nav-grid">
+            <a href="index.html" class="desktop-menu-link">Home</a>
+            <a href="Cake.html" class="desktop-menu-link">Cake</a>
+            <a href="21_Wish.html" class="desktop-menu-link">21 Door</a>
+            <a href="chat.html" class="desktop-menu-link">Heaven</a>
+            <a href="Diary.html" class="desktop-menu-link">Diary</a>
+            <a href="anatomy.html" class="desktop-menu-link">Anatomy</a>
+            <a href="Box.html" class="desktop-menu-link">Box</a>
+            <a href="Special.html" class="desktop-menu-link">Special</a>
+            <a href="color.html" class="desktop-menu-link">Color</a>
+            <a href="you.html" class="desktop-menu-link">You</a>
+            <a href="Teacher.html" class="desktop-menu-link">Teacher</a>
+            <a href="Universe.html" class="desktop-menu-link">Universe</a>
+            <a href="The_River.html" class="desktop-menu-link">River</a>
+            <a href="Mountain.html" class="desktop-menu-link">Mountain</a>
+            <a href="Skill.html" class="desktop-menu-link">Skill</a>
+            <a href="Paper_Star.html" class="desktop-menu-link">Paper Star</a>
+            <a href="Carttoon.html" class="desktop-menu-link">Cartoon</a>
+            <a href="Periodik_table.html" class="desktop-menu-link">Periodic Table</a>
+            <a href="Concept.html" class="desktop-menu-link">Concept</a>
+            <a href="Calender.html" class="desktop-menu-link">Calendar</a>
+            <a href="Perspective.html" class="desktop-menu-link">Perspective</a>
+            <a href="Santa.html" class="desktop-menu-link">Santa</a>
+            <a href="Presence.html" class="desktop-menu-link">Presence</a>
+            <a href="Cloud.html" class="desktop-menu-link">Cloud</a>
+            <a href="Ink.html" class="desktop-menu-link">Paint</a>
+            <a href="Butterfly.html" class="desktop-menu-link">Butterfly</a>
+            <a href="Weather.html" class="desktop-menu-link">Weather</a>
+            <a href="Spotlight.html" class="desktop-menu-link">Spotlight</a>
+            <a href="Room.html" class="desktop-menu-link">Room</a>
+            <a href="Radio.html" class="desktop-menu-link">Radio</a>
+            <a href="Food.html" class="desktop-menu-link food-highlight">Food</a>
+            <a href="Music.html" class="desktop-menu-link">Music</a>
+            <a href="letter.html" class="desktop-menu-link">Letter</a>
+            <a href="Msg.html" class="desktop-menu-link">Message</a>
+        </div>
+        
+        <div class="stamp" style="position: relative; margin-top: auto; transform: none; left: auto; bottom: auto;">
+             <span>EST.<br>2024</span>
+        </div>
+    </div>
+
+    <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-14 shadow-lg flex items-center justify-center space-x-1 -translate-y-full border-b-4 lg:hidden">
+      <a href="Music.html" class="nav-link p-1 w-full text-center">Music</a>
+      <a href="Msg.html" class="nav-link p-1 w-full text-center">Msg</a>
+      <a href="letter.html" class="nav-link px-2">Letter</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-14 shadow-lg flex items-center justify-center space-x-1 translate-y-full border-t-4 lg:hidden">
+      <a href="Skill.html" class="nav-link p-1 w-full text-center">Skill</a>
+      <a href="Paper_Star.html" class="nav-link p-1 w-full text-center">Star</a>
+      <a href="Carttoon.html" class="nav-link p-1 w-full text-center">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel fixed left-0 top-14 bottom-14 z-[60] w-24 shadow-xl flex flex-col items-center space-y-1 -translate-x-full overflow-y-auto py-14 border-r-4 lg:hidden">
+        <a href="index.html" class="nav-link px-2">Home</a>
+        <a href="Cake.html" class="nav-link p-1 w-full text-center">Cake</a>
+        <a href="21_Wish.html" class="nav-link p-1 w-full text-center">21</a>
+        <a href="chat.html" class="nav-link px-2">Heaven</a>
+        <a href="Diary.html" class="nav-link p-1 w-full text-center">Diary</a>
+        <a href="anatomy.html" class="nav-link px-2">Anatomy</a>
+        <a href="Box.html" class="nav-link p-1 w-full text-center">Box</a>
+        <a href="Special.html" class="nav-link px-2">Special</a>
+        <a href="color.html" class="nav-link p-1 w-full text-center">Color</a>
+        <a href="you.html" class="nav-link px-2">You</a>
+        <a href="Teacher.html" class="nav-link p-1 w-full text-center">Teacher</a>
+        <a href="Universe.html" class="nav-link p-1 w-full text-center">Uni</a>
+        <a href="The_River.html" class="nav-link p-1 w-full text-center">River</a>
+        <a href="Mountain.html" class="nav-link p-1 w-full text-center">Mtn</a>
+      </nav>
+      
+      <nav id="rightNav" class="nav-panel fixed right-0 top-14 bottom-14 z-[60] w-24 shadow-xl flex flex-col items-center space-y-1 translate-x-full overflow-y-auto py-14 border-l-4 lg:hidden">
+        <a href="Periodik_table.html" class="nav-link p-1 w-full text-center">Table</a>
+        <a href="Concept.html" class="nav-link p-1 w-full text-center">Concept</a>
+        <a href="Calender.html" class="nav-link p-1 w-full text-center">Date</a>
+        <a href="Perspective.html" class="nav-link p-1 w-full text-center">View</a>
+        <a href="Santa.html" class="nav-link p-1 w-full text-center">Santa</a>
+        <a href="Presence.html" class="nav-link p-1 w-full text-center">Here</a>
+        <a href="Cloud.html" class="nav-link p-1 w-full text-center">Cloud</a>
+        <a href="Ink.html" class="nav-link p-1 w-full text-center">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-1 w-full text-center">Fly</a>
+        <a href="Weather.html" class="nav-link p-1 w-full text-center">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-1 w-full text-center">Light</a>
+        <a href="Room.html" class="nav-link p-1 w-full text-center">Room</a>
+        <a href="Radio.html" class="nav-link p-1 w-full text-center">Radio</a>
+        <a href="Food.html" class="nav-link p-1 w-full text-center">Food</a>
+      </nav>
+
+    <div id="mainContent">
+      <div class="wrap">
+        
+        <div class="bookmark hidden lg:block"></div>
+
+        <main>
+          <div class="corner-ornament co-tl hidden lg:block"></div>
+          <div class="corner-ornament co-tr hidden lg:block"></div>
+          <div class="corner-ornament co-bl hidden lg:block"></div>
+          <div class="corner-ornament co-br hidden lg:block"></div>
+
+          <div class="main-title-wrapper"> 
+              <p class="subtitle-the">THE INDIAN</p>
+              <h1>MENU</h1>
+          </div>
+          <section class="menu-list" id="menuList" aria-live="polite"></section>
+        </main>
+      </div>
+    </div>
+    
+    <div id="descriptionModal" class="modal-overlay" onclick="closeDescription()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeDescription()">
+                &times;
+            </button>
+            <h2 id="modalTitle" class="modal-title"></h2>
+            
+            <p id="modalJoke" class="modal-joke"></p>
+            <hr class="modal-divider"/>
+            <p id="modalSpecialty" class="modal-specialty"></p>
+            
+            <p id="modalCompliment" class="modal-compliment"></p>
+
+            <p class="text-center text-xs text-[var(--ink-dim)] mt-4">Tap outside or press <span class="font-bold">X</span> to close.</p>
+        </div>
+    </div>
+
+    
+    <script>
+
+const MENU_STRUCTURE = [
+  { title: "Aarambh (Beginnings)", tags: ["Aarambh"] },
+  { title: "Mukhyo Vyanjan (Main Course)", tags: ["Mukhyo Vyanjan"] },
+  { title: "Mishti (Sweets)", tags: ["Mishti aur Roti"] },
+  { title: "Pey (Beverages)", tags: ["Pey"] }
+];
+
+const DISHES = [
+  {
+    id:"pakora",
+    name:"Vegetable Pakora",
+    tags:["Aarambh","Spicy","Vegan"],
+    line:"Crispy, golden-fried vegetables seasoned just right—a perfect start.",
+    joke:"Just like pakoras, you bring a little crunch and a lot of warmth wherever you go.",
+    compliment:"You have a natural brightness that makes moments feel lighter."
+  },
+  {
+    id:"samosa",
+    name:"Punjabi Samosa",
+    tags:["Aarambh","Comfort","Vegan"],
+    line:"Flaky pastry filled with spiced potatoes and peas.",
+    joke:"Just like samosas, you seem strong on the outside but have a soft, kind heart inside.",
+    compliment:"Your calm nature makes people feel at ease around you."
+  },
+  {
+    id:"kebab",
+    name:"Chicken Tikka Kebab",
+    tags:["Aarambh","Poultry","Spicy"],
+    line:"Smoky, marinated chicken grilled to perfection.",
+    joke:"Just like kebabs, you’re warm, and surprisingly unforgettable.",
+    compliment:"You leave a gentle, memorable impression without trying."
+  },
+  {
+    id:"bhel",
+    name:"Bhel Puri",
+    tags:["Aarambh","Bright","Vegan"],
+    line:"A tangy, crunchy street-food mix of puffed rice and chutneys.",
+    joke:"Just like bhel puri, you add colour, freshness, and a spark of fun to every moment.",
+    compliment:"Your presence naturally brings positivity to the atmosphere."
+  },
+  {
+    id:"papad",
+    name:"Masala Papad",
+    tags:["Aarambh","Bright","Vegan"],
+    line:"Crispy lentil wafers topped with fresh toppings.",
+    joke:"Just like masala papad, your smile can lighten a whole room without even trying.",
+    compliment:"You have an uplifting charm that people genuinely enjoy."
+  },
+  {
+    id:"paneer-pakora",
+    name:"Paneer Pakora",
+    tags:["Aarambh","Comfort"],
+    line:"Soft paneer coated and fried to golden crispiness.",
+    joke:"Just like paneer pakora, you’re soft at heart and always comforting.",
+    compliment:"Your kindness shows in small, thoughtful ways."
+  },
+  {
+    id:"corn-chaat",
+    name:"Corn Chaat",
+    tags:["Aarambh","Bright","Vegan"],
+    line:"Sweet, tangy, and spicy corn tossed fresh.",
+    joke:"Just like corn chaat, you’re sweet, bright, and full of cheerful energy.",
+    compliment:"You bring a refreshing vibe that makes conversations feel easy."
+  },
+  {
+    id:"hara-bhara",
+    name:"Hara Bhara Kebab",
+    tags:["Aarambh","Vegetarian"],
+    line:"Healthy and flavourful spinach & pea patties.",
+    joke:"Just like hara bhara kebab, you’re refreshing, vibrant, and full of life.",
+    compliment:"Your energy feels naturally positive and lively."
+  },
+  {
+    id:"spring-roll",
+    name:"Veg Spring Roll",
+    tags:["Aarambh","Bright","Crispy"],
+    line:"Crispy rolls stuffed with seasoned vegetables.",
+    joke:"Just like spring rolls, you’re crisp, bright, and always make things better.",
+    compliment:"You bring a fresh, happy energy wherever you go."
+  },
+  {
+    id:"dahi-kebab",
+    name:"Dahi Kebab",
+    tags:["Aarambh","Comfort","Vegetarian"],
+    line:"Soft yogurt-based kebabs that melt in the mouth.",
+    joke:"Just like dahi kebab, you’re soft, gentle, and unforgettable.",
+    compliment:"There’s something soothing and kind about you."
+  },
+  {
+    id:"fish-finger",
+    name:"Fish Finger",
+    tags:["Aarambh","Seafood","Crispy"],
+    line:"Crispy, golden-fried fish strips.",
+    joke:"Just like fish fingers, you’re crisp, fun, and instantly likeable.",
+    compliment:"You have an easy, pleasant charm that feels natural."
+  },
+
+  {
+    id:"butter-chicken",
+    name:"Butter Chicken",
+    tags:["Mukhyo Vyanjan","Poultry","Comfort"],
+    line:"Rich, creamy tomato gravy with tender chicken.",
+    joke:"Just like butter chicken, you’re comforting, warm, and make people feel safe.",
+    compliment:"You have a gentle warmth that people appreciate instantly."
+  },
+  {
+    id:"roti",
+    name:"Tandoori Roti",
+    tags:["Mukhyo Vyanjan"],
+    line:"Whole wheat roti cooked in a tandoor.",
+    joke:"Just like tandoori roti, you’re simple, real, and always appreciated.",
+    compliment:"Your authenticity is one of your nicest qualities."
+  },
+  {
+    id:"rogan-josh",
+    name:"Kashmiri Rogan Josh",
+    tags:["Mukhyo Vyanjan","Red Meat","Spicy"],
+    line:"Aromatic mutton curry with rich spices.",
+    joke:"Just like rogan josh, you have depth and a strong, graceful charm.",
+    compliment:"Your confidence feels natural and graceful."
+  },
+  {
+    id:"paneer-tikka",
+    name:"Paneer Tikka Masala",
+    tags:["Mukhyo Vyanjan","Vegetarian"],
+    line:"Smoky paneer in a spicy gravy.",
+    joke:"Just like paneer tikka, you’re soft, steady, and quietly impressive.",
+    compliment:"You carry yourself with a soft confidence that feels genuine."
+  },
+  {
+    id:"dal-makhani",
+    name:"Dal Makhani",
+    tags:["Mukhyo Vyanjan","Vegetarian"],
+    line:"Creamy black lentils simmered overnight.",
+    joke:"Just like dal makhani, you bring calm and make everything feel better.",
+    compliment:"Your presence has a comforting, peaceful effect on people."
+  },
+  {
+    id:"aloo-gobi",
+    name:"Aloo Gobi",
+    tags:["Mukhyo Vyanjan","Vegetarian","Vegan"],
+    line:"Classic potatoes and cauliflower with spices.",
+    joke:"Just like aloo gobi, you’re simple in the best way pure and genuinely good.",
+    compliment:"You have a very genuine and sincere nature."
+  },
+  {
+    id:"prawn-malai",
+    name:"Prawn Malai Curry",
+    tags:["Mukhyo Vyanjan","Seafood"],
+    line:"Coastal-style curry cooked in coconut milk.",
+    joke:"Just like prawn malai curry, you carry a gentle elegance that’s memorable.",
+    compliment:"There’s something softness in you that feels very thoughtful."
+  },
+  {
+    id:"chole-bhature",
+    name:"Chole Bhature",
+    tags:["Mukhyo Vyanjan","Comfort"],
+    line:"Spicy chickpeas with fluffy bhature.",
+    joke:"Just like chole bhature, you bring excitement and comfort together perfectly.",
+    compliment:"You balance fun and calmness really beautifully."
+  },
+  {
+    id:"palak-paneer",
+    name:"Palak Paneer",
+    tags:["Mukhyo Vyanjan","Vegetarian"],
+    line:"Paneer cooked in smooth spinach gravy.",
+    joke:"Just like palak paneer, you’re warm, nourishing, and quietly strong.",
+    compliment:"Your seem strong in a steady, composed way."
+  },
+  {
+    id:"veg-biryani",
+    name:"Veg Biryani",
+    tags:["Mukhyo Vyanjan","Vegetarian"],
+    line:"Flavoured rice layered with vegetables and spices.",
+    joke:"Just like biryani, you’re layered, thoughtful, and wonderful with every new thing someone discovers about you.",
+    compliment:"You have thoughtful depth that makes people want to know you more."
+  },
+  {
+    id:"malai-kofta",
+    name:"Malai Kofta",
+    tags:["Mukhyo Vyanjan","Vegetarian","Comfort"],
+    line:"Creamy curry with soft kofta dumplings.",
+    joke:"Just like malai kofta, you’re soft, kind, and truly delightful.",
+    compliment:"Your kindness shows in subtle, meaningful ways."
+  },
+  {
+    id:"kadhai-paneer",
+    name:"Kadhai Paneer",
+    tags:["Mukhyo Vyanjan","Vegetarian","Spicy"],
+    line:"Spicy paneer cooked with capsicum and tomatoes.",
+    joke:"Just like kadhai paneer, you’re dcolourful, and full of lively spirit.",
+    compliment:"You add a lively, positive vibe wherever you go."
+  },
+  {
+    id:"squid",
+    name:"Squid",
+    tags:["Mukhyo Vyanjan","Seafood"],
+    line:"Tender squid cooked with spices.",
+    joke:"Just like squid, you’re unique, graceful, and more fascinating than you let people see at first.",
+    compliment:"There’s something calm and intriguing about you."
+  },
+  {
+    id:"mutton-korma",
+    name:"Mutton Korma",
+    tags:["Mukhyo Vyanjan","Red Meat","Comfort"],
+    line:"Tender mutton pieces cooked in a rich, creamy gravy.",
+    joke:"Just like mutton korma, you’re rich in warmth and always comforting.",
+    compliment:"Your presence feels steady and reassuring."
+  },
+  {
+    id:"chicken-rezala",
+    name:"Chicken Rezala",
+    tags:["Mukhyo Vyanjan","Poultry","Aromatic"],
+    line:"A fragrant Mughlai chicken dish with white gravy.",
+    joke:"Just like rezala, you’re graceful, subtle, and beautifully balanced.",
+    compliment:"You carry yourself with gentle elegance."
+  },
+  {
+    id:"veg-handi",
+    name:"Vegetable Handi",
+    tags:["Mukhyo Vyanjan","Vegetarian","Comfort"],
+    line:"Mixed vegetables cooked in a creamy, aromatic gravy.",
+    joke:"Just like veg handi, you’re warm, colourful, and full of goodness.",
+    compliment:"You have a naturally kind and caring vibe."
+  },
+
+  {
+    id:"rasgulla",
+    name:"Rasgulla",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"Soft cottage cheese balls in syrup.",
+    joke:"Just like a rasgulla, you’re soft, sweet, and impossible not to smile at.",
+    compliment:"Your sweetness feels natural and effortless."
+  },
+  {
+    id:"gulab-jamun",
+    name:"Gulab Jamun",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"Milk-solid dumplings soaked in sugar syrup.",
+    joke:"Just like gulab jamun, you’re warm, comforting, and a little too sweet.",
+    compliment:"You have a comforting warmth that stays with people."
+  },
+  {
+    id:"sandesh",
+    name:"Sandesh",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"A Bengali delight made from chhena.",
+    joke:"Just like sandesh, you’re soft, elegant, and effortlessly sweet.",
+    compliment:"There’s an elegance in the way you carry yourself."
+  },
+  {
+    id:"kheer",
+    name:"Kheer",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"Traditional rice pudding with nuts.",
+    joke:"Just like kheer, you’re gentle, warm, and make moments special.",
+    compliment:"Your gentle behaviour makes people feel comfortable."
+  },
+  {
+    id:"jalebi",
+    name:"Jalebi",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"Crispy spirals soaked in syrup.",
+    joke:"Just like jalebi, you’re sweet, unique, and a little too adorable.",
+    compliment:"You have a naturally adorable charm."
+  },
+  {
+    id:"mishti-doi",
+    name:"Mishti Doi",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"Caramelised sweet yogurt.",
+    joke:"Just like mishti doi, you’re calming and sweet in a natural way.",
+    compliment:"Your sweetness feels peaceful and sincere."
+  },
+  {
+    id:"naan",
+    name:"Garlic Naan",
+    tags:["Mukhyo Vyanjan","Comfort"],
+    line:"Soft flatbread brushed with garlic butter.",
+    joke:"Just like garlic naan, you make everything feel warmer and better.",
+    compliment:"You bring a sense of warmth to the people around you."
+  },
+  {
+    id:"pulao",
+    name:"Peas Pulao",
+    tags:["Mukhyo Vyanjan","Vegetarian"],
+    line:"Fragrant rice with peas.",
+    joke:"Just like peas pulao, you quietly make days better just by being there.",
+    compliment:"Your presence has a quiet, soothing effect."
+  },
+  {
+    id:"paratha",
+    name:"Laccha Paratha",
+    tags:["Mukhyo Vyanjan","Comfort"],
+    line:"Layered flaky flatbread.",
+    joke:"Just like laccha paratha, you have layers—each one lovelier than the last.",
+    compliment:"You’re someone who becomes even more likeable the more one knows you."
+  },
+  {
+    id:"jeera-rice",
+    name:"Jeera Rice",
+    tags:["Mukhyo Vyanjan","Comfort"],
+    line:"Rice tempered with cumin.",
+    joke:"Just like jeera rice, you’re simple, comforting, and easy to love.",
+    compliment:"You have a calm simplicity that feels very genuine."
+  },
+  {
+    id:"poori",
+    name:"Poori",
+    tags:["Mukhyo Vyanjan","Comfort"],
+    line:"Deep-fried puffed bread.",
+    joke:"Just like poori, you make moments feel joyful and full of warmth.",
+    compliment:"Your cheerful nature makes people enjoy your company."
+  },
+  {
+    id:"rabri",
+    name:"Rabri",
+    tags:["Mishti aur Roti","Dessert"],
+    line:"Thickened sweetened milk with nuts.",
+    joke:"Just like rabri, you’re rich, sweet, and truly special.",
+    compliment:"Your sweetness feels genuine and heartfelt."
+  },
+  {
+    id:"brownie",
+    name:"Chocolate Brownie",
+    tags:["Mishti aur Roti","Dessert","Comfort"],
+    line:"Warm chocolate brownie with a fudgy center.",
+    joke:"Just like a brownie, you’re warm, soft, and easy to love.",
+    compliment:"You have a comforting nature that people enjoy being around."
+  },
+  {
+    id:"roomali-roti",
+    name:"Roomali Roti",
+    tags:["Mukhyo Vyanjan","Bread"],
+    line:"Ultra-soft, thin roti folded like a handkerchief.",
+    joke:"Just like roomali roti, you’re soft, delicate, and truly impressive.",
+    compliment:"Your gentle side is one of your most beautiful qualities."
+  },
+
+  {
+    id:"lassi",
+    name:"Sweet Lassi",
+    tags:["Pey","Drink"],
+    line:"A cooling sweet yogurt drink.",
+    joke:"Just like lassi, you bring a calm that cools even the busiest day.",
+    compliment:"You naturally make things feel more peaceful."
+  },
+  {
+    id:"chai",
+    name:"Masala Chai",
+    tags:["Pey","Drink"],
+    line:"Hot spiced tea brewed with milk.",
+    joke:"Just like masala chai, you’re warm, comforting, and easy to look forward to.",
+    compliment:"Talking to you feels warm and comforting."
+  },
+  {
+    id:"lemonade",
+    name:"Fresh Lemonade",
+    tags:["Pey","Drink","Vegan"],
+    line:"Refreshing Indian lemon drink.",
+    joke:"Just like lemonade, you’re refreshing, bright, and always able to lighten the mood.",
+    compliment:"Your cheerful nature makes things feel fresh and positive."
+  },
+  {
+    id:"cold-coffee",
+    name:"Cold Coffee",
+    tags:["Pey","Drink","Comfort"],
+    line:"Chilled coffee blended with milk.",
+    joke:"Just like cold coffee, you’re cool, refreshing, and surprisingly addictive.",
+    compliment:"You have a naturally cool and pleasant vibe."
+  },
+  {
+    id:"hot-chocolate",
+    name:"Hot Chocolate",
+    tags:["Pey","Drink","Comfort"],
+    line:"Warm cocoa drink topped with cream.",
+    joke:"Just like hot chocolate, you’re warm, sweet, and the definition of comfort.",
+    compliment:"You bring a gentle warmth to every interaction."
+  },
+  {
+    id:"mango-shake",
+    name:"Mango Shake",
+    tags:["Pey","Drink","Comfort"],
+    line:"Thick shake made with ripe mangoes.",
+    joke:"Just like a mango shake, you’re fun, cheerful, and naturally sweet.",
+    compliment:"Your cheerful vibes make people feel lighter."
+  },
+  {
+    id:"coconut-water",
+    name:"Coconut Water",
+    tags:["Pey","Drink","Vegan"],
+    line:"Pure water from fresh coconuts.",
+    joke:"Just like coconut water, you’re refreshing, pure, and full of energy.",
+    compliment:"You have a calming presence that feels very pure-hearted."
+  },
+  {
+    id:"watermelon-juice",
+    name:"Watermelon Juice",
+    tags:["Pey","Drink","Bright"],
+    line:"Refreshing juice made from fresh watermelon.",
+    joke:"Just like watermelon juice, you’re refreshing, sweet, and full of good vibes.",
+    compliment:"You bring a bright, cool energy with you."
+  },
+  {
+    id:"blue-lagoon",
+    name:"Blue Lagoon",
+    tags:["Pey","Drink","Bright"],
+    line:"A citrusy mocktail with a cool blue tint.",
+    joke:"Just like a blue lagoon, you’re calm, cool, and beautifully refreshing.",
+    compliment:"You have a peaceful, pleasant aura that stands out."
+  }
+];
+
+      const STORAGE_KEY = "menuPlannerLines.v2";
+      let lines = loadLines();
+      
+      const menuList = document.getElementById('menuList');
+      const modal = document.getElementById('descriptionModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalJoke = document.getElementById('modalJoke');
+      const modalSpecialty = document.getElementById('modalSpecialty');
+      
+      const modalCompliment = document.getElementById('modalCompliment');
+      
+      function loadLines(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        }catch(e){ return {}; }
+      }
+      
+      function escapeHtml(s){
+        if (typeof s !== 'string') s = String(s);
+        return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      }
+
+      function getVisibleDishes() {
+        if (window.innerWidth >= 1024) {
+            return DISHES;
+        }
+
+        const mobileIds = [
+            "samosa", "kebab", "bhel", "corn-chaat", "spring-roll", "fish-finger",
+            "butter-chicken", "rogan-josh", "dal-makhani", "palak-paneer", "veg-biryani", "malai-kofta", "naan", "jeera-rice",
+            "rasgulla", "gulab-jamun", "jalebi", "mishti-doi", "brownie",
+            "lassi", "chai", "cold-coffee", "mango-shake", "blue-lagoon"
+        ];
+        
+        return DISHES.filter(d => mobileIds.includes(d.id));
+      }
+
+      function render(){
+        menuList.innerHTML = "";
+        
+        const visibleDishes = getVisibleDishes();
+
+        MENU_STRUCTURE.forEach(section => {
+            const sectionItems = visibleDishes.filter(d => 
+                d.tags.some(tag => section.tags.includes(tag))
+            );
+
+            if (sectionItems.length > 0) {
+                const titleElement = document.createElement('h2');
+                titleElement.className = 'menu-section-title';
+                titleElement.textContent = section.title;
+                menuList.appendChild(titleElement);
+
+                sectionItems.forEach(d => {
+                  const item = document.createElement('div');
+                  item.className = 'menu-item';
+                  item.setAttribute('data-id', d.id);
+                  item.onclick = () => openDescription(d.id);
+                  
+                  item.innerHTML = `
+                    <div class="menu-content-wrapper">
+                        <h2 class="dish-name">${d.name}</h2>
+                        <div class="indicator"></div>
+                    </div>
+                    <div class="dish-tags">
+                        ${d.tags.map(t => `<span class="tag-label">${t}</span>`).join('')}
+                    </div>
+                  `;
+                  menuList.appendChild(item);
+                });
+            }
+        });
+      }
+
+      window.addEventListener('resize', render);
+
+      function openDescription(id) {
+        const dish = DISHES.find(d => d.id === id);
+        if (!dish) return;
+
+        const specialtyText = lines[id] ?? dish.line;
+        const jokeText = dish.joke;
+        
+        const complimentText = dish.compliment;
+
+        modalTitle.textContent = dish.name;
+        modalJoke.textContent = `"${jokeText}"`; 
+        modalSpecialty.innerHTML = `<span class="font-bold text-[var(--accent-rich)] text-sm uppercase tracking-wider block mb-2">Specialty</span>${specialtyText}`; 
+        
+        modalCompliment.textContent = complimentText;
+        
+        modal.classList.add('open');
+      }
+
+      function closeDescription() {
+        modal.classList.remove('open');
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+             if (modal.classList.contains('open')) closeDescription();
+             if (desktopNavPanel.classList.contains('open')) closeDesktopNav();
+        }
+      });
+
+      const leafShadow = document.getElementById('leafShadow');
+      if (leafShadow) {
+          document.addEventListener('mousemove', (e) => {
+              if (window.innerWidth >= 1024) {
+                  const x = (e.clientX / window.innerWidth) * 20;
+                  const y = (e.clientY / window.innerHeight) * 20;
+                  leafShadow.style.transform = `translate(${x}px, ${y}px)`;
+              }
+          });
+      }
+
+      render();
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            let areNavsOpen = false;
+
+            function openAllNavs() {
+                if(topNav) topNav.classList.remove('-translate-y-full');
+                if(bottomNav) bottomNav.classList.remove('translate-y-full');
+                if(leftNav) leftNav.classList.remove('-translate-x-full');
+                if(rightNav) rightNav.classList.remove('translate-x-full');
+                if(mainContent && window.innerWidth < 1024) {
+                    mainContent.classList.remove('pt-20');
+                    mainContent.classList.add('pt-14', 'pb-14', 'pl-24', 'pr-24');
+                }
+                if(navToggleIcon) navToggleIcon.classList.add('hidden');
+                if(navToggleX) navToggleX.classList.remove('hidden');
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                if(topNav) topNav.classList.add('-translate-y-full');
+                if(bottomNav) bottomNav.classList.add('translate-y-full');
+                if(leftNav) leftNav.classList.add('-translate-x-full');
+                if(rightNav) rightNav.classList.add('translate-x-full');
+                if(mainContent && window.innerWidth < 1024) {
+                    mainContent.classList.remove('pt-14', 'pb-14', 'pl-24', 'pr-24');
+                    mainContent.classList.add('pt-20');
+                }
+                if(navToggleIcon) navToggleIcon.classList.remove('hidden');
+                if(navToggleX) navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+            
+            if(navToggle) {
+                navToggle.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    toggleAllNavs();
+                });
+            }
+            
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const desktopNavPanel = document.getElementById('desktopNavPanel');
+            const desktopNavOverlay = document.getElementById('desktopNavOverlay');
+            const desktopNavClose = document.getElementById('desktopNavClose');
+            
+            function openDesktopNav() {
+                desktopNavPanel.classList.add('open');
+                desktopNavOverlay.classList.add('open');
+            }
+            
+            function closeDesktopNav() {
+                desktopNavPanel.classList.remove('open');
+                desktopNavOverlay.classList.remove('open');
+            }
+            
+            if(desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openDesktopNav();
+                });
+            }
+            
+            if(desktopNavClose) {
+                desktopNavClose.addEventListener('click', closeDesktopNav);
+            }
+            
+            if(desktopNavOverlay) {
+                desktopNavOverlay.addEventListener('click', closeDesktopNav);
+            }
+
+            document.addEventListener('click', (e) => {
+                 if (areNavsOpen && mainContent && mainContent.contains(e.target)) {
+                      closeAllNavs();
+                 }
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetHref = e.currentTarget.getAttribute('href');
+                    if (targetHref && targetHref.startsWith('#')) {
+                        e.preventDefault(); 
+                    }
+                    if (areNavsOpen) {
+                        setTimeout(closeAllNavs, 100); 
+                    }
+                });
+            });
+            
+        });
+    </script>
+</body>
+</html>

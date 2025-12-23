@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Childhood Memory TV Room</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+
+
+<style>
+    .festive-text { font-family: 'Gochi Hand', cursive; }
+    .tv-title { font-family: 'Pacifico', cursive; }
+
+    :root{
+        /* Night Mode (Default) */
+        --wall1:#0f1020;
+        --wall2:#1b1f3a;
+        --text:#f5f4ff;
+        --ink:#dbe8ff;
+        --nav-bg: #243156;
+        --nav-hover: #1a2543;
+        --tv-bg: #06080f;
+        --window-sky: #0b1026;
+        --window-frame: #3e2723;
+        --btn-bg: #243156;
+        --rug-color: #2c1a16;
+        --clock-face: #1a1e2e;
+        --clock-border: #3e2723;
+    }
+
+    body.day-mode {
+        /* Day Mode Colors */
+        --wall1: #fdfbf7;
+        --wall2: #e0e0e0;
+        --text: #2d3748;
+        --ink: #4a5568;
+        --nav-bg: #4a5568;
+        --nav-hover: #2d3748;
+        --tv-bg: #1a202c;
+        --window-sky: #87CEEB;
+        --window-frame: #5d4037;
+        --btn-bg: #4a5568;
+        --rug-color: #795548;
+        --clock-face: #fff;
+        --clock-border: #5d4037;
+    }
+
+    * {box-sizing:border-box;-webkit-tap-highlight-color:none;}
+
+    body{
+        margin:0;
+        font-family:'Inter', sans-serif;
+        color:var(--text);
+        background:linear-gradient(180deg, var(--wall2), var(--wall1));
+        min-height: 100vh;
+        overflow-x:hidden;
+        position: relative;
+        transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    #mainContent, .nav-panel, #desktopSidebarScroll {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    #mainContent::-webkit-scrollbar,
+    .nav-panel::-webkit-scrollbar,
+    #desktopSidebarScroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    #mainContent {
+        position: absolute; 
+        top: 0; 
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+        transition: padding 0.3s ease-in-out;
+    }
+
+    .room-content {
+        padding-top: 4rem; 
+        padding-bottom: 4rem;
+        min-height: calc(100% + 1px);
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+    }
+
+    .lights{
+        position:absolute;
+        top:3vh;
+        left:0; right:0;
+        display:flex;
+        justify-content:center;
+        gap:16px;
+    }
+    .bulb{
+        width:12px;
+        height:12px;
+        border-radius:50%;
+        background:#ffedb8;
+        box-shadow:
+            0 0 12px #ffe7a1,
+            0 0 25px #ffdf8c,
+            0 0 40px #ffd97a,
+            0 0 120px #ffd265;
+        animation:glow 3s infinite;
+    }
+    
+    body.day-mode .bulb {
+        box-shadow: 0 0 5px #ffedb8;
+        animation: none;
+        background: #ddd;
+    }
+
+    @keyframes glow{50%{opacity:.4;filter:brightness(1.3)}}
+
+    .tv-area{
+        display:flex;
+        justify-content:center;
+        margin-top:5vh;
+        width: 100%;
+        position: relative;
+    }
+
+    .tv{
+        width:min(90vw,380px);
+        aspect-ratio:4/3;
+        background:var(--tv-bg);
+        border-radius:16px;
+        box-shadow:0 0 40px #000a;
+        position:relative;
+        transition: width 0.3s ease, background 0.5s ease;
+        z-index: 10;
+    }
+
+    .screen{
+        position:absolute;
+        left:6%; top:7%; right:25%; bottom:10%;
+        background:#0b101b;
+        border-radius:12px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        padding:8px;
+        border: 1px solid #333;
+    }
+
+    .poem{
+        width:100%;
+        height:100%;
+        overflow-y:auto;
+        text-align:center;
+        padding:8px;
+    }
+    .poem::-webkit-scrollbar{display:none;}
+
+    .line{
+        opacity:0;
+        transform:translateY(8px);
+        transition:opacity .5s ease, transform .5s ease;
+        font-size:clamp(14px,4vw,17px);
+        color:var(--ink);
+        margin:8px 0;
+    }
+    .line.show{opacity:1; transform:translateY(0);}
+
+    .hint{ opacity:.7; font-size:12px; color: #8892b0; }
+
+    .panel{
+        position:absolute;
+        top:7%; bottom:10%; right:5%;
+        width:19%;
+        background:#1a1e2e;
+        border-radius:12px;
+    }
+
+    .btn{
+        width:30px;height:30px;
+        background:var(--btn-bg);
+        border-radius:50%;
+        margin:16px auto;
+        border:2px solid #3a4b76;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        cursor:pointer;
+        color:white;
+        font-size:14px;
+        box-shadow:0 0 8px #0006;
+        transition: background 0.3s ease;
+    }
+    .btn:active{transform:scale(.9);}
+
+    .speaker{
+        position:absolute;
+        bottom:8%;
+        left:18%; right:18%;
+        height:48%;
+        background:repeating-linear-gradient(90deg,#0a0f1b 0 3px,#10182c 3px 6px);
+        border-radius:5px;
+    }
+
+    /* --- Toggle Button --- */
+    #themeToggle {
+        transition: transform 0.3s ease, background 0.3s ease;
+    }
+    #themeToggle:hover { transform: scale(1.1) rotate(10deg); }
+
+
+    /* --- DESKTOP ELEMENTS --- */
+    .window-container {
+        width: 280px; 
+        height: 400px; 
+        background: var(--window-frame);
+        padding: 8px;
+        border-radius: 4px;
+        box-shadow: 2px 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 5;
+    }
+
+    .window-glass {
+        width: 100%;
+        height: 100%;
+        background: var(--window-sky);
+        position: relative;
+        overflow: hidden;
+        transition: background 1s ease;
+        border: 2px solid rgba(0,0,0,0.2);
+    }
+    
+    .window-glass::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%;
+        width: 4px; height: 100%;
+        background: var(--window-frame);
+        transform: translateX(-50%);
+    }
+    .window-glass::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 0;
+        width: 100%; height: 4px;
+        background: var(--window-frame);
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    .celestial {
+        position: absolute;
+        transition: all 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    
+    .moon {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: transparent;
+        box-shadow: -8px 8px 0 0 #f4f6f0;
+        top: 30px; left: 100px;
+        opacity: 1;
+    }
+    
+    .sun {
+        width: 50px; height: 50px;
+        border-radius: 50%;
+        background: #ffd700;
+        box-shadow: 0 0 20px #ffea00;
+        top: 150%; left: 20px; 
+        opacity: 0;
+    }
+
+    body.day-mode .moon {
+        top: -60px; 
+        opacity: 0;
+    }
+    body.day-mode .sun {
+        top: 30px;
+        opacity: 1;
+    }
+
+    .shelf-container {
+        width: 300px;
+        height: 10px;
+        background: #5d4037;
+        border-radius: 2px;
+        position: relative;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    }
+    
+    .shelf-items {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        padding: 0 20px;
+        gap: 4px;
+    }
+    
+    .book {
+        width: 20px;
+        background: #8d6e63;
+        border-radius: 2px;
+        box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .book:nth-child(1) { height: 40px; background: #ef5350; }
+    .book:nth-child(2) { height: 55px; background: #42a5f5; }
+    .book:nth-child(3) { height: 45px; background: #ffca28; transform: rotate(-10deg) translateX(5px); }
+    
+    .plant {
+        width: 40px; height: 50px;
+        margin-left: auto;
+        position: relative;
+    }
+    .pot {
+        width: 30px; height: 25px;
+        background: #e65100;
+        border-radius: 0 0 10px 10px;
+        position: absolute; bottom: 0; left: 5px;
+    }
+    .leaf {
+        width: 10px; height: 25px;
+        background: #66bb6a;
+        border-radius: 10px 10px 0 0;
+        position: absolute; bottom: 25px;
+    }
+    .leaf.l { left: 8px; transform: rotate(-15deg); height: 20px; }
+    .leaf.c { left: 15px; height: 30px; }
+    .leaf.r { left: 22px; transform: rotate(15deg); height: 22px; }
+
+    /* New Elements: Rug */
+    .rug {
+        width: 700px;
+        height: 80px;
+        background: var(--rug-color);
+        border-radius: 50%;
+        position: relative;
+        margin-top: -30px;
+        z-index: 1;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        transition: background 0.5s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* New Elements: Cat */
+    .cat-container {
+        position: absolute;
+        right: 100px;
+        bottom: 20px;
+        width: 60px;
+        height: 30px;
+    }
+    .cat-body {
+        width: 50px; height: 30px;
+        background: #eee;
+        border-radius: 25px 25px 0 0;
+        position: absolute;
+        bottom: 0; left: 0;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+    .cat-head {
+        width: 25px; height: 25px;
+        background: #eee;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 10px; left: -10px;
+        z-index: 2;
+    }
+    .cat-ear {
+        width: 0; height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 10px solid #eee;
+        position: absolute;
+        top: -5px;
+    }
+    .cat-ear.l { left: 0; transform: rotate(-15deg); }
+    .cat-ear.r { right: 0; transform: rotate(15deg); }
+    .cat-tail {
+        width: 40px; height: 10px;
+        border-radius: 5px;
+        border: 4px solid #eee;
+        border-left: 0; border-top: 0;
+        position: absolute;
+        bottom: 0; right: -15px;
+        transform: rotate(-10deg);
+    }
+
+    /* New Elements: Clock */
+    .clock {
+        width: 100px; height: 100px;
+        border-radius: 50%;
+        background: var(--clock-face);
+        border: 6px solid var(--clock-border);
+        position: relative;
+        box-shadow: 2px 5px 10px rgba(0,0,0,0.3);
+        margin-bottom: 40px; /* Space between clock and shelf */
+        transition: background 0.5s ease, border-color 0.5s ease;
+    }
+    .clock::after {
+        content: '';
+        width: 8px; height: 8px;
+        background: #ef5350;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+    .hand {
+        position: absolute;
+        bottom: 50%; left: 50%;
+        background: #333;
+        transform-origin: bottom center;
+        border-radius: 4px;
+    }
+    .hand.hour {
+        width: 4px; height: 25px;
+        transform: translateX(-50%) rotate(45deg);
+    }
+    .hand.minute {
+        width: 3px; height: 35px;
+        transform: translateX(-50%) rotate(330deg);
+    }
+    body.day-mode .hand { background: #5d4037; }
+
+
+    .photo-box{
+        width:min(90vw,380px);
+        height:320px; 
+        background:#0b0e1c;
+        border-radius:16px;
+        margin:4vh auto 0;
+        box-shadow:0 0 28px #000a;
+        overflow:hidden;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        border:2px solid #1d2338;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .photo-box img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+    }
+
+    .nav-panel, #navToggleIcon, #navToggleX {
+        transition: all 0.3s ease-in-out;
+    }
+
+    @media (min-width: 1024px) {
+        #mainContent {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room-content {
+            display: grid !important;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto 1fr auto; 
+            width: 80%;
+            max-width: 1200px;
+            height: 90vh;
+            padding: 2rem;
+            gap: 2rem;
+            align-items: center;
+            justify-items: center;
+            position: relative;
+        }
+
+        .lights {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            position: relative;
+            top: 0;
+            width: 100%;
+        }
+        
+        .lights::after { content: ''; display: flex; gap: 16px; }
+
+        .desktop-scene {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            display: flex;
+            align-items: flex-end; 
+            justify-content: center;
+            gap: 60px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .tv-area {
+            width: auto;
+            margin-top: 0;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .tv {
+            width: 550px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        
+        .wall-decor {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center decorative items */
+            gap: 20px;
+            padding-bottom: 50px; 
+        }
+        
+        .photo-box { display: none !important; }
+        .h-24 { display: none; }
+        
+        footer {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            width: 100%;
+            align-self: end;
+        }
+    }
+
+</style>
+</head>
+<body>
+    
+    <!-- Day/Night Toggle (Hidden on Mobile, Visible on Desktop lg:flex) -->
+    <button id="themeToggle" class="hidden lg:flex fixed top-6 right-6 z-[100] p-2 bg-[#243156] text-[#dbe8ff] rounded-full shadow-lg hover:bg-[#1a2543] focus:outline-none border-2 border-[#3a4b76]" title="Toggle Theme">
+        <svg id="sunIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="moonIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+    
+    <button id="navToggle" class="lg:hidden fixed top-6 left-6 z-[100] p-2 bg-[#243156] text-[#dbe8ff] rounded-full shadow-lg hover:bg-[#1a2543] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#dbe8ff] focus:ring-offset-2">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    
+    <nav id="topNav" class="nav-panel lg:hidden fixed top-0 left-0 right-0 z-[60] h-16 bg-[#243156] text-[#dbe8ff] shadow-md flex items-center justify-center space-x-6 -translate-y-full">
+        <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Massege</a>
+        <a href="Music.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Music</a>
+        <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#1a2543] transition-colors duration-200 festive-text">Letter</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel lg:hidden fixed bottom-0 left-0 right-0 z-[60] h-16 bg-[#243156] text-[#dbe8ff] shadow-md flex items-center justify-center space-x-2 translate-y-full">
+        <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel lg:hidden fixed left-0 top-0 bottom-0 z-[60] w-20 bg-[#1b1f3a] text-[#dbe8ff] shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#1a2543] transition-colors duration-200 festive-text">Home</a>
+        <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Cake</a>
+        <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">21_Door</a>
+        <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#1a2543] transition-colors duration-200 festive-text">Heaven</a>
+        <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Diary</a>
+        <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#1a2543] transition-colors duration-200 festive-text">Anatomy</a>
+        <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Box</a>
+        <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#1a2543] transition-colors duration-200 festive-text">Special</a>
+        <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Color</a>
+        <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#1a2543] transition-colors duration-200 festive-text">You</a>
+        <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Teacher</a>
+        <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Universe</a>
+        <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">River</a>
+        <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Mountain</a>
+    </nav>
+    
+    <nav id="rightNav" class="nav-panel lg:hidden fixed right-0 top-0 bottom-0 z-[60] w-20 bg-[#1b1f3a] text-[#dbe8ff] shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+        <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Periodik_table</a>
+        <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Calender</a>
+        <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Perspective</a>
+        <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-2Next">Butterfly</a>
+        <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Room</a>
+        <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Radio</a>
+        <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#243156] transition-colors duration-200 festive-text">Food</a>
+    </nav>
+    
+
+    <button id="desktopNavToggle" class="hidden lg:flex fixed top-8 left-8 z-[100] items-center justify-center w-12 h-12 bg-[#243156] text-[#dbe8ff] rounded-full shadow-lg hover:bg-[#1a2543] transition-colors duration-200 hover:scale-105">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+    </button>
+
+    <div id="desktopOverlay" class="hidden lg:block fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm"></div>
+
+    <nav id="desktopSidebar" class="hidden lg:flex fixed left-0 top-0 bottom-0 w-[400px] bg-[var(--nav-bg)] z-[100] shadow-2xl flex-col border-r border-[#243156] transform -translate-x-full transition-transform duration-300 ease-in-out">
+        
+        <div class="h-24 bg-[var(--nav-bg)] flex items-center justify-between px-8 border-b border-[#243156]">
+            <span class="tv-title text-2xl text-[#dbe8ff]">Memories</span>
+            <button id="desktopNavClose" class="p-2 text-[#dbe8ff] hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <div id="desktopSidebarScroll" class="flex-1 overflow-y-auto p-6">
+            <div class="grid grid-cols-2 gap-3">
+                <a href="index.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Home</a>
+                <a href="Cake.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Cake</a>
+                <a href="21_Wish.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">21_Door</a>
+                <a href="chat.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Heaven</a>
+                <a href="Diary.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Diary</a>
+                <a href="anatomy.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Anatomy</a>
+                <a href="Box.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Box</a>
+                <a href="Special.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Special</a>
+                <a href="color.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Color</a>
+                <a href="you.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">You</a>
+                <a href="Teacher.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Teacher</a>
+                <a href="Universe.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Universe</a>
+                <a href="The_River.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">River</a>
+                <a href="Mountain.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Mountain</a>
+                <a href="Skill.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Skill</a>
+                <a href="Paper_Star.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Paper Star</a>
+                <a href="Carttoon.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Cartoon</a>
+                <a href="Periodik_table.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Periodik_table</a>
+                <a href="Concept.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Concept</a>
+                <a href="Calender.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Calender</a>
+                <a href="Perspective.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Perspective</a>
+                <a href="Santa.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Santa</a>
+                <a href="Presence.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Presence</a>
+                <a href="Cloud.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Cloud</a>
+                <a href="Ink.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Paint</a>
+                <a href="Butterfly.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Butterfly</a>
+                <a href="Weather.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Weather</a>
+                <a href="Spotlight.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Spotlight</a>
+                <a href="Room.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Room</a>
+                <a href="Radio.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Radio</a>
+                <a href="Food.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Food</a>
+                <a href="Music.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Music</a>
+                <a href="letter.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Letter</a>
+                <a href="Msg.html" class="nav-link block text-center p-3 rounded bg-[#243156] hover:bg-[#2d3b61] text-sm festive-text text-[#dbe8ff] transition-all hover:scale-105">Massege</a>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-[#243156] text-center">
+            <p class="text-xs text-gray-400">Memory Lane</p>
+        </div>
+    </nav>
+
+
+    <div id="mainContent" class="pt-28 lg:pt-0 lg:flex lg:justify-center lg:items-center">
+
+        <div class="room-content"> 
+
+            <div class="lights">
+                <div class="bulb"></div><div class="bulb"></div>
+                <div class="bulb"></div><div class="bulb"></div>
+                <div class="bulb"></div><div class="bulb"></div>
+            </div>
+
+            <div class="desktop-scene lg:flex hidden">
+                <div class="tv-area">
+                    <div class="tv">
+                        <div class="screen">
+                            <div class="poem" id="poemDesktop">
+                                <div class="hint" id="hintDesktop">Tap the button →</div>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <div class="btn" id="changeBtnDesktop">▶</div>
+                            <div class="speaker"></div>
+                        </div>
+                    </div>
+                    <!-- Added Rug with Cat -->
+                    <div class="rug">
+                        <div class="cat-container">
+                            <div class="cat-tail"></div>
+                            <div class="cat-body"></div>
+                            <div class="cat-head">
+                                <div class="cat-ear l"></div>
+                                <div class="cat-ear r"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wall-decor">
+                    <!-- Added Clock -->
+                    <div class="clock">
+                        <div class="hand hour"></div>
+                        <div class="hand minute"></div>
+                    </div>
+
+                    <div class="shelf-container">
+                        <div class="shelf-items">
+                            <div class="book"></div>
+                            <div class="book"></div>
+                            <div class="book"></div>
+                            <div class="plant">
+                                <div class="leaf l"></div>
+                                <div class="leaf c"></div>
+                                <div class="leaf r"></div>
+                                <div class="pot"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="window-container">
+                        <div class="window-glass">
+                            <div class="celestial moon"></div>
+                            <div class="celestial sun"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tv-area lg:hidden">
+                <div class="tv">
+                    <div class="screen">
+                        <div class="poem" id="poem">
+                            <div class="hint" id="hint">Tap the button →</div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="btn" id="changeBtn">▶</div>
+                        <div class="speaker"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="photo-box">
+                <img src="Sitting_Girl.jpg" alt="Your Photo" onerror="this.onerror=null; this.src='https://placehold.co/380x320/0B0E1C/f5f4ff?text=Photo+Fallback';">
+            </div>
+            
+            <div class="h-24"></div>
+
+            <footer class="text-center py-4">
+                <p class="text-sm text-[#f5f4ff] opacity-70">Made with love by Shubham</p>
+            </footer>
+
+        </div>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const SCENES = [
+        [
+            "Doraemon ke gadgets se zyada magical cheez tum ho.",
+            "Woh future se aaya tha problems solve karne…",
+            "par tum sirf ek muskaan se duniya halka kar deti ho.",
+            "Tumhaari presence khud ek comfort gadget jaisi hai."
+        ],
+        [
+            "Shinchan ki tarah tumhaari masti bilkul natural hai.",
+            "Woh bina soche hasaa deta tha…",
+            "aur tum bina koshish ke dil halka kar deti ho.",
+            "Tumhari innocence ab bhi zinda hai."
+        ],
+        [
+            "Nobita ki tarah tumhara dil bohot saaf hai.",
+            "Haan, kabhi overthink bhi karti ho…",
+            "par tumhaari niyat hamesha pure hoti hai.",
+            "Softness tumhari strength hai."
+        ],
+        [
+            "Hattori jaisa courage tumhaare andar chupkar rehta hai.",
+            "Silent, patient… par bilkul real.",
+            "Tum apni himmat dikhati nahi ho,",
+            "par jab waqt aata hai, tum shine karti ho."
+        ],
+        [
+            "Bachpan ke har cartoon mein thoda sa ‘tum’ chhupa tha…",
+            "Shinchan ki masti,",
+            "Nobita ka dil,",
+            "Doraemon ka comfort,",
+            "Hattori ka courage.",
+            "Aur shayad tabhi bachpan itna khoobsurat tha.”"
+        ]
+    ];
+
+    let index = 0;
+    
+    const poemMobile = document.getElementById("poem");
+    const hintMobile = document.getElementById("hint");
+    const btnMobile = document.getElementById("changeBtn");
+    
+    const poemDesktop = document.getElementById("poemDesktop");
+    const hintDesktop = document.getElementById("hintDesktop");
+    const btnDesktop = document.getElementById("changeBtnDesktop");
+
+    function showScene(i){
+        [poemMobile, poemDesktop].forEach(p => {
+            if(p) {
+                p.innerHTML = "";
+                const lines = SCENES[i];
+                const nodes = [];
+                lines.forEach(text=>{
+                    const d = document.createElement("div");
+                    d.className = "line";
+                    d.textContent = text;
+                    p.appendChild(d);
+                    nodes.push(d);
+                });
+                nodes.forEach((n,j)=>{
+                    setTimeout(()=> n.classList.add("show"), 350*j + 200);
+                });
+            }
+        });
+    }
+
+    function handleNextScene() {
+        if(hintMobile) hintMobile.remove();
+        if(hintDesktop) hintDesktop.remove();
+        
+        showScene(index);
+        index = Math.min(index+1, SCENES.length-1);
+    }
+
+    if(btnMobile) btnMobile.addEventListener("click", handleNextScene);
+    if(btnDesktop) btnDesktop.addEventListener("click", handleNextScene);
+
+    const navLinks = document.querySelectorAll('#topNav .nav-link, #bottomNav .nav-link, #leftNav .nav-link, #rightNav .nav-link');
+    const mainContent = document.getElementById('mainContent');
+    const topNav = document.getElementById('topNav');
+    const bottomNav = document.getElementById('bottomNav');
+    const leftNav = document.getElementById('leftNav');
+    const rightNav = document.getElementById('rightNav');
+    const navToggle = document.getElementById('navToggle');
+    const navToggleIcon = document.getElementById('navToggleIcon');
+    const navToggleX = document.getElementById('navToggleX');
+
+    let areNavsOpen = false;
+
+    function openAllNavs() {
+        topNav.classList.remove('-translate-y-full');
+        bottomNav.classList.remove('translate-y-full');
+        leftNav.classList.remove('-translate-x-full');
+        rightNav.classList.remove('translate-x-full');
+        
+        mainContent.classList.remove('pt-28', 'pb-16', 'pl-16', 'pr-16');
+        mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+        
+        navToggleIcon.classList.add('hidden');
+        navToggleX.classList.remove('hidden');
+        areNavsOpen = true;
+    }
+
+    function closeAllNavs() {
+        topNav.classList.add('-translate-y-full');
+        bottomNav.classList.add('translate-y-full');
+        leftNav.classList.add('-translate-x-full');
+        rightNav.classList.add('translate-x-full');
+        
+        mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+        mainContent.classList.add('pt-28');
+        
+        navToggleIcon.classList.remove('hidden');
+        navToggleX.classList.add('hidden');
+        areNavsOpen = false;
+    }
+
+    function toggleAllNavs() {
+        if (areNavsOpen) {
+            closeAllNavs();
+        } else {
+            openAllNavs();
+        }
+    }
+
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        toggleAllNavs();
+    });
+
+    mainContent.addEventListener('click', () => {
+        if (window.innerWidth < 1024 && areNavsOpen) {
+            closeAllNavs();
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (e.currentTarget.getAttribute('href').startsWith('#')) {
+                e.preventDefault(); 
+            }
+            if (areNavsOpen) {
+                setTimeout(closeAllNavs, 100); 
+            }
+        });
+    });
+
+    const desktopToggle = document.getElementById('desktopNavToggle');
+    const desktopClose = document.getElementById('desktopNavClose');
+    const desktopSidebar = document.getElementById('desktopSidebar');
+    const desktopOverlay = document.getElementById('desktopOverlay');
+
+    function openDesktopNav() {
+        desktopSidebar.classList.remove('-translate-x-full');
+        desktopOverlay.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeDesktopNav() {
+        desktopSidebar.classList.add('-translate-x-full');
+        desktopOverlay.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    if(desktopToggle && desktopSidebar && desktopOverlay) {
+        desktopToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDesktopNav();
+        });
+
+        desktopClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeDesktopNav();
+        });
+
+        desktopOverlay.addEventListener('click', closeDesktopNav);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeDesktopNav();
+        });
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('day-mode');
+        
+        if (document.body.classList.contains('day-mode')) {
+            moonIcon.classList.add('hidden');
+            sunIcon.classList.remove('hidden');
+        } else {
+            moonIcon.classList.remove('hidden');
+            sunIcon.classList.add('hidden');
+        }
+    });
+
+}); 
+</script>
+
+</body>
+</html>

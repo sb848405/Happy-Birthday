@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>A Magical Gift For You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;600;700&family=Pacifico:wght@400&family=Gochi+Hand&family=Chewy&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-osx-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fdf2f8; 
+        }
+        
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX {
+            transition: all 0.3s ease-in-out;
+        }
+        #mainContent, .nav-panel, #desktopSidebarScroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        #desktopSidebarScroll::-webkit-scrollbar {
+            display: none;
+        }
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        #main-title {
+            font-family: 'Great Vibes', cursive;
+        }
+        .font-cursive {
+            font-family: 'Pacifico', cursive;
+        }
+
+        #navToggle { z-index: 999; }
+        .nav-panel { z-index: 998; }
+        #gift-scene { z-index: 50; }
+        #spotlight-scene { z-index: 51; } 
+
+
+        .animated-gradient-text {
+            background-image: linear-gradient(-45deg, #ff00ae, #ff7e00, #fffb00, #00ffc8, #007bff, #c300ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 10s ease infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            touch-action: none;
+            z-index: 20;
+            backdrop-filter: blur(1px); 
+        }
+
+        #blackout-cover {
+            position: absolute;
+            inset: 0;
+            background-color: #000;
+            z-index: 25; 
+            transition: opacity 0.1s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes sparkle {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            50% { transform: scale(1.5) rotate(180deg); opacity: 0.2; }
+            100% { transform: scale(1) rotate(360deg); opacity: 0.8; }
+        }
+
+        .glitter-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: #ffd700; 
+            box-shadow: 0 0 5px #ffd700, 0 0 10px rgba(255, 215, 0, 0.5);
+            border-radius: 50%;
+            animation: sparkle 1s infinite alternate;
+            pointer-events: none;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0.5; }
+        }
+        .confetti {
+            position: fixed; 
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: fall 5s linear forwards;
+            pointer-events: none;
+            z-index: 21; 
+        }
+
+        #gift-scene {
+            position: fixed; 
+            inset: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-evenly; 
+            padding: 1rem; 
+            background: linear-gradient(135deg, #fff1f2 0%, #ffedd5 100%); 
+            transition: opacity 0.5s ease-out;
+            z-index: 50; 
+        }
+
+        .card {
+            user-select: none; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 90%; 
+            margin-left: 5%; 
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; 
+            background-color: #ffffff; 
+            padding: 1rem; 
+            border-radius: 0.5rem; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); 
+            cursor: grab; 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            transform-origin: center center; 
+            touch-action: none; 
+            will-change: transform;
+        }
+        .card img {
+            width: 5rem; height: 5rem; border-radius: 0.25rem; object-fit: cover; flex-shrink: 0; pointer-events: none;
+        }
+        .dragging {
+            cursor: grabbing !important; transition: none; user-select: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); will-change: transform, box-shadow;
+        }
+        .dragging-special {
+            box-shadow: 0 0 30px 5px #fde047, 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(1.0) rotate(0deg) !important;
+        }
+        #last-card {
+            cursor: pointer; pointer-events: all !important; 
+        }
+        #last-card:hover {
+            box-shadow: 0 0 25px #fde047, 0 0 40px #fde047; transform: scale(1.0) rotate(0deg) !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(219, 39, 119, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(219, 39, 119, 0.5); }
+        }
+
+        #gift-box-container {
+            position: relative; 
+            width: 288px; 
+            height: 288px; 
+            perspective: 1000px; 
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: all 0.7s ease-out 0.2s; 
+            animation: pulse 2.5s infinite ease-in-out; 
+            border-radius: 8px;
+            z-index: 60;
+        }
+        
+        #gift-lid { 
+            position: absolute; inset: 0; 
+            background-color: #f472b6; border-radius: 8px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 30; 
+            cursor: grab;
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+            background-image: linear-gradient(to bottom, #f68ac1, #f472b6); 
+            touch-action: none; 
+        }
+
+        .ribbon { position: absolute; background-color: #db2777; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 1px rgba(0,0,0,0.2); }
+        .ribbon-x { left: 0; right: 0; top: 50%; height: 28px; transform: translateY(-50%); }
+        .ribbon-y { top: 0; bottom: 0; left: 50%; width: 28px; transform: translateX(-50%); }
+
+        .bow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background-color: #db2777; border-radius: 50%; z-index: 35; }
+        .bow::before, .bow::after { content: ''; position: absolute; width: 36px; height: 54px; background-color: #db2777; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; z-index: 34; }
+        .bow::before { left: -17px; top: -12px; transform: rotate(-45deg); }
+        .bow::after { right: -17px; top: -12px; transform: rotate(45deg); }
+
+        @keyframes swing {
+            0%, 100% { transform: translate(-50%, -20%) rotate(5deg); }
+            50% { transform: translate(-50%, -20%) rotate(-5deg); }
+        }
+        @keyframes sway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        #gift-tag {
+            position: absolute; top: 50%; left: 50%; z-index: 40; width: 80px; height: 80px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #db2777; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform-origin: 50% 0; animation: swing 3s infinite ease-in-out; border-top: 2px solid #db2777; text-align: center; padding: 5px; font-size: 14px; line-height: 1.2; pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(100vh) scale(0.5); }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { opacity: 0; transform: translateY(-100vh) scale(1); }
+        }
+        .bubble {
+            position: fixed; bottom: 0; background-color: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 50%; z-index: 100; animation: floatUp linear; text-align: center; font-size: 14px; color: rgba(219, 39, 119, 0.7); font-weight: 600; pointer-events: none;
+        }
+
+        #desktopSidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden relative">
+
+    <audio id="bgMusic" src="Harmonica (Squid Game).mp3" loop></audio>
+
+    <button id="navToggle" class="md:hidden fixed top-6 left-6 z-[999] p-2 bg-pink-700 text-white rounded-full shadow-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+    <button id="desktopNavToggle" class="hidden md:block fixed top-6 left-6 z-[1000] p-3 bg-indigo-900 text-yellow-100 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200">
+        <div class="flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span class="font-bold font-cursive">Menu</span>
+        </div>
+    </button>
+
+        <nav id="topNav" class="md:hidden nav-panel fixed top-0 left-0 right-0 z-[998] h-16 bg-pink-700 text-yellow-100 shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Massege</a>
+            <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Music</a>
+        </nav>
+        
+        <nav id="bottomNav" class="md:hidden nav-panel fixed bottom-0 left-0 right-0 z-[998] h-16 bg-pink-700 text-yellow-100 shadow-md flex items-center justify-center space-x-2 translate-y-full">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="md:hidden nav-panel fixed left-0 top-0 bottom-0 z-[998] w-20 bg-pink-700 text-yellow-100 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="rightNav" class="md:hidden nav-panel fixed right-0 top-0 bottom-0 z-[998] w-20 bg-pink-700 text-yellow-100 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-pink-600 transition-colors duration-200 festive-text">Food</a>
+        </nav>
+
+    <nav id="desktopSidebar" class="hidden md:flex fixed left-0 top-0 h-full w-96 bg-indigo-900 z-[999] shadow-2xl transform -translate-x-full flex-col pt-20 pb-6 px-4 border-r border-indigo-700">
+        <h2 class="text-2xl font-cursive text-yellow-300 mb-6 text-center border-b border-indigo-700 pb-2">Magical Menu</h2>
+        <div id="desktopSidebarScroll" class="flex-1 overflow-y-auto pr-2">
+            <div class="grid grid-cols-2 gap-3">
+                <a href="index.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Home</a>
+                <a href="Cake.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Cake</a>
+                <a href="21_Wish.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">21_Door</a>
+                <a href="chat.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Heaven</a>
+                <a href="Diary.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Diary</a>
+                <a href="anatomy.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Anatomy</a>
+                <a href="Box.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Box</a>
+                <a href="Special.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Special</a>
+                <a href="color.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Color</a>
+                <a href="you.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">You</a>
+                <a href="Teacher.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Teacher</a>
+                <a href="Universe.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Universe</a>
+                <a href="The_River.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">River</a>
+                <a href="Mountain.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Mountain</a>
+                <a href="Skill.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Skill</a>
+                <a href="Paper_Star.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Paper Star</a>
+                <a href="Carttoon.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Cartoon</a>
+                <a href="Periodik_table.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Periodik_table</a>
+                <a href="Concept.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Concept</a>
+                <a href="Calender.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Calender</a>
+                <a href="Perspective.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Perspective</a>
+                <a href="Santa.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Santa</a>
+                <a href="Presence.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Presence</a>
+                <a href="Cloud.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Cloud</a>
+                <a href="Ink.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Paint</a>
+                <a href="Butterfly.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Butterfly</a>
+                <a href="Weather.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Weather</a>
+                <a href="Spotlight.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Spotlight</a>
+                <a href="Room.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Room</a>
+                <a href="Radio.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Radio</a>
+                <a href="Food.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Food</a>
+                <a href="Music.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Music</a>
+                <a href="letter.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Letter</a>
+                <a href="Msg.html" class="bg-indigo-800 text-yellow-100 hover:bg-pink-600 px-3 py-3 rounded-md text-center text-sm font-medium transition-colors duration-200 festive-text border border-indigo-700">Massege</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="mainContent" class="absolute inset-0 pt-28 overflow-y-auto">
+
+        <div id="gift-scene">
+            
+            <div class="hidden lg:block absolute left-12 bottom-12 z-0 opacity-90 pointer-events-none" style="animation: sway 4s infinite ease-in-out alternate;">
+                <svg width="200" height="300" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 280 Q100 200 70 150" stroke="#9ca3af" stroke-width="1.5"/>
+                    <path d="M100 280 Q100 200 130 140" stroke="#9ca3af" stroke-width="1.5"/>
+                    <path d="M100 280 Q100 200 100 120" stroke="#9ca3af" stroke-width="1.5"/>
+                    
+                    <g transform="translate(40, 60)">
+                        <ellipse cx="30" cy="40" rx="28" ry="35" fill="#f472b6" opacity="0.9"/>
+                        <path d="M20 25 Q25 20 35 22" stroke="white" stroke-width="2" opacity="0.4" fill="none"/>
+                    </g>
+                    <g transform="translate(100, 50)">
+                        <ellipse cx="30" cy="40" rx="28" ry="35" fill="#c084fc" opacity="0.9"/>
+                        <path d="M20 25 Q25 20 35 22" stroke="white" stroke-width="2" opacity="0.4" fill="none"/>
+                    </g>
+                    <g transform="translate(70, 0)">
+                        <ellipse cx="30" cy="40" rx="28" ry="35" fill="#facc15" opacity="0.9"/>
+                        <path d="M20 25 Q25 20 35 22" stroke="white" stroke-width="2" opacity="0.4" fill="none"/>
+                    </g>
+                    
+                    <circle cx="100" cy="280" r="4" fill="#9ca3af"/>
+                </svg>
+            </div>
+
+            <div class="hidden lg:block absolute right-12 bottom-20 z-0 opacity-90 pointer-events-none animate-[pulse_5s_infinite]">
+                 <svg width="180" height="180" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="50" cy="85" rx="35" ry="10" fill="#e5e7eb"/>
+                    
+                    <path d="M25 60 L25 80 Q50 90 75 80 L75 60 Q50 70 25 60" fill="#fbcfe8"/> 
+                    <ellipse cx="50" cy="60" rx="25" ry="8" fill="#f9a8d4"/> 
+                    
+                    <path d="M35 45 L35 60 Q50 65 65 60 L65 45 Q50 50 35 45" fill="#f472b6"/> 
+                    <ellipse cx="50" cy="45" rx="15" ry="5" fill="#db2777"/> 
+
+                    <rect x="42" y="30" width="2" height="15" fill="#fde047"/>
+                    <rect x="50" y="32" width="2" height="13" fill="#60a5fa"/>
+                    <rect x="56" y="30" width="2" height="15" fill="#fde047"/>
+
+                    <circle cx="43" cy="28" r="1.5" fill="#ef4444" class="animate-bounce"/>
+                    <circle cx="51" cy="30" r="1.5" fill="#ef4444" class="animate-bounce" style="animation-delay: 0.2s"/>
+                    <circle cx="57" cy="28" r="1.5" fill="#ef4444" class="animate-bounce" style="animation-delay: 0.4s"/>
+                </svg>
+            </div>
+            
+            <h1 id="main-title" style="font-size: 3.75rem; color: #ec4899; margin-bottom: 0; text-align: center; opacity: 0; transform: translateY(1.25rem); transition: all 0.7s ease-out;">
+                A Sweet Gift For You!
+            </h1>
+
+            <div class="hidden md:block absolute top-12 right-12 opacity-80 pointer-events-none animate-[bounce_4s_infinite]">
+                <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="30" cy="40" r="20" fill="#f472b6" opacity="0.8"/>
+                    <circle cx="60" cy="30" r="25" fill="#c084fc" opacity="0.8"/>
+                    <circle cx="50" cy="60" r="22" fill="#60a5fa" opacity="0.8"/>
+                    <path d="M30 60 L30 90" stroke="#9ca3af" stroke-width="1"/>
+                    <path d="M60 55 L60 90" stroke="#9ca3af" stroke-width="1"/>
+                    <path d="M50 82 L50 95" stroke="#9ca3af" stroke-width="1"/>
+                </svg>
+            </div>
+
+            <div class="hidden md:block absolute bottom-12 left-12 opacity-60 pointer-events-none">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="animate-[pulse_3s_infinite]">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+            </div>
+
+            <div class="hidden md:block absolute bottom-12 right-20 opacity-70 pointer-events-none animate-[spin_10s_linear_infinite]">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                </svg>
+            </div>
+
+            <div class="hidden md:block absolute top-1/2 left-10 transform -translate-y-1/2 opacity-50 pointer-events-none">
+                <h3 class="font-cursive text-2xl text-pink-400 -rotate-90">Open the Menu &#10140;</h3>
+            </div>
+
+            
+            <div class="hidden md:block floating-item absolute bottom-[15%] left-[10%] md:left-[20%] z-40 cursor-grab hover:scale-110 transition-transform duration-300 flex items-center justify-center" 
+                 data-rot="-6" 
+                 style="width: 220px; height: 220px; transform: rotate(-6deg);">
+                <div style="font-size: 8rem; line-height: 1; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));">💐</div>
+            </div>
+
+            <div class="hidden md:block floating-item absolute bottom-[15%] right-[10%] md:right-[20%] z-40 cursor-grab hover:scale-110 transition-transform duration-300" 
+                 data-rot="6" 
+                 style="width: 150px; transform: rotate(6deg);">
+                <svg viewBox="0 0 150 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto drop-shadow-2xl">
+                    <defs>
+                        <linearGradient id="goldLink" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fcd34d" />
+                            <stop offset="100%" stop-color="#d97706" />
+                        </linearGradient>
+                    </defs>
+
+                    <g stroke="#b45309" stroke-width="1">
+                        <rect x="68" y="10" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="28" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="46" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="64" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="82" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        
+                        <rect x="54" y="15" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="33" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="51" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="69" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="87" width="14" height="15" rx="3" fill="url(#goldLink)" />
+
+                        <rect x="82" y="15" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="33" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="51" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="69" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="87" width="14" height="15" rx="3" fill="url(#goldLink)" />
+                    </g>
+
+                    <g stroke="#b45309" stroke-width="1">
+                        <rect x="68" y="200" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="218" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="236" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="254" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="68" y="272" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        
+                        <rect x="54" y="198" width="14" height="15" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="211" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="229" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="247" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="54" y="265" width="14" height="20" rx="3" fill="url(#goldLink)" />
+
+                        <rect x="82" y="198" width="14" height="15" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="211" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="229" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="247" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                        <rect x="82" y="265" width="14" height="20" rx="3" fill="url(#goldLink)" />
+                    </g>
+
+                    <path d="M55 100 L55 110 L95 110 L95 100" fill="#d1d5db" stroke="#9ca3af" stroke-width="2"/>
+                    <path d="M55 200 L55 190 L95 190 L95 200" fill="#d1d5db" stroke="#9ca3af" stroke-width="2"/>
+
+                    <circle cx="75" cy="150" r="45" fill="#f3f4f6" stroke="#9ca3af" stroke-width="4"/>
+                    <circle cx="75" cy="150" r="38" fill="white" stroke="#e5e7eb" stroke-width="1"/>
+                    
+                    <rect x="73" y="118" width="4" height="8" fill="#1f2937"/> 
+                    <rect x="73" y="174" width="4" height="8" fill="#1f2937"/> 
+                    <rect x="107" y="148" width="8" height="4" fill="#1f2937"/> 
+                    <rect x="35" y="148" width="8" height="4" fill="#1f2937"/> 
+
+                    <line id="hour-hand" x1="75" y1="150" x2="75" y2="130" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/> 
+                    <line id="minute-hand" x1="75" y1="150" x2="95" y2="150" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/> 
+                    <line id="second-hand" x1="75" y1="150" x2="65" y2="165" stroke="#ef4444" stroke-width="1" stroke-linecap="round"/> 
+                    
+                    <circle cx="75" cy="150" r="2" fill="#374151"/>
+
+                    <rect x="120" y="142" width="6" height="16" rx="2" fill="#d1d5db" stroke="#9ca3af"/>
+                </svg>
+            </div>
+
+            <div id="gift-box-container">
+                <div id="gift-body" style=" position: absolute; inset: 0; background-color: #fdf2f8; border: 4px solid #fbcfe8; border-radius: 8px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); z-index: 10; "></div>
+
+                <div id="card-container" style=" position: absolute; inset: 0; padding: 1.5rem; z-index: 20; pointer-events: none; ">
+                    <div class="card" data-x="1.61" data-y="-4.66" data-rot="-2.25" style="opacity: 0; transition: all 0.7s ease-out; display: none;">
+                        <img src="Choco_Pie.jpeg" alt="Choco+Pie" onerror="this.src='https://placehold.co/100x100/D22B2B/FFFFFF?text=Choco+Pie'">
+                        <div class="card-content">
+                            <p style="color: #b91c1c;">Hey My...</p>
+                            <p>Choco Pie</p>
+                        </div>
+                    </div>
+                    <div class="card" data-x="2.89" data-y="-3.12" data-rot="3.86" style="opacity: 0; transition: all 0.7s ease-out; display: none;">
+                        <img src="Fuse.jpeg" alt="Fuse" onerror="this.src='https://placehold.co/100x100/4B0082/FFFFFF?text=Fuse'">
+                        <div class="card-content">
+                            <p style="color: #4B0082;">when I see you my mind</p>
+                            <p>FUSE...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card" data-x="2.89" data-y="-3.12" data-rot="3.86" style="opacity: 0; transition: all 0.7s ease-out; display: none;">
+                        <img src="Heart.jpeg" alt="Heart" onerror="this.src='https://placehold.co/100x100/FF0000/FFFFFF?text=Heart'">
+                        <div class="card-content">
+                            <p style="color: #4B0082;">You are everyones heart</p>
+                            <p>Heart.</p>
+                        </div>
+                    </div>
+                    <div class="card" data-x="4.62" data-y="3.56" data-rot="-3.95" style="opacity: 0; transition: all 0.7s ease-out; display: none;">
+                        <img src="Center_freseh.jpeg" alt="Center Fresh" onerror="this.src='https://placehold.co/100x100/00AEEF/FFFFFF?text=Center+Fresh'">
+                        <div class="card-content">
+                            <p style="color: #0284c7;">You give...</p>
+                            <p>freshness in life</p>
+                        </div>
+                    </div>
+
+                    <div class="card" data-x="0.32" data-y="-1.79" data-rot="0.94" style="opacity: 0; transition: all 0.7s ease-out; display: none;">
+                        <img src="Kit kat.jpeg" alt="Kit+Kat" onerror="this.src='https://placehold.co/100x100/FF0000/FFFFFF?text=Kit+Kat'">
+                        <div class="card-content">
+                            <p style="color: #dc2626;">Have a break, have a...</p>
+                            <p>Kit Kat</p>
+                        </div>
+                    </div>
+                    <div class="card" data-x="-0.40" data-y="0.94" data-rot="1.84" style="opacity: 0; transition: all 0.7s ease-out; display: none;">
+                        <img src="Gems.jpeg" alt="Gems" onerror="this.src='https://placehold.co/100x100/8A2BE2/FFFFFF?text=GEMS'">
+                        <div class="card-content">
+                            <p style="color: #7e22ce;">You are...</p>
+                            <p>a GEMS</p>
+                        </div>
+                    </div>
+                    <div class="card" id="birthday-card" data-x="4.26" data-y="-1.04" data-rot="-2.94" style="opacity: 0; transition: all 0.7s ease-out; display: none; padding: 1.5rem; flex-direction: column; justify-content: center; gap: 0.75rem;">
+                        <svg class="w-16 h-16 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 4rem; height: 4rem; color: #ec4899;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.25a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15.25V11a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 11v4.25zM8.25 18v-2.625m7.5 2.625v-2.625M9 8.25h.01M12 8.25h.01M15 8.25h.01M4.5 15.25h15"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 5.25a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v3a.75.75 0 01-.75.75h-3a.75.75 0 01-.75-.75v-3z"></path></svg>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #db2777;">Happy Birthday!</p>
+                    </div>
+                    <div class="card" id="last-card" data-x="1.67" data-y="0.32" data-rot="-1.12" style="opacity: 0; transition: all 0.7s ease-out; display: none; padding: 1.5rem; flex-direction: column; justify-content: center; gap: 0.75rem; text-align: center;">
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #d97706;">✨ A Final Surprise... ✨</p>
+                        <p style="color: #6b7280;">(Click Me[Make sure you move your hand in whole screen to see the surprise])</p>
+                    </div>
+                </div>
+
+                <div id="gift-lid" style="transform: translateY(0px) rotate(0deg); opacity: 1; transition: all 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);">
+                    <div class="ribbon ribbon-y"></div>
+                    <div class="ribbon ribbon-x"></div>
+                    <div class="bow"></div>
+                    <div id="gift-tag">Drag Me</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="spotlight-scene" class="bg-black text-white h-screen w-screen overflow-hidden relative" style="position: fixed; inset: 0; display: none; opacity: 0; transition: opacity 1.5s ease-in-out; background-color: #000;">
+            
+            <div class="absolute inset-0 z-5" id="glitter-background-static">
+            </div>
+
+            <div id="hidden-content-container" class="absolute inset-0 flex flex-col items-center justify-center p-4 z-10 select-none text-center" style="opacity: 0;"> 
+                
+                <div id="final-image" class="w-11/12 max-w-sm overflow-hidden rounded-lg shadow-2xl mb-8">
+                    <img 
+                        src="Best.jpg" 
+                        alt="Birthday Photo" 
+                        class="w-full h-auto object-cover" 
+                        onerror="this.src='https://placehold.co/600x400/FFC0CB/000000?text=Your+Precious+Photo+Here'"
+                    >
+                </div>
+
+                <h1 class="text-4xl md:text-6xl text-center animated-gradient-text font-cursive">
+                    Happiest Birthday<br>Miss Juhi
+                </h1>
+            </div>
+
+            <div class="overlay" id="spotlight-overlay"></div>
+
+            <div id="blackout-cover"></div>
+        </div>
+
+        <div class="min-h-[100vh] pt-[40vh] text-center text-gray-500">
+            <p>
+                
+            </p>
+            <p class="mt-4">
+                
+            </p>
+        </div>
+        
+        <footer class="text-center py-10 mt-16 bg-white/90 backdrop-blur-sm border-t border-gray-200 relative z-10">
+            <p class="text-gray-600">Made with ❤️ just for you.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        window.addEventListener('load', () => {
+            console.log("DOM Loaded. Initializing App...");
+
+            const bgMusic = document.getElementById('bgMusic');
+            
+            function manageBgMusic() {
+                if (window.innerWidth >= 768) {
+                    const playPromise = bgMusic.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log("Autoplay prevented. Waiting for interaction.");
+                            const playOnInteraction = () => {
+                                if (window.innerWidth >= 768) {
+                                    bgMusic.play();
+                                }
+                                document.removeEventListener('click', playOnInteraction);
+                                document.removeEventListener('touchstart', playOnInteraction);
+                                document.removeEventListener('keydown', playOnInteraction);
+                            };
+                            document.addEventListener('click', playOnInteraction);
+                            document.addEventListener('touchstart', playOnInteraction);
+                            document.addEventListener('keydown', playOnInteraction);
+                        });
+                    }
+                } else {
+                    bgMusic.pause();
+                }
+            }
+
+            manageBgMusic();
+
+            window.addEventListener('resize', manageBgMusic);
+
+
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            let areNavsOpen = false;
+
+            
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const desktopSidebar = document.getElementById('desktopSidebar');
+            let isDesktopNavOpen = false;
+
+
+            const giftScene = document.getElementById('gift-scene');
+            const cardContainer = document.getElementById('card-container');
+            const cards = Array.from(document.querySelectorAll('#card-container .card'));
+            const lastCard = document.getElementById('last-card');
+            const giftLid = document.getElementById('gift-lid');
+            const mainTitle = document.getElementById('main-title');
+            const giftBoxContainer = document.getElementById('gift-box-container');
+            
+            const spotlightScene = document.getElementById('spotlight-scene');
+            const spotlightOverlay = document.getElementById('spotlight-overlay');
+            const glitterContainer = document.getElementById('glitter-background-static');
+            const blackoutCover = document.getElementById('blackout-cover'); 
+            const hiddenContentContainer = document.getElementById('hidden-content-container');
+
+            let isGiftOpen = false; 
+            let activeCard = null;
+            let initialPointerX = 0, initialPointerY = 0;
+            let initialTranslateX = 0, initialTranslateY = 0;
+            let topZIndex = 100; 
+            
+            function createBubble() {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                const words = ["joy", "smile", "magic", "you", "sweet", "love", "✨"];
+                const word = words[Math.floor(Math.random() * words.length)];
+                bubble.textContent = word;
+                const size = Math.random() * 40 + 20;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.lineHeight = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                const duration = Math.random() * 5000 + 7000;
+                bubble.style.animationDuration = `${duration}ms`;
+                document.body.appendChild(bubble);
+                setTimeout(() => bubble.remove(), duration);
+            }
+
+            function showCardStack() {
+                cardContainer.style.pointerEvents = 'auto'; 
+
+                cards.forEach((card, index) => {
+                    card.style.display = 'flex';
+                    card.style.zIndex = cards.length - index;
+                    
+                    if (card.id === 'last-card') {
+                        card.addEventListener('pointerdown', showFinale);
+                    } else {
+                        addDragListeners(card);
+                    }
+                    
+                    setTimeout(() => {
+                        const randomRot = parseFloat(card.dataset.rot || (Math.random() * 8 - 4));
+                        const randomX = parseFloat(card.dataset.x || (Math.random() * 10 - 5));
+                        const randomY = parseFloat(card.dataset.y || (Math.random() * 10 - 5));
+                        
+                        card.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRot}deg)`;
+                        card.dataset.x = randomX;
+                        card.dataset.y = randomY;
+                        card.dataset.rot = randomRot;
+
+                        card.style.opacity = '1';
+                    }, 50 * index);
+                });
+            }
+
+
+            function getEventPosition(event) {
+                if (event.touches && event.touches.length > 0) {
+                    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+                }
+                return { x: event.clientX, y: event.clientY };
+            }
+
+            async function openGiftAndShowCards() {
+                if (isGiftOpen) return;
+                isGiftOpen = true;
+
+                giftLid.removeEventListener('pointerdown', dragStartLid);
+                document.removeEventListener('pointermove', dragMoveLid);
+                document.removeEventListener('pointerup', dragEndLid);
+                document.removeEventListener('pointercancel', dragEndLid);
+
+                giftBoxContainer.style.animationPlayState = 'paused';
+
+                mainTitle.textContent = "A Sweet Message For You!";
+                
+                giftScene.style.zIndex = 10;
+                giftScene.style.backgroundColor = 'transparent';
+
+                setInterval(createBubble, 1500);
+
+                giftLid.style.transition = 'transform 0.7s ease-in, opacity 0.5s ease-out';
+                giftLid.style.transform = 'translateY(100vh) rotate(30deg)';
+                giftLid.style.opacity = '0';
+
+
+                setTimeout(() => {
+                    giftLid.style.display = 'none';
+                    giftBoxContainer.style.animationPlayState = 'running'; 
+                    showCardStack();
+                }, 700);
+            }
+
+
+            let lidDragging = false;
+            let currentLidY = 0; 
+
+            function dragStartLid(event) {
+                if (isGiftOpen) return;
+                
+                if (event.type === 'mousedown' && event.button !== 0) return;
+                
+                lidDragging = true;
+                event.preventDefault(); 
+                giftLid.setPointerCapture(event.pointerId);
+
+                giftLid.classList.add('dragging');
+                giftLid.style.transition = 'none';
+                giftBoxContainer.style.animationPlayState = 'paused';
+
+                let eventPos = getEventPosition(event);
+                initialPointerY = eventPos.y;
+                
+                currentLidY = 0; 
+
+                document.addEventListener('pointermove', dragMoveLid);
+                document.addEventListener('pointerup', dragEndLid);
+                document.addEventListener('pointercancel', dragEndLid);
+            }
+
+            function dragMoveLid(event) {
+                if (!lidDragging || isGiftOpen) return;
+                event.preventDefault(); 
+                
+                let eventPos = getEventPosition(event);
+                let deltaY = eventPos.y - initialPointerY;
+                
+                deltaY = Math.max(0, deltaY); 
+
+                currentLidY = deltaY;
+                
+                giftLid.style.transform = `translateY(${deltaY}px) rotate(0deg)`;
+            }
+
+            function dragEndLid(event) {
+                if (!lidDragging || isGiftOpen) return;
+                lidDragging = false;
+                
+                if (event.pointerId) {
+                    giftLid.releasePointerCapture(event.pointerId);
+                }
+
+                const OPEN_THRESHOLD = 100;
+
+                if (currentLidY > OPEN_THRESHOLD) {
+                    openGiftAndShowCards();
+                } else {
+                    giftLid.style.transition = 'transform 0.3s ease-out, box-shadow 0.2s ease-out';
+                    giftLid.style.transform = 'translateY(0) rotate(0deg)';
+                    giftBoxContainer.style.animationPlayState = 'running';
+                }
+
+                giftLid.classList.remove('dragging');
+
+                document.removeEventListener('pointermove', dragMoveLid);
+                document.removeEventListener('pointerup', dragEndLid);
+                document.removeEventListener('pointercancel', dragEndLid);
+            }
+
+            function dragStart(event) {
+                if (event.type === 'mousedown' && event.button !== 0) return;
+                
+                activeCard = event.currentTarget;
+                if (activeCard.id === 'last-card') { activeCard = null; return; }
+                
+                event.stopPropagation();
+                
+                activeCard.setPointerCapture(event.pointerId);
+                giftBoxContainer.style.animationPlayState = 'paused';
+                activeCard.classList.add('dragging');
+                if (activeCard.id === 'birthday-card') { activeCard.classList.add('dragging-special'); }
+                topZIndex++;
+                activeCard.style.zIndex = topZIndex;
+                let eventPos = getEventPosition(event);
+                initialPointerX = eventPos.x;
+                initialPointerY = eventPos.y;
+                initialTranslateX = parseFloat(activeCard.dataset.x || 0);
+                initialTranslateY = parseFloat(activeCard.dataset.y || 0);
+                activeCard.style.transition = 'none'; 
+                activeCard.style.transform = `translate(${initialTranslateX}px, ${initialTranslateY}px) rotate(0deg)`;
+                document.addEventListener('pointermove', dragMove);
+                document.addEventListener('pointerup', dragEnd);
+                document.addEventListener('pointercancel', dragEnd);
+            }
+
+            function dragMove(event) {
+                if (!activeCard) return;
+                event.stopPropagation();
+                
+                let eventPos = getEventPosition(event);
+                let deltaX = eventPos.x - initialPointerX;
+                let deltaY = eventPos.y - initialPointerY;
+                let newX = initialTranslateX + deltaX;
+                let newY = initialTranslateY + deltaY;
+                activeCard.style.transform = `translate(${newX}px, ${newY}px) rotate(0deg)`;
+                activeCard.dataset.x = newX;
+                activeCard.dataset.y = newY;
+            }
+
+            function dragEnd(event) {
+                if (!activeCard) return;
+                activeCard.releasePointerCapture(event.pointerId);
+                giftBoxContainer.style.animationPlayState = 'running';
+                activeCard.style.transition = 'transform 0.2s ease-out, box-shadow 0.2s ease-out';
+                if (activeCard.id === 'birthday-card') { activeCard.classList.remove('dragging-special'); }
+                activeCard.classList.remove('dragging');
+                let finalX = activeCard.dataset.x || 0;
+                let finalY = activeCard.dataset.y || 0;
+                let originalRot = activeCard.dataset.rot || 0;
+                activeCard.style.transform = `translate(${finalX}px, ${finalY}px) rotate(${originalRot}deg)`;
+                activeCard = null; 
+                document.removeEventListener('pointermove', dragMove);
+                document.removeEventListener('pointerup', dragEnd);
+                document.removeEventListener('pointercancel', dragEnd);
+            }
+
+            function addDragListeners(card) { card.addEventListener('pointerdown', dragStart); }
+
+
+            const confettiColors = ['#ff00ae', '#ff7e00', '#fffb00', '#00ffc8', '#007bff', '#c300ff'];
+            const SPOTLIGHT_SIZE = 300; 
+            const FEATHER_START = SPOTLIGHT_SIZE * 0.3; 
+            const FEATHER_END = SPOTLIGHT_SIZE; 
+            let autoX = 0.5, autoY = 0.5; 
+            let autoTime = 0;
+            let isUserControlling = false;
+            let lastInteractionTime = 0;
+            const AUTO_START_DELAY = 5000; 
+            
+            function createStaticGlitter() {
+                for (let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('glitter-star');
+                    star.style.left = `${Math.random() * 100}vw`;
+                    star.style.top = `${Math.random() * 100}vh`;
+                    star.style.animationDelay = `${Math.random() * 2}s`;
+                    star.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                    glitterContainer.appendChild(star);
+                }
+            }
+
+            function spawnConfetti() {
+                for (let i = 0; i < 40; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                    confetti.style.animationDuration = `${Math.random() * 2 + 3}s`; 
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), (parseFloat(confetti.style.animationDuration) * 1000) + (parseFloat(confetti.style.animationDelay) * 1000));
+                }
+            }
+            
+            function updateSpotlightPosition(x, y) {
+                const gradientStyle = `radial-gradient(
+                    circle ${SPOTLIGHT_SIZE}px at ${x}px ${y}px, 
+                    transparent 0%, 
+                    transparent ${FEATHER_START}px, 
+                    rgba(0, 0, 0, 1) ${FEATHER_END}px 
+                )`;
+                spotlightOverlay.style.backgroundImage = gradientStyle;
+            }
+
+            function startAutoSpotlight() {
+                if (spotlightScene.style.opacity === '0' || spotlightScene.style.display === 'none') {
+                    requestAnimationFrame(startAutoSpotlight);
+                    return;
+                }
+
+                if (isUserControlling) {
+                    requestAnimationFrame(startAutoSpotlight);
+                    return;
+                }
+                
+                if (performance.now() - lastInteractionTime > AUTO_START_DELAY) {
+                    const speed = 0.008; 
+                    autoTime += speed;
+                    
+                    autoX = 0.5 + 0.5 * Math.sin(autoTime / 1.5); 
+                    autoY = 0.5 + 0.5 * Math.cos(autoTime); 
+
+                    const x = autoX * window.innerWidth;
+                    const y = autoY * window.innerHeight;
+
+                    updateSpotlightPosition(x, y);
+                }
+                
+                requestAnimationFrame(startAutoSpotlight);
+            }
+
+            function handleUserInteraction(e) {
+                
+                if (
+                    (e.target === navToggle || navToggle.contains(e.target)) ||
+                    (e.target === topNav || topNav.contains(e.target)) ||
+                    (e.target === bottomNav || bottomNav.contains(e.target)) ||
+                    (e.target === leftNav || leftNav.contains(e.target)) ||
+                    (e.target === rightNav || rightNav.contains(e.target)) ||
+                    (e.target === desktopNavToggle || desktopNavToggle.contains(e.target)) ||
+                    (e.target === desktopSidebar || desktopSidebar.contains(e.target))
+                ) {
+                    return;
+                }
+                
+
+                if (spotlightScene.style.opacity === '0' || spotlightScene.style.display === 'none') return;
+                
+                let x, y;
+                if (e.touches) {
+                    e.preventDefault(); 
+                    if (e.touches.length > 0) {
+                        x = e.touches[0].clientX;
+                        y = e.touches[0].clientY;
+                    } else {
+                        return; 
+                    }
+                } else {
+                    x = e.clientX;
+                    y = e.clientY;
+                }
+                
+                isUserControlling = true;
+                lastInteractionTime = performance.now();
+                
+                updateSpotlightPosition(x, y);
+
+                clearTimeout(spotlightScene.controlTimeout);
+                spotlightScene.controlTimeout = setTimeout(() => {
+                    isUserControlling = false;
+                }, 100); 
+            }
+
+            function initSpotlightScene() {
+                createStaticGlitter();
+                spawnConfetti();
+                
+                const initialGradient = `radial-gradient(
+                    circle ${SPOTLIGHT_SIZE}px at -500px -500px, 
+                    transparent 0%, 
+                    transparent ${FEATHER_START}px, 
+                    rgba(0, 0, 0, 1) ${FEATHER_END}px
+                )`;
+                spotlightOverlay.style.backgroundImage = initialGradient;
+                
+                setTimeout(() => {
+                    blackoutCover.style.opacity = '0';
+                    setTimeout(() => {
+                        blackoutCover.style.display = 'none';
+                    }, 150); 
+                }, 100);
+
+                hiddenContentContainer.style.opacity = '1'; 
+
+                document.body.addEventListener('mousemove', handleUserInteraction);
+                document.body.addEventListener('touchstart', handleUserInteraction, { passive: false });
+                document.body.addEventListener('touchmove', handleUserInteraction, { passive: false });
+                
+                lastInteractionTime = performance.now();
+                startAutoSpotlight();
+            }
+
+            function showFinale(event) {
+                event.preventDefault(); 
+                event.stopPropagation();
+                
+                if (lastCard) {
+                    lastCard.removeEventListener('pointerdown', showFinale);
+                }
+
+                
+                const panels = [topNav, bottomNav, leftNav, rightNav];
+                
+                
+                navToggle.classList.remove('bg-pink-700', 'hover:bg-pink-600', 'focus:ring-pink-500');
+                navToggle.classList.add('bg-indigo-900', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+                
+                
+                panels.forEach(panel => {
+                    panel.classList.remove('bg-pink-700');
+                    panel.classList.add('bg-indigo-900');
+                });
+                
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('hover:bg-pink-600');
+                    link.classList.add('hover:bg-indigo-700');
+                });
+                
+
+                
+                blackoutCover.style.opacity = '1';
+                blackoutCover.style.display = 'block';
+
+                giftScene.style.opacity = '0';
+                
+                setTimeout(() => {
+                    giftScene.style.display = 'none';
+                    
+                    spotlightScene.style.display = 'block';
+                    initSpotlightScene();
+
+                    setTimeout(() => {
+                        spotlightScene.style.opacity = '1';
+                    }, 50); 
+                    
+                }, 500);
+            }
+
+
+            function openAllNavs() {
+                topNav.classList.remove('-translate-y-full');
+                bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full');
+                rightNav.classList.remove('translate-x-full');
+                mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                mainContent.classList.remove('pt-28'); 
+                navToggleIcon.classList.add('hidden');
+                navToggleX.classList.remove('hidden');
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                rightNav.classList.add('translate-x-full');
+                mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                mainContent.classList.add('pt-28'); 
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+
+            
+            function toggleDesktopNav() {
+                if(isDesktopNavOpen) {
+                    desktopSidebar.classList.add('-translate-x-full');
+                    isDesktopNavOpen = false;
+                } else {
+                    desktopSidebar.classList.remove('-translate-x-full');
+                    isDesktopNavOpen = true;
+                }
+            }
+
+            function closeDesktopNav() {
+                if(isDesktopNavOpen) {
+                    desktopSidebar.classList.add('-translate-x-full');
+                    isDesktopNavOpen = false;
+                }
+            }
+
+            
+            
+            giftLid.addEventListener('pointerdown', dragStartLid);
+
+            setTimeout(() => {
+                mainTitle.style.opacity = '1';
+                mainTitle.style.transform = 'translateY(0)';
+                giftBoxContainer.style.opacity = '1';
+                giftBoxContainer.style.transform = 'translateY(0)';
+            }, 100);
+
+            
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                toggleAllNavs();
+            });
+
+            
+            desktopNavToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleDesktopNav();
+            });
+            
+            
+            document.addEventListener('click', (e) => {
+                
+                if (areNavsOpen) {
+                    if (e.target !== navToggle && !navToggle.contains(e.target)) {
+                        closeAllNavs();
+                    }
+                }
+                
+                
+                if (isDesktopNavOpen) {
+                    if (!desktopSidebar.contains(e.target) && !desktopNavToggle.contains(e.target)) {
+                        closeDesktopNav();
+                    }
+                }
+            });
+
+            
+            const floatingItems = document.querySelectorAll('.floating-item');
+            floatingItems.forEach(item => {
+                addDragListeners(item);
+            });
+
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetHash = e.currentTarget.getAttribute('href');
+                    if (targetHash.startsWith('#')) {
+                        e.preventDefault(); 
+                    }
+                    if (areNavsOpen) {
+                        if (!targetHash.startsWith('#')) {
+                             setTimeout(closeAllNavs, 100); 
+                        } else {
+                            closeAllNavs();
+                        }
+                    }
+                });
+            });
+
+            function updateWatch() {
+                const now = new Date();
+                const h = now.getHours();
+                const m = now.getMinutes();
+                const s = now.getSeconds();
+
+                const hDeg = (h % 12) * 30 + m * 0.5;
+                const mDeg = m * 6;
+                const sDeg = s * 6;
+
+                const hourHand = document.getElementById('hour-hand');
+                const minuteHand = document.getElementById('minute-hand');
+                const secondHand = document.getElementById('second-hand');
+
+                if(hourHand) hourHand.setAttribute('transform', `rotate(${hDeg}, 75, 150)`);
+                if(minuteHand) minuteHand.setAttribute('transform', `rotate(${mDeg}, 75, 150)`);
+                if(secondHand) secondHand.setAttribute('transform', `rotate(${sDeg}, 75, 150)`);
+            }
+            setInterval(updateWatch, 1000);
+            updateWatch();
+            
+        });
+    </script>
+
+</body>
+</html>

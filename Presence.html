@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Presence</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --c1: #8a2be2;
+    --c2: #00c8ff;
+    --c3: #ff4b9e;
+    --bg1:#fdfcff;
+    --bg2:#f5f4f7;
+    --gold-1:#D8B765;
+    --gold-2:#E7C987;
+    --char:#222;
+    --nav-pink:#FF69B4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background: radial-gradient(1200px 800px at 50% 60%, var(--bg2), var(--bg1));
+    overflow:hidden;
+    font-family:"Merriweather","Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:#334;
+    transition: background 1.5s ease;
+  }
+    
+  #bg{ position:fixed; inset:0; z-index:1; overflow:hidden; pointer-events:none; }
+  .blob{ position:absolute; width:52vmin; height:52vmin; border-radius:50%; filter: blur(70px) saturate(130%); opacity:.65; mix-blend-mode:multiply; will-change: transform; }
+  .b1{ background: radial-gradient(circle at 30% 30%, var(--c1), transparent 65%); left:-10vmin; top:-8vmin; animation:floatA 22s ease-in-out infinite alternate; }
+  .b2{ background: radial-gradient(circle at 60% 40%, var(--c2), transparent 65%); right:-12vmin; top:10vmin; animation:floatB 18s ease-in-out infinite alternate-reverse; }
+  .b3{ background: radial-gradient(circle at 50% 60%, var(--c3), transparent 65%); left:15vmin; bottom:-12vmin; animation:floatC 26s ease-in-out infinite alternate; }
+    
+  @keyframes floatA {0%{transform:translate(-10%,-6%) scale(1)}50%{transform:translate(5%,-12%) scale(1.18)}100%{transform:translate(-8%,8%) scale(.96)}}
+  @keyframes floatB {0%{transform:translate(10%,8%) scale(1.05)}50%{transform:translate(-4%,-6%) scale(1.22)}100%{transform:translate(8%,12%) scale(.92)}}
+  @keyframes floatC {0%{transform:translate(0%,0%) scale(.95)}50%{transform:translate(8%,10%) scale(1.12)}100%{transform:translate(-6%,-8%) scale(1)}}
+
+  .slide{ position:fixed; inset:0; z-index:3; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: clamp(16px,4vw,32px); text-align:center; opacity:0; transform:translateY(24px) scale(.995); transition: opacity .6s ease, transform .6s ease; pointer-events:none; }
+  .slide.active{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+
+  .title{ font-weight:700; font-size: clamp(22px,5vw,38px); letter-spacing:.2px; text-shadow:0 0 12px rgba(0,0,0,.12); font-family:'Merriweather',serif; }
+    
+  .title .letter{ display:inline-block; transform:translateY(30px); opacity:0; transition: all .7s cubic-bezier(.175,.885,.32,1.275); transition-delay: var(--delay); }
+  .slide.active .title .letter{ transform:translateY(0); opacity:1; }
+
+  .analog-wrap{ margin-top:10px; display:flex; align-items:center; justify-content:center; height:140px; }
+  .shared-clock{ width:126px; height:126px; display:block; }
+    
+  .hand { transform-origin: 0px 0px; }
+  .hand-hour, .hand-minute { transition: transform 1400ms cubic-bezier(.22,.9,.18,1); }
+  .hand-second { transition: transform 900ms cubic-bezier(.22,.9,.18,1), opacity 250ms; }
+  .hand-second.hidden{ opacity:0; }
+
+  .description{ font-size: clamp(13px,1.8vw,16px); line-height:1.6; margin-top:14px; max-width:700px; color:#667; white-space: pre-line; opacity:0; transform:translateY(20px); transition: opacity .7s ease .6s, transform .7s ease .6s; }
+    
+  .slide.active .description{ opacity:1; transform:translateY(0); }
+
+  .actions{ position: fixed; left:0; right:0; bottom: clamp(12px,3.5vh,30px); z-index:4; display:flex; justify-content:center; pointer-events:none; }
+  .btn{ pointer-events:auto; padding:10px 26px; border-radius:999px; cursor:pointer; font-size:16px; backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0,0,0,.08); background: rgba(255,255,255,0.6); border:1px solid rgba(0,0,0,0.06); transition: all 0.3s ease; }
+  .btn:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.9); }
+
+  .nav-panel{ position: fixed; z-index:60; color:#fff; background:var(--nav-pink); box-shadow:0 10px 30px rgba(0,0,0,.15); transition: transform 320ms cubic-bezier(.22,.9,.18,1); -webkit-overflow-scrolling: touch; }
+  
+  /* Increased z-index to 62 so top/bottom navs appear above side navs (z-index 60) */
+  #navTop{ left:0; right:0; top:0; height:64px; transform: translateY(-120%); display:flex; align-items:center; justify-content:center; gap:18px; z-index: 62; }
+  #navBottom{ left:0; right:0; bottom:0; height:64px; transform: translateY(120%); display:flex; align-items:center; justify-content:center; gap:18px; z-index: 62; }
+  
+  /* Reduced gap from 14px to 6px for tighter side buttons */
+  #navLeft{ top:0; bottom:0; left:0; width:84px; transform: translateX(-120%); display:flex; flex-direction:column; align-items:center; padding-top:80px; gap:6px; overflow:auto; }
+  #navRight{ top:0; bottom:0; right:0; width:84px; transform: translateX(120%); display:flex; flex-direction:column; align-items:center; padding-top:80px; gap:6px; overflow:auto; }
+
+  .nav-link-mobile{ padding:8px 12px; border-radius:10px; font-weight:600; color:#fff; text-decoration:none; font-size:14px; }
+  .nav-link-mobile:hover{ background: rgba(0,0,0,0.08); }
+
+  .open-top{ transform: translateY(0) !important; }
+  .open-bottom{ transform: translateY(0) !important; }
+  .open-left{ transform: translateX(0) !important; }
+  .open-right{ transform: translateX(0) !important; }
+
+  #navToggle{ position: fixed; z-index:70; left:14px; top:14px; width:44px; height:44px; border-radius:999px; background:var(--nav-pink); color:white; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.12); border:none; cursor:pointer; }
+
+  #navDim{ position: fixed; inset:0; z-index:59; background: rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition: opacity 220ms; }
+  #navDim.visible{ opacity:1; pointer-events:auto; }
+
+  .desktop-menu-btn {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    z-index: 100;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .desktop-menu-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    background: white;
+  }
+  .desktop-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(3px);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .desktop-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .desktop-sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0; width: 400px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    z-index: 101;
+    transform: translateX(-100%);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 10px 0 50px rgba(0,0,0,0.1);
+    display: flex; flex-direction: column; padding: 40px;
+    border-right: 1px solid rgba(255,255,255,0.5);
+  }
+  .desktop-sidebar.active { transform: translateX(0); }
+
+  .sidebar-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,0.05); }
+  .sidebar-title { font-family: 'Merriweather', serif; font-size: 28px; font-weight: 700; color: var(--nav-pink); }
+
+  .nav-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    overflow-y: auto; padding-right: 10px;
+    scrollbar-width: thin; scrollbar-color: #ddd transparent;
+  }
+  .nav-grid::-webkit-scrollbar { width: 6px; }
+  .nav-grid::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 3px; }
+
+  .d-nav-btn {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 12px 10px; background: white; border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    color: #555; text-decoration: none; transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  }
+  .d-nav-btn:hover {
+    background: var(--nav-pink); color: white; transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); border-color: transparent;
+  }
+
+  #desktop-scene { display: none; }
+  #desktop-clock-root { display: none; }
+    
+  #particle-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    #bg { display: none !important; }
+    #navTop, #navBottom, #navLeft, #navRight, #navToggle, #navDim { display: none !important; }
+      
+    .actions { display: none !important; }
+      
+    body {
+      background: linear-gradient(to bottom, #87CEEB 0%, #cae8f0 60%, #eefcff 100%);
+    }
+      
+    #desktop-scene {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      perspective: 1200px;
+      pointer-events: none;
+    }
+
+    .ds-sun {
+      position: absolute;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: #FFD700;
+      box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
+      top: 10%; left: 10%;
+      z-index: 0;
+      opacity: 1;
+      transition: all 1.5s ease;
+      transform: translate(0,0) scale(1);
+    }
+    .ds-sun.sunset {
+      background: #FF7F50;
+      box-shadow: 0 0 80px rgba(255, 69, 0, 0.6);
+      top: 45%; left: 15%;
+      transform: scale(1.4);
+    }
+    .ds-sun.night {
+      top: 100%;
+      opacity: 0;
+    }
+
+    .ds-moon {
+      position: absolute;
+      width: 90px; height: 90px;
+      top: 100%;
+      left: 80%;
+      z-index: 20; 
+      opacity: 0;
+      transition: top 2s ease, opacity 2s ease;
+    }
+    .ds-moon.visible {
+      top: 15%;
+      opacity: 1;
+    }
+
+    .ds-birds-container {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    .ds-birds-container.active { opacity: 0.8; }
+
+    .bird {
+      position: absolute;
+      width: 24px; height: 24px;
+      animation: fly 15s linear infinite;
+    }
+    .bird-wing {
+      fill: none;
+      stroke: #1a1a1a;
+      stroke-width: 2.5px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: flap 0.8s ease-in-out infinite alternate;
+      transform-origin: center;
+    }
+
+    @keyframes flap {
+      0% { d: path("M2 14 Q 12 2 22 14"); transform: translateY(0px); }
+      100% { d: path("M2 8 Q 12 20 22 8"); transform: translateY(-4px); }
+    }
+      
+    @keyframes fly {
+      0% { transform: translate(-10vw, 20vh) scale(0.6); }
+      50% { transform: translate(50vw, 15vh) scale(0.8); }
+      100% { transform: translate(110vw, 10vh) scale(0.6); }
+    }
+
+    .bird:nth-child(2) { animation-delay: 1s; top: 20px; animation-duration: 16s; }
+    .bird:nth-child(3) { animation-delay: 2.5s; top: -15px; animation-duration: 14s; }
+    .bird:nth-child(4) { animation-delay: 0.5s; top: 40px; animation-duration: 17s; }
+
+    .ds-stars {
+      position: absolute; inset: 0; z-index: 0; opacity: 0;
+      transition: opacity 2s ease;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #fff, rgba(0,0,0,0));
+      background-size: 200px 200px;
+      background-repeat: repeat;
+    }
+    .ds-stars.visible { opacity: 1; }
+      
+    .ds-grass {
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 45vh;
+      background: linear-gradient(to bottom, #6a9e5f 0%, #4a7c40 100%);
+      transition: filter 1s ease;
+    }
+    .ds-grass.night {
+      filter: brightness(0.3);
+    }
+
+    .ds-trees {
+      position: absolute; bottom: 44vh; left: 0; right: 0;
+      height: 150px;
+      display: flex; justify-content: space-between;
+      opacity: 0.8;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .ds-tree {
+      width: 0; height: 0;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 120px solid #557d4e;
+      position: relative;
+    }
+    .ds-tree::after {
+      content:''; position: absolute; top: 120px; left: -10px;
+      width: 20px; height: 30px; background: #5d4037;
+    }
+    .ds-tree:nth-child(1) { transform: scale(0.8) translateX(5vw); border-bottom-color: #4a6b42; }
+    .ds-tree:nth-child(2) { transform: scale(1.2) translateX(20vw); border-bottom-color: #5d8253; }
+    .ds-tree:nth-child(3) { transform: scale(0.9) translateX(-10vw); border-bottom-color: #44613d; }
+    .ds-tree:nth-child(4) { transform: scale(1.1) translateX(-25vw); border-bottom-color: #557d4e; }
+
+    .ds-wall-left {
+      position: absolute; bottom: 45vh; left: 0; right: calc(50% + 72px);
+      height: 50px;
+      background: #795548;
+      background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 40px 16px;
+      z-index: 1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: filter 1s ease;
+    }
+    .ds-wall-left::before {
+      content: ''; position: absolute; top: -6px; left: 0; right: 0; height: 6px; background: #5d4037;
+    }
+      
+    .ds-wall-right {
+      position: absolute; bottom: 45vh; left: calc(50% + 72px); right: 0;
+      height: 50px;
+      background: #795548;
+      background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 40px 16px;
+      z-index: 1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: filter 1s ease;
+    }
+    .ds-wall-right::before {
+      content: ''; position: absolute; top: -6px; left: 0; right: 0; height: 6px; background: #5d4037;
+    }
+      
+    .ds-wall-left.night, .ds-wall-right.night { filter: brightness(0.4); }
+
+    .ds-gate {
+        position: absolute; bottom: 45vh; left: 50%; transform: translateX(-50%);
+        width: 140px; height: 60px;
+        z-index: 2;
+        display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .ds-gate-pillar {
+        width: 15px; height: 100%;
+        background: #5d4037;
+        border-radius: 2px 2px 0 0;
+        box-shadow: 1px 0 2px rgba(0,0,0,0.3);
+    }
+    .ds-gate-inner {
+        flex: 1; height: 80%;
+        border: 2px solid #3e2723;
+        border-bottom: none;
+        background: repeating-linear-gradient(90deg, 
+            transparent 0, transparent 10px, 
+            #3e2723 10px, #3e2723 12px
+        );
+    }
+
+    .ds-cross-road {
+      position: absolute; bottom: 39vh; left: 0; right: 0;
+      height: 6vh;
+      background: #e6dcc8;
+      z-index: 1;
+      background-image: 
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      border-top: 4px solid #d4c4a8;
+        
+      transition: filter 1s ease;
+    }
+    .ds-cross-road.night { filter: brightness(0.4); }
+
+    .ds-road-wrap {
+      position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%); width: 100%; height: 55vh;
+      display: flex; justify-content: center;
+      perspective: 600px;
+      z-index: 3;
+    }
+    .ds-road {
+      width: 440px; height: 100%;
+      background: #e6dcc8; 
+      transform: rotateX(60deg) scaleY(2);
+      transform-origin: bottom center;
+      box-shadow: 0 0 40px rgba(0,0,0,0.2);
+      position: relative;
+      background-image: 
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      border-left: 12px solid #d4c4a8;
+      border-right: 12px solid #d4c4a8;
+      transition: filter 1s ease;
+    }
+    .ds-road.night { filter: brightness(0.4); }
+      
+    .ds-road::before {
+      content: ''; position: absolute; inset: 0;
+      border-left: 15px solid rgba(0,0,0,0.15);
+      border-right: 15px solid rgba(0,0,0,0.15);
+    }
+
+      
+    .ds-road-patch {
+      position: absolute; bottom: 38.8vh; left: 50%; transform: translateX(-50%);
+      width: 440px; height: 6.5vh; 
+      background: #e6dcc8;
+      z-index: 4; 
+      background-image: 
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transition: filter 1s ease;
+    }
+    .ds-road-patch.night { filter: brightness(0.4); }
+
+    .ds-bench {
+      position: absolute; bottom: 12vh; z-index: 4;
+      transition: filter 1s ease;
+    }
+      
+    .ds-bench.left { left: calc(50% - 350px); bottom: 38vh; transform: scale(0.8); }
+    .ds-bench.right { right: calc(50% - 350px); bottom: 38vh; transform: scale(0.8) rotateY(180deg); }
+    .ds-bench.night { filter: brightness(0.5); }
+
+      
+    .park-item { position: absolute; z-index: 2; pointer-events: none; opacity: 0.9; }
+      
+    .ds-swing { right: 12%; width: 260px; height: 190px; bottom: 24vh; }
+    .ds-seesaw { left: 15%; width: 280px; height: 100px; bottom: 16vh; transform: rotate(5deg); }
+    .ds-slide { left: 5%; width: 200px; height: 240px; bottom: 26vh; }
+    .ds-roundabout { right: 25%; width: 200px; height: 80px; bottom: 16vh; }
+
+    .ds-lamp-container {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 45vh;
+      perspective: 600px;
+      pointer-events: none;
+      z-index: 50; 
+    }
+    .ds-lamp {
+      position: absolute;
+      bottom: 0;
+      transform-origin: bottom center;
+    }
+      
+    .lamp-glow {
+      opacity: 0; transition: opacity 1s ease;
+    }
+    .lamp-glow.on { opacity: 1; filter: drop-shadow(0 0 12px gold); }
+    .lamp-glow.extra-bright { opacity: 1; filter: drop-shadow(0 0 25px orange) brightness(1.5); }
+
+    .lamp-l-1 { left: calc(50% - 380px); bottom: 14vh; transform: scale(1.1); z-index: 10; }
+    .lamp-l-2 { left: calc(50% - 240px); bottom: 25vh; transform: scale(0.7); z-index: 5; opacity: 0.9; }
+      
+    .lamp-r-1 { right: calc(50% - 380px); bottom: 14vh; transform: scale(1.1); z-index: 10; }
+    .lamp-r-2 { right: calc(50% - 240px); bottom: 25vh; transform: scale(0.7); z-index: 5; opacity: 0.9; }
+
+    .slide {
+      justify-content: center;
+      padding-top: 25vh;
+    }
+    .title {
+      font-size: 56px; 
+      margin-bottom: 20px;
+      color: #333;
+      text-shadow: 2px 2px 0px rgba(255,255,255,0.6);
+      position: relative; z-index: 10;
+      transition: color 1s ease;
+    }
+    .title.night { color: #f0f0f0; text-shadow: 0 0 15px rgba(255,255,255,0.8); }
+
+    .description {
+      font-size: 21px; line-height: 1.7; max-width: 420px;
+      margin-top: 30px;
+      color: #4a3b2a; font-weight: 600;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.9);
+      background: transparent; padding: 0; border-radius: 0;
+      backdrop-filter: none; box-shadow: none;
+      position: relative; z-index: 10;
+      transition: color 1s ease;
+    }
+    .description.night { color: #e0e0e0; text-shadow: 0 1px 8px #000; }
+
+    .analog-wrap {
+      display: none;
+    }
+
+    #desktop-clock-root {
+      display: block;
+      position: fixed; right: calc(50% - 540px); bottom: 35vh;
+      width: auto; height: auto; z-index: 5; margin: 0;
+      transform: scale(0.85);
+    }
+    #desktop-clock-root::after {
+      content: ''; position: absolute; top: 98%; left: 50%;
+      transform: translateX(-50%); width: 14px; height: 60vh;
+      background: #1a1a1a; border-radius: 4px; z-index: -1;
+    }
+    .shared-clock {
+      background: white; border-radius: 50%;
+      box-shadow: 0 0 0 8px #1a1a1a, 0 10px 20px rgba(0,0,0,0.3);
+      width: 180px; height: 180px;
+    }
+    .slide.active { align-items: center; }
+  }
+
+  @media (max-width: 1023px) {
+    .desktop-menu-btn, .desktop-overlay, .desktop-sidebar { display: none !important; }
+  }
+
+</style>
+</head>
+<body class="antialiased text-gray-800">
+
+<div id="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+
+<div id="desktop-scene">
+  <div id="dsStars" class="ds-stars"></div>
+  <div id="dsSun" class="ds-sun"></div>
+    
+  <div id="dsMoon" class="ds-moon">
+    <svg viewBox="0 0 100 100" width="100%" height="100%" fill="none">
+      <circle cx="50" cy="50" r="40" fill="#F4F6F0" style="filter: drop-shadow(0 0 15px rgba(255,255,255,0.9));" />
+    </svg>
+  </div>
+    
+  <div id="dsBirds" class="ds-birds-container">
+    <div class="bird"><svg viewBox="0 0 24 24"><path class="bird-wing" d="M2 14 Q 12 2 22 14" /></svg></div>
+    <div class="bird"><svg viewBox="0 0 24 24"><path class="bird-wing" d="M2 14 Q 12 2 22 14" /></svg></div>
+    <div class="bird"><svg viewBox="0 0 24 24"><path class="bird-wing" d="M2 14 Q 12 2 22 14" /></svg></div>
+    <div class="bird"><svg viewBox="0 0 24 24"><path class="bird-wing" d="M2 14 Q 12 2 22 14" /></svg></div>
+  </div>
+    
+  <div class="ds-trees">
+    <div class="ds-tree"></div>
+    <div class="ds-tree"></div>
+    <div class="ds-tree"></div>
+    <div class="ds-tree"></div>
+  </div>
+
+  <div id="dsCrossRoad" class="ds-cross-road"></div>
+  <div id="dsRoadPatch" class="ds-road-patch"></div>
+    
+  <div class="ds-wall-left"></div>
+  <div class="ds-wall-right"></div>
+    
+  <div class="ds-gate">
+      <div class="ds-gate-pillar"></div>
+      <div class="ds-gate-inner"></div>
+      <div class="ds-gate-pillar"></div>
+  </div>
+
+  <div class="park-item ds-swing">
+    <svg viewBox="0 0 140 100" fill="none">
+      <path d="M10 100 L30 10 M130 100 L110 10 M10 40 L35 40 M105 40 L130 40 M20 10 L120 10" stroke="#4a3b2a" stroke-width="3"/>
+      <path d="M40 10 L40 70 M60 10 L60 70 M80 10 L80 70 M100 10 L100 70" stroke="#333" stroke-width="1.5"/>
+      <rect x="35" y="70" width="30" height="5" fill="#d84315"/>
+      <rect x="75" y="70" width="30" height="5" fill="#d84315"/>
+    </svg>
+  </div>
+
+  <div class="park-item ds-seesaw">
+    <svg viewBox="0 0 160 60" fill="none">
+      <path d="M70 60 L80 30 L90 60 Z" fill="#555"/>
+      <rect x="10" y="25" width="140" height="6" fill="#fbc02d" transform="rotate(-5 80 30)"/>
+      <rect x="15" y="18" width="8" height="12" fill="#333" transform="rotate(-5 80 30)"/>
+      <rect x="137" y="28" width="8" height="12" fill="#333" transform="rotate(-5 80 30)"/>
+    </svg>
+  </div>
+
+  <div class="park-item ds-slide">
+    <svg viewBox="0 0 100 120" fill="none">
+      <path d="M20 120 L40 20" stroke="#555" stroke-width="3"/>
+      <path d="M30 120 L50 20" stroke="#555" stroke-width="3"/>
+      <path d="M20 30 L35 30 M25 50 L40 50 M30 70 L45 70 M35 90 L50 90" stroke="#333" stroke-width="2"/>
+      <path d="M45 20 Q90 40 90 120" stroke="#1e88e5" stroke-width="8" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="park-item ds-roundabout">
+    <svg viewBox="0 0 100 40" fill="none">
+      <ellipse cx="50" cy="30" rx="45" ry="10" fill="#e53935" stroke="#b71c1c" stroke-width="2"/>
+      <rect x="48" y="5" width="4" height="25" fill="#333"/>
+      <path d="M50 5 L20 30 M50 5 L80 30 M50 5 L50 35" stroke="#555" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <div id="dsGrass" class="ds-grass"></div>
+  <div class="ds-road-wrap">
+    <div id="dsRoad" class="ds-road"></div>
+  </div>
+    
+  <div id="dsBenchLeft" class="ds-bench left">
+    <svg width="180" height="100" viewBox="0 0 180 100" fill="none">
+      <path d="M20 90 L20 100 M160 90 L160 100" stroke="#3e2723" stroke-width="4"/>
+      <rect x="10" y="50" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="60" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="70" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="10" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="22" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="34" width="160" height="8" rx="2" fill="#795548"/>
+      <path d="M20 40 L20 90 M160 40 L160 90" stroke="#1a1a1a" stroke-width="4"/>
+    </svg>
+  </div>
+  <div id="dsBenchRight" class="ds-bench right">
+    <svg width="180" height="100" viewBox="0 0 180 100" fill="none">
+       <path d="M20 90 L20 100 M160 90 L160 100" stroke="#3e2723" stroke-width="4"/>
+      <rect x="10" y="50" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="60" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="70" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="10" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="22" width="160" height="8" rx="2" fill="#795548"/>
+      <rect x="10" y="34" width="160" height="8" rx="2" fill="#795548"/>
+      <path d="M20 40 L20 90 M160 40 L160 90" stroke="#1a1a1a" stroke-width="4"/>
+    </svg>
+  </div>
+
+  <div class="ds-lamp-container">
+    <svg style="position:absolute; width:0; height:0; overflow:hidden;">
+      <defs>
+        <g id="victorianLamp">
+          <rect x="-4" y="0" width="8" height="320" fill="#1a1a1a"/>
+          <path d="M-10 320 L10 320 L15 330 L-15 330 Z" fill="#1a1a1a"/>
+          <rect x="-35" y="40" width="70" height="6" rx="2" fill="#1a1a1a"/>
+          <path d="M-4 60 Q-20 60 -25 46 M4 60 Q20 60 25 46" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+            
+          <g transform="translate(-35, 10)">
+            <path d="M-10 30 L10 30 L15 5 L-15 5 Z" fill="#1a1a1a"/>
+            <rect x="-10" y="10" width="20" height="20" fill="rgba(255,255,220,0.6)" stroke="#1a1a1a" stroke-width="1"/>
+            <circle class="lamp-glow" cx="0" cy="20" r="25" fill="url(#glowGradient)" />
+            <path d="M0 5 L0 -5" stroke="#1a1a1a" stroke-width="2"/>
+          </g>
+            
+          <g transform="translate(35, 10)">
+            <path d="M-10 30 L10 30 L15 5 L-15 5 Z" fill="#1a1a1a"/>
+            <rect x="-10" y="10" width="20" height="20" fill="rgba(255,255,220,0.6)" stroke="#1a1a1a" stroke-width="1"/>
+            <circle class="lamp-glow" cx="0" cy="20" r="25" fill="url(#glowGradient)" />
+            <path d="M0 5 L0 -5" stroke="#1a1a1a" stroke-width="2"/>
+          </g>
+        </g>
+        <radialGradient id="glowGradient">
+          <stop offset="0%" stop-color="#fff7cc" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#ffeb3b" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+
+    <div class="ds-lamp lamp-l-1"><svg width="100" height="330" viewBox="-50 0 100 330"><use href="#victorianLamp"/></svg></div>
+    <div class="ds-lamp lamp-l-2"><svg width="100" height="330" viewBox="-50 0 100 330"><use href="#victorianLamp"/></svg></div>
+      
+    <div class="ds-lamp lamp-r-1"><svg width="100" height="330" viewBox="-50 0 100 330"><use href="#victorianLamp"/></svg></div>
+    <div class="ds-lamp lamp-r-2"><svg width="100" height="330" viewBox="-50 0 100 330"><use href="#victorianLamp"/></svg></div>
+  </div>
+
+</div>
+
+<div id="desktop-clock-root"></div>
+
+<canvas id="particle-canvas"></canvas>
+
+<audio id="bgAudio" src="bgm.mp3" preload="auto" autoplay playsinline></audio>
+
+<div id="navDim" aria-hidden="true" class="lg:hidden"></div>
+
+<nav id="navTop" class="nav-panel lg:hidden space-x-2">
+  <a class="nav-link-mobile" href="Msg.html">Message</a>
+  <a class="nav-link-mobile" href="letter.html">Letter</a>
+  <a class="nav-link-mobile" href="Music.html">Music</a>
+</nav>
+
+<nav id="navBottom" class="nav-panel lg:hidden space-x-2">
+  <a class="nav-link-mobile" href="Skill.html">Skill</a>
+  <a class="nav-link-mobile" href="Paper_Star.html">Paper Star</a>
+  <a class="nav-link-mobile" href="Carttoon.html">Cartoon</a>
+</nav>
+
+<nav id="navLeft" class="nav-panel lg:hidden space-x-2">
+  <a class="nav-link-mobile" href="index.html">Home</a>
+  <a class="nav-link-mobile" href="Cake.html">Cake</a>
+  <a class="nav-link-mobile" href="21_Wish.html">21_Door</a>
+  <a class="nav-link-mobile" href="chat.html">Heaven</a>
+  <a class="nav-link-mobile" href="Diary.html">Diary</a>
+  <a class="nav-link-mobile" href="Box.html">Box</a>
+  <a class="nav-link-mobile" href="anatomy.html">Anatomy</a>
+  <a class="nav-link-mobile" href="Special.html">Special</a>
+  <a class="nav-link-mobile" href="color.html">Color</a>
+  <a class="nav-link-mobile" href="you.html">You</a>
+  <a class="nav-link-mobile" href="Teacher.html">Teacher</a>
+  <a class="nav-link-mobile" href="Universe.html">Universe</a>
+  <a class="nav-link-mobile" href="The_River.html">River</a>
+  <a class="nav-link-mobile" href="Mountain.html">Mountain</a>
+</nav>
+
+<nav id="navRight" class="nav-panel lg:hidden space-x-2">
+  <a class="nav-link-mobile" href="Periodik_table.html">Periodic Table</a>
+  <a class="nav-link-mobile" href="Concept.html">Concept</a>
+  <a class="nav-link-mobile" href="Calender.html">Calendar</a>
+  <a class="nav-link-mobile" href="Perspective.html">Perspective</a>
+  <a class="nav-link-mobile" href="Santa.html">Santa</a>
+  <a class="nav-link-mobile" href="Presence.html">Presence</a>
+  <a class="nav-link-mobile" href="Cloud.html">Cloud</a>
+  <a class="nav-link-mobile" href="Ink.html">Paint</a>
+  <a class="nav-link-mobile" href="Butterfly.html">Butterfly</a>
+  <a class="nav-link-mobile" href="Weather.html">Weather</a>
+  <a class="nav-link-mobile" href="Spotlight.html">Spotlight</a>
+  <a class="nav-link-mobile" href="Room.html">Room</a>
+  <a class="nav-link-mobile" href="Radio.html">Radio</a>
+  <a class="nav-link-mobile" href="Food.html">Food</a>
+</nav>
+
+<button id="navToggle" class="lg:hidden">
+  <svg id="navIcon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+  <svg id="navCloseIcon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none">
+    <path d="M6 18L18 6M6 6l12 12"/>
+  </svg>
+</button>
+
+<button id="desktopTrigger" class="desktop-menu-btn">
+  <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h8M4 18h16" />
+  </svg>
+  <span>Explore</span>
+</button>
+
+<div id="desktopOverlay" class="desktop-overlay"></div>
+
+<aside id="desktopSidebar" class="desktop-sidebar">
+  <div class="sidebar-header">
+    <h2 class="sidebar-title">Navigation</h2>
+    <p style="font-size:14px; color:#888; margin-top:5px;">Where would you like to go?</p>
+  </div>
+    
+  <div class="nav-grid">
+    <a class="d-nav-btn" href="index.html">Home</a>
+    <a class="d-nav-btn" href="Cake.html">Cake</a>
+    <a class="d-nav-btn" href="21_Wish.html">21_Door</a>
+    <a class="d-nav-btn" href="chat.html">Heaven</a>
+    <a class="d-nav-btn" href="Diary.html">Diary</a>
+    <a class="d-nav-btn" href="anatomy.html">Anatomy</a>
+    <a class="d-nav-btn" href="Box.html">Box</a>
+    <a class="d-nav-btn" href="Special.html">Special</a>
+    <a class="d-nav-btn" href="color.html">Color</a>
+    <a class="d-nav-btn" href="you.html">You</a>
+    <a class="d-nav-btn" href="Teacher.html">Teacher</a>
+    <a class="d-nav-btn" href="Universe.html">Universe</a>
+    <a class="d-nav-btn" href="The_River.html">River</a>
+    <a class="d-nav-btn" href="Mountain.html">Mountain</a>
+    <a class="d-nav-btn" href="Skill.html">Skill</a>
+    <a class="d-nav-btn" href="Paper_Star.html">Paper Star</a>
+    <a class="d-nav-btn" href="Carttoon.html">Cartoon</a>
+    <a class="d-nav-btn" href="Periodik_table.html">Periodic Table</a>
+    <a class="d-nav-btn" href="Concept.html">Concept</a>
+    <a class="d-nav-btn" href="Calender.html">Calendar</a>
+    <a class="d-nav-btn" href="Perspective.html">Perspective</a>
+    <a class="d-nav-btn" href="Santa.html">Santa</a>
+    <a class="d-nav-btn bg-yellow-500/10 text-yellow-200 border-yellow-500/30" href="Presence.html">Presence</a>
+    <a class="d-nav-btn" href="Cloud.html">Cloud</a>
+    <a class="d-nav-btn" href="Ink.html">Paint</a>
+    <a class="d-nav-btn" href="Butterfly.html">Butterfly</a>
+    <a class="d-nav-btn" href="Weather.html">Weather</a>
+    <a class="d-nav-btn" href="Spotlight.html">Spotlight</a>
+    <a class="d-nav-btn" href="Room.html">Room</a>
+    <a class="d-nav-btn" href="Radio.html">Radio</a>
+    <a class="d-nav-btn" href="Food.html">Food</a>
+    <a class="d-nav-btn" href="Music.html">Music</a>
+    <a class="d-nav-btn" href="letter.html">Letter</a>
+    <a class="d-nav-btn" href="Msg.html">Message</a>
+  </div>
+</aside>
+
+<div id="presencePopup" 
+      style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+            background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:200; opacity:0;
+            pointer-events:none; transition:opacity .5s ease;">
+  <div style="background:white; padding:24px 30px; border-radius:16px; text-align:center;
+              max-width:300px; font-family:'Merriweather'; box-shadow:0 8px 25px rgba(0,0,0,.25);
+              transform:translateY(20px); transition:transform .5s ease;">
+    <h2 style="font-size:20px; font-weight:700; margin-bottom:10px;">Have you ever realized…</h2>
+    <p style="font-size:15px; line-height:1.5; color:#444; margin-bottom:18px;">
+      how quietly your presence changes a whole place?
+    </p>
+    <button id="popupContinue"
+            style="padding:8px 20px; background:#ff69b4; color:white; border:none;
+                   border-radius:10px; font-size:14px; cursor:pointer;">
+      Continue →
+    </button>
+  </div>
+</div>
+
+<div id="sharedClockTemplate" style="display:none">
+  <svg class="shared-clock" viewBox="0 0 120 120">
+    <defs>
+      <radialGradient id="g1" cx="50%" cy="40%">
+        <stop offset="0%" stop-color="#fff8e6"/>
+        <stop offset="45%" stop-color="#E7C987"/>
+        <stop offset="100%" stop-color="#D8B765"/>
+      </radialGradient>
+    </defs>
+    <circle cx="60" cy="60" r="56" fill="url(#g1)" stroke="#b58f40" stroke-width="2"/>
+    <circle cx="60" cy="60" r="50" fill="#fafafa" stroke="rgba(0,0,0,0.03)" stroke-width="1"/>
+    <g transform="translate(60,60)" stroke="rgba(0,0,0,0.14)" stroke-width="1.6">
+      <g><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(30)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(60)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(90)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(120)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(150)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(180)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(210)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(240)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(270)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(300)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+      <g transform="rotate(330)"><line x1="0" y1="-42" x2="0" y2="-50" stroke="#8a6b2d" stroke-width="2.4"/></g>
+    </g>
+
+    <g id="hands" transform="translate(60,60)">
+      <g id="hourHand" class="hand hand-hour" style="transform: rotate(0deg);">
+        <rect x="-2" y="-32" width="4" height="32" rx="2" fill="#2b2b2b"></rect>
+      </g>
+      <g id="minuteHand" class="hand hand-minute" style="transform: rotate(0deg);">
+        <rect x="-1.5" y="-45" width="3" height="45" rx="1.5" fill="#2b2b2b"></rect>
+      </g>
+      <g id="secondHand" class="hand hand-second" style="transform: rotate(0deg);">
+        <rect x="-1" y="-52" width="2" height="52" rx="1" fill="#b33"></rect>
+      </g>
+      <circle cx="0" cy="0" r="3.2" fill="var(--gold-1)" stroke="#b58f40" stroke-width="0.6"/>
+    </g>
+  </svg>
+</div>
+
+<div id="slide-container" style="position:absolute; inset:0; z-index:3;">
+
+  <section class="slide active">
+    <h1 class="title">The Quiet Hour</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">🌅 1 hour to come
+
+                        place waits quietly for you still calm, still normal, but already aware<br>
+                        that something soft and bright is on the way.<br>
+                        Even the air feels like it's warming up in advance. 🌤️✨</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">The Half-Hour Glow</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏳ 30 minutes to come
+
+                   A little excitement starts spreading in the corners.
+                   Lights look brighter, shadows behave better,
+                   and the whole place seems to whisper,
+                   “She’ll be here soon… look alive.” 😌🌸</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">The Soft Fifteen</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⌛ 15 minutes to come
+
+                   The silence softens itself,
+                   the wind slows down as if practising a gentle welcome,
+                   and everything prepares for the kind of peace
+                   that only your presence brings. 🌬️💗</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">The Final Five</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏱ 5 minutes to come
+
+                   The surroundings straighten up,
+                   colors adjust themselves like they’re fixing their makeup,
+                   and the moment starts glowing quietly —
+                   because you’re almost here. 🌼💫</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">The Shy Minute</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏰ 1 minute to come
+
+                   Time becomes shy.
+                   The air pauses.
+                   Even the smallest details wait politely,
+                   as if the whole place is holding its breath
+                   just to welcome you right. 🌙🤍</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">The Last Ten Seconds</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">👣 10 seconds to come (seeing you from a distance)
+
+                   Everything slips into natural slow-motion.
+                   The world brightens one shade higher,
+                   the breeze aligns with your footsteps,
+                   and your presence starts colouring the place
+                   even before you reach it. ✨🌷</p>
+  </section>
+  <section class="slide">
+    <h1 class="title">Arrival</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">🤝 While meeting
+
+                   When you arrive, the atmosphere shifts instantly —
+                   warm, calm, gently glowing.
+                   Chairs, sunlight, even the background air
+                   start behaving extra nicely,
+                   as if trying to match your energy. 🌞💞
+
+                   A small smile from you feels like
+                   the whole place gets better lighting.
+                   A tiny laugh from you feels like
+                   the day itself becomes lighter. 💐😄</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">The Gentle Goodbye</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏳ 10 seconds after you leave
+
+                   The place goes strangely quiet —
+                   like it suddenly remembers it has nothing smart left to say.
+                   The air still holds a hint of your warmth,
+                   as if you’re just one breath away. 🌫️💗</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">One Minute After</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏳ 1 minute after you leave
+
+                   The surroundings try to return to normal…
+                   but fail adorably.
+                   The light looks confused,
+                   the breeze slows down like it’s still expecting you to turn back. 🌥️✨</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">Fifteen Minutes After</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏳ 15 minutes after you leave
+
+                   A gentle dullness settles in.
+                   The colors dim a little,
+                   as if your brightness was borrowed
+                   and now the place doesn’t know what to do without it. 🌙🌸</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">Thirty Minutes After</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏳ 30 minutes after you leave
+
+                   Everything finally goes back to its routine,
+                   but the atmosphere keeps a quiet softness —
+                   a leftover trace of your presence
+                   that refuses to fade quickly. 🍃🤍</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">One Hour After</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">⏳ 1 hour after you leave
+
+                   The world is completely normal again…
+                   but the place still remembers you
+                   the way a window remembers sunlight
+                   long after the sun has moved on. 🌦️💞</p>
+  </section>
+
+  <section class="slide">
+    <h1 class="title">Happy Birthday</h1>
+    <div class="analog-wrap"></div>
+    <p class="description">🎂 Happy Birthday
+
+                   You’re not just a person passing through a place —
+                   you’re the reason the place feels sweeter,
+                   softer, warmer, calmer,
+                   and a little more alive. ✨💖
+                   Happy Birthday may your day glow like your presence. 🎉🌸</p>
+  </section>
+
+</div>
+
+<div class="actions">
+  <button class="btn" id="nextBtn">Next →</button>
+</div>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const nextBtn = document.getElementById('nextBtn');
+let currentIndex = 0;
+
+const slideTimes = [
+  {h:16,m:0,s:0, showSeconds:false},
+  {h:16,m:30,s:0, showSeconds:false},
+  {h:16,m:45,s:0, showSeconds:false},
+  {h:16,m:55,s:0, showSeconds:false},
+  {h:16,m:59,s:0, showSeconds:false},
+  {h:16,m:59,s:50, showSeconds:true},
+  {h:17,m:0,s:0, showSeconds:false},
+  {h:23,m:0,s:10, showSeconds:true},
+  {h:23,m:1,s:0, showSeconds:false},
+  {h:23,m:15,s:0, showSeconds:false},
+  {h:23,m:30,s:0, showSeconds:false},
+  {h:0,m:0,s:0, showSeconds:false},
+  {h:0,m:0,s:0, showSeconds:false}
+];
+
+const template = document.getElementById('sharedClockTemplate');
+const sharedClock = template.firstElementChild.cloneNode(true);
+template.remove();
+
+const hourHand = sharedClock.querySelector('#hourHand');
+const minuteHand = sharedClock.querySelector('#minuteHand');
+const secondHand = sharedClock.querySelector('#secondHand');
+
+let absHourAngle = null;
+let absMinuteAngle = null;
+let absSecondAngle = null;
+
+function attachClock(index){
+  const isDesktop = window.innerWidth >= 1024;
+  if(isDesktop){
+    const deskRoot = document.getElementById('desktop-clock-root');
+    if(deskRoot.firstElementChild !== sharedClock) {
+       deskRoot.appendChild(sharedClock);
+    }
+    slides.forEach(s => s.querySelector('.analog-wrap').innerHTML = '');
+  } else {
+    const wrap = slides[index].querySelector('.analog-wrap');
+    wrap.innerHTML = '';
+    wrap.appendChild(sharedClock);
+  }
+}
+
+function timeToAngles(t){
+  const hour12 = t.h % 12;
+  const hourAngle = (hour12 * 30) + (t.m * 0.5) + (t.s * (0.5/60));
+  const minuteAngle = (t.m * 6) + (t.s * 0.1);
+  const secondAngle = t.s * 6;
+  return {h: hourAngle, m: minuteAngle, s: secondAngle};
+}
+
+function computeForwardTarget(currentAbs, targetNorm){
+  if (currentAbs === null) return targetNorm;
+  const curNorm = ((currentAbs % 360) + 360) % 360;
+  let delta = targetNorm - curNorm;
+  if (Math.abs(delta) < 1e-9) return currentAbs;
+  if (delta < 0) delta += 360;
+  return currentAbs + delta;
+}
+
+function easeInOutCubic(t){ return t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+function animateHandsTo(targetNorms, duration=1400, showSeconds=false){
+  const targetHourAbs = computeForwardTarget(absHourAngle, targetNorms.h);
+  const targetMinuteAbs = computeForwardTarget(absMinuteAngle, targetNorms.m);
+  const targetSecondAbs = computeForwardTarget(absSecondAngle, targetNorms.s);
+
+  const startHour = (absHourAngle === null) ? targetHourAbs : absHourAngle;
+  const startMinute = (absMinuteAngle === null) ? targetMinuteAbs : absMinuteAngle;
+  const startSecond = (absSecondAngle === null) ? targetSecondAbs : absSecondAngle;
+
+  const t0 = performance.now();
+  if(showSeconds) secondHand.classList.remove('hidden');
+
+  return new Promise(resolve=>{
+    function step(now){
+      const p = Math.min(1, (now - t0) / duration);
+      const eased = easeInOutCubic(p);
+      const curH = startHour + (targetHourAbs - startHour) * eased;
+      const curM = startMinute + (targetMinuteAbs - startMinute) * eased;
+      const curS = startSecond + (targetSecondAbs - startSecond) * eased;
+
+      hourHand.style.transform = `rotate(${curH}deg)`;
+      minuteHand.style.transform = `rotate(${curM}deg)`;
+      secondHand.style.transform = `rotate(${curS}deg)`;
+
+      if(p < 1) requestAnimationFrame(step);
+      else {
+        absHourAngle = targetHourAbs;
+        absMinuteAngle = targetMinuteAbs;
+        absSecondAngle = targetSecondAbs;
+        if(!showSeconds) secondHand.classList.add('hidden');
+        resolve();
+      }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+attachClock(0);
+const initNorm = timeToAngles(slideTimes[0]);
+absHourAngle = initNorm.h;
+absMinuteAngle = initNorm.m;
+absSecondAngle = initNorm.s;
+
+requestAnimationFrame(() => {
+  hourHand.style.transform = `rotate(${absHourAngle}deg)`;
+  minuteHand.style.transform = `rotate(${absMinuteAngle}deg)`;
+  secondHand.style.transform = `rotate(${absSecondAngle}deg)`;
+  if (!slideTimes[0].showSeconds) secondHand.classList.add('hidden');
+});
+
+function updateSceneEnvironment(index) {
+  if(window.innerWidth < 1024) return;
+
+  const sun = document.getElementById('dsSun');
+  const moon = document.getElementById('dsMoon');
+  const stars = document.getElementById('dsStars');
+  const birds = document.getElementById('dsBirds');
+  const road = document.getElementById('dsRoad');
+  const roadPatch = document.getElementById('dsRoadPatch');
+  const grass = document.getElementById('dsGrass');
+  const lampGlows = document.querySelectorAll('.lamp-glow');
+  const benches = document.querySelectorAll('.ds-bench');
+  const title = slides[index].querySelector('.title');
+  const desc = slides[index].querySelector('.description');
+    
+  const wallsLeft = document.querySelectorAll('.ds-wall-left');
+  const wallsRight = document.querySelectorAll('.ds-wall-right');
+  const crossRoad = document.getElementById('dsCrossRoad');
+    
+  const time = slideTimes[index];
+    
+    
+  document.body.style.background = "linear-gradient(to bottom, #87CEEB 0%, #cae8f0 60%, #eefcff 100%)";
+    
+  sun.className = "ds-sun";
+  moon.className = "ds-moon";
+  stars.classList.remove('visible');
+    
+  if(birds) birds.classList.add('active');
+
+  road.classList.remove('night');
+  if(roadPatch) roadPatch.classList.remove('night');
+  grass.classList.remove('night');
+  if(title) title.classList.remove('night');
+  if(desc) desc.classList.remove('night');
+  benches.forEach(b => b.classList.remove('night'));
+    
+  wallsLeft.forEach(w => w.classList.remove('night'));
+  wallsRight.forEach(w => w.classList.remove('night'));
+  if(crossRoad) crossRoad.classList.remove('night');
+    
+  lampGlows.forEach(g => {
+    g.classList.remove('on');
+    g.classList.remove('extra-bright');
+  });
+
+    
+  if (time.h >= 16 && time.m >= 59 || time.h >= 17 && time.h < 20) {
+    document.body.style.background = "linear-gradient(to bottom, #FF7F50 0%, #d65bca 60%, #8a2be2 100%)";
+    sun.className = "ds-sun sunset";
+    moon.className = "ds-moon visible";
+      
+    lampGlows.forEach(g => g.classList.add('extra-bright'));
+      
+    road.classList.add('night'); 
+    if(roadPatch) roadPatch.classList.add('night');
+      
+    if(birds) birds.classList.add('active');
+  }
+    
+    
+  if (time.h >= 20 || time.h < 6) {
+      
+    document.body.style.background = "linear-gradient(to bottom, #050510 0%, #1a1a2e 100%)";
+    sun.className = "ds-sun night";
+    moon.className = "ds-moon visible";
+      
+    stars.classList.add('visible');
+      
+    if(birds) birds.classList.remove('active');
+      
+    road.classList.add('night');
+    if(roadPatch) roadPatch.classList.add('night');
+    grass.classList.add('night');
+    if(title) title.classList.add('night');
+    if(desc) desc.classList.add('night');
+    benches.forEach(b => b.classList.add('night'));
+      
+    wallsLeft.forEach(w => w.classList.add('night'));
+    wallsRight.forEach(w => w.classList.add('night'));
+    if(crossRoad) crossRoad.classList.add('night');
+      
+    lampGlows.forEach(g => {
+        g.classList.remove('extra-bright');
+        g.classList.add('on');
+    });
+  }
+}
+
+function applyTheme(idx){
+  const palettes = [
+    ['#8a2be2','#00c8ff','#ff4b9e'],
+    ['#ff7ad9','#7ad9ff','#ffd36e'],
+    ['#7c7bff','#54ffd9','#ff7a9e'],
+    ['#64a8ff','#b57aff','#ff8f66'],
+    ['#78ffd6','#7aa2ff','#ff66c4'],
+    ['#a47bff','#66ffe2','#ffbd6e'],
+    ['#6ee7ff','#b380ff','#ff6ea6'],
+    ['#ffb6c1','#89f7fe','#ffd1dc'],
+    ['#ffc3a0','#b8f2e6','#f6b6ff'],
+    ['#c1ffd7','#b3d4ff','#ffb3d2'],
+    ['#d7c1ff','#bff6e0','#ffd9b3'],
+    ['#bfe7ff','#d3b7ff','#ffb7da'],
+    ['#8a2be2','#00c8ff','#ff4b9e']
+  ];
+  const p = palettes[idx];
+  document.documentElement.style.setProperty('--c1', p[0]);
+  document.documentElement.style.setProperty('--c2', p[1]);
+  document.documentElement.style.setProperty('--c3', p[2]);
+}
+
+async function showSlide(index){
+  slides[currentIndex].classList.remove('active');
+  currentIndex = index;
+  const s = slides[currentIndex];
+  s.classList.add('active');
+  attachClock(currentIndex);
+
+  const t = slideTimes[currentIndex];
+  const norms = timeToAngles(t);
+    
+  updateSceneEnvironment(currentIndex);
+    
+  await animateHandsTo(norms, 1400, !!t.showSeconds);
+  applyTheme(currentIndex);
+
+    
+  if(index === slides.length - 1) {
+    triggerMassiveConfetti();
+  }
+}
+
+updateSceneEnvironment(0);
+
+let isAnimating = false;
+
+
+async function goToNext() {
+  if(isAnimating) return;
+    
+    
+  if (currentIndex === slides.length - 1) return;
+
+  isAnimating = true;
+  startAudioIfNeeded();
+  const nextIndex = currentIndex + 1;
+  await showSlide(nextIndex);
+  isAnimating = false;
+}
+
+nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); 
+    goToNext();
+});
+
+
+window.addEventListener('click', (e) => {
+  if (window.innerWidth >= 1024) {
+      
+    if (e.target.closest('button, a, .desktop-sidebar, .desktop-menu-btn')) return;
+    goToNext();
+  }
+});
+
+window.addEventListener('keydown', e=>{
+  if(['ArrowRight','Enter',' '].includes(e.key)){ e.preventDefault(); nextBtn.click(); }
+});
+
+let touchX = null;
+window.addEventListener('touchstart', e=>{ touchX = e.touches[0].clientX; startAudioIfNeeded(); }, {passive:true});
+window.addEventListener('touchend', e=>{
+  if(touchX==null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx < -40) nextBtn.click();
+  touchX = null;
+});
+
+let confettiInterval = null;
+
+function triggerMassiveConfetti() {
+  // Clear any existing interval to prevent duplicates
+  if (confettiInterval) clearInterval(confettiInterval);
+
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 };
+  const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+  // Initial burst
+  confetti({
+      particleCount: 100,
+      spread: 100,
+      origin: { y: 0.6 },
+      zIndex: 2000
+  });
+
+  // Continuous loop
+  confettiInterval = setInterval(function() {
+    const particleCount = 50; 
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+  }, 400); 
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.title').forEach(title => {
+    title.innerHTML = title.textContent.split('').map((c,idx)=>
+      `<span class="letter" style="--delay:${idx*28}ms">${c===' ' ? '&nbsp;' : c}</span>`
+    ).join('');
+  });
+  applyTheme(0);
+});
+
+const audioEl = document.getElementById('bgAudio'); audioEl.loop = false;
+
+function tryPlayAudioOnLoad(){
+  const p = audioEl.play();
+  if (p && typeof p.then === 'function') p.catch(()=>{});
+}
+
+window.addEventListener('load', ()=>{ tryPlayAudioOnLoad(); });
+
+let audioStarted = false, webAudioGain = null;
+
+function initWebAudioGain(){
+  try{
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if(!AudioContext) return null;
+    const ac = new AudioContext();
+    const src = ac.createMediaElementSource(audioEl);
+    const g = ac.createGain();
+    g.gain.value = 0;
+    src.connect(g).connect(ac.destination);
+    return {ac,g};
+  }catch(e){return null;}
+}
+
+function fadeInAudio(){
+  const TARGET=0.35, DURATION=1800;
+  if(webAudioGain){
+    const now = webAudioGain.ac.currentTime;
+    webAudioGain.g.gain.cancelScheduledValues(now);
+    webAudioGain.g.gain.setValueAtTime(0, now);
+    webAudioGain.g.gain.linearRampToValueAtTime(TARGET, now + DURATION/1000);
+  } else {
+    audioEl.volume = 0;
+    const steps=20;
+    let step=0;
+    const t = setInterval(()=>{
+      step++;
+      audioEl.volume = Math.min(TARGET, (TARGET * step/steps));
+      if(step>=steps) clearInterval(t);
+    }, DURATION/steps);
+  }
+}
+
+function startAudioIfNeeded(){
+  if(audioStarted) return;
+  audioStarted=true;
+  webAudioGain = initWebAudioGain();
+  const p = audioEl.play();
+  if(p && typeof p.then === 'function'){ p.then(()=>fadeInAudio()).catch(()=>fadeInAudio()); }
+  else fadeInAudio();
+}
+
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [], canvasW, canvasH;
+
+function resizeCanvas(){
+  canvasW = canvas.width = window.innerWidth;
+  canvasH = canvas.height = window.innerHeight;
+  attachClock(currentIndex);
+}
+
+window.addEventListener('resize', resizeCanvas, {passive:true});
+resizeCanvas();
+
+function getThemeColor(){
+  const s = getComputedStyle(document.documentElement);
+  return [s.getPropertyValue('--c1').trim(), s.getPropertyValue('--c2').trim(), s.getPropertyValue('--c3').trim()][Math.floor(Math.random()*3)];
+}
+
+window.addEventListener('mousemove', e=>{
+  let x=e.clientX, y=e.clientY;
+  particles.push({
+    x, y,
+    color:getThemeColor(),
+    size:Math.random()*4+2,
+    vx:Math.random()*2-1,
+    vy:Math.random()*2-1,
+    life:80
+  });
+}, {passive:true});
+
+function particleLoop(){
+    
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'; 
+  ctx.fillRect(0,0,canvasW,canvasH);
+  ctx.globalCompositeOperation = 'source-over';
+
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x+=p.vx;
+    p.y+=p.vy;
+    p.life--;
+    p.size*=0.98;
+
+    if(p.life>0 && p.size>0.5){
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.life/80;
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha=1;
+    } else particles.splice(i,1);
+  }
+  requestAnimationFrame(particleLoop);
+}
+particleLoop();
+
+const navToggle = document.getElementById('navToggle');
+const navTop = document.getElementById('navTop');
+const navBottom = document.getElementById('navBottom');
+const navLeft = document.getElementById('navLeft');
+const navRight = document.getElementById('navRight');
+const navDim = document.getElementById('navDim');
+const navIcon = document.getElementById('navIcon');
+const navCloseIcon = document.getElementById('navCloseIcon');
+
+let navOpen = false;
+
+function openAllNavs(){
+  navTop.classList.add('open-top');
+  navBottom.classList.add('open-bottom');
+  navLeft.classList.add('open-left');
+  navRight.classList.add('open-right');
+  navDim.classList.add('visible');
+  navIcon.style.display='none';
+  navCloseIcon.style.display='block';
+  navOpen=true;
+}
+
+function closeAllNavs(){
+  navTop.classList.remove('open-top');
+  navBottom.classList.remove('open-bottom');
+  navLeft.classList.remove('open-left');
+  navRight.classList.remove('open-right');
+  navDim.classList.remove('visible');
+  navIcon.style.display='block';
+  navCloseIcon.style.display='none';
+  navOpen=false;
+}
+
+navToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  startAudioIfNeeded();
+  if(navOpen) closeAllNavs();
+  else openAllNavs();
+});
+
+navDim.addEventListener('click', closeAllNavs);
+
+document.querySelectorAll('.nav-panel .nav-link-mobile').forEach(a=>
+  a.addEventListener('click', ()=>setTimeout(closeAllNavs,120))
+);
+
+const desktopTrigger = document.getElementById('desktopTrigger');
+const desktopSidebar = document.getElementById('desktopSidebar');
+const desktopOverlay = document.getElementById('desktopOverlay');
+
+function openDesktopNav() {
+  desktopSidebar.classList.add('active');
+  desktopOverlay.classList.add('active');
+  startAudioIfNeeded();
+}
+
+function closeDesktopNav() {
+  desktopSidebar.classList.remove('active');
+  desktopOverlay.classList.remove('active');
+}
+
+if(desktopTrigger) {
+  desktopTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openDesktopNav();
+  });
+}
+
+if(desktopOverlay) {
+  desktopOverlay.addEventListener('click', closeDesktopNav);
+}
+
+if(desktopSidebar) {
+  desktopSidebar.querySelectorAll('.d-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeDesktopNav();
+    });
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (!sessionStorage.getItem('presence_shown')) {
+    const pop = document.getElementById('presencePopup');
+    const box = pop.firstElementChild;
+    const btn = document.getElementById('popupContinue');
+
+    pop.style.opacity = "1";
+    pop.style.pointerEvents = "auto";
+    box.style.transform = "translateY(0)";
+
+    btn.addEventListener('click', () => {
+      pop.style.opacity = "0";
+      pop.style.pointerEvents = "none";
+      box.style.transform = "translateY(20px)";
+      sessionStorage.setItem('presence_shown', '1');
+    });
+  }
+});
+</script>
+</body>
+</html>

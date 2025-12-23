@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>For You</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;900&display=swap" rel="stylesheet">
+
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+        background-color: #050505; 
+        color: white; 
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        perspective: 1000px;
+        overflow-x: hidden; 
+    }
+
+    #aurora {
+        position: fixed; inset: 0; z-index: -3;
+        background: linear-gradient(180deg, #020617 0%, #172554 100%);
+        opacity: 1;
+    }
+    
+    #particles { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+
+    @media (min-width: 1024px) {
+        #aurora, #particles { display: none !important; }
+    }
+
+    #warp-canvas {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: -5;
+        background: black;
+        opacity: 0; 
+        transition: opacity 0.5s;
+    }
+    @media (min-width: 1024px) {
+        #warp-canvas { opacity: 1; }
+    }
+
+    @media (min-width: 1024px) {
+        .mobile-only { display: none !important; }
+    }
+    @media (max-width: 1023px) {
+        .desktop-only { display: none !important; }
+    }
+
+    .nav-panel, #navToggleIcon, #navToggleX { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .festive-text { font-family: 'Gochi Hand', cursive; }
+    
+    #navToggle { 
+        background-color: rgba(255,255,255,0.1); 
+        color: white; 
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    #navToggle:active { transform: scale(0.9); }
+
+    #slideContainer {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 10;
+        perspective: 1200px;
+    }
+
+    .holo-card {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        min-height: 500px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transform-style: preserve-3d;
+        transform: rotateX(0deg) rotateY(0deg);
+        transition: transform 0.1s ease-out; 
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 3rem 2rem;
+        text-align: center;
+        opacity: 0;
+        animation: cardFloat 6s ease-in-out infinite;
+    }
+    
+    .holo-card.enter { animation: popIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    .holo-card.exit { animation: popOut 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+    @keyframes popIn {
+        0% { opacity: 0; transform: translateY(50px) scale(0.9) rotateX(10deg); }
+        100% { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
+    }
+    @keyframes popOut {
+        0% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; transform: translateY(-30px) scale(0.95); }
+    }
+
+    .holo-glare {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 30px;
+        background: linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.0) 35%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.0) 55%, transparent 100%);
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.8;
+        transform: translateZ(1px);
+        mix-blend-mode: overlay;
+        transition: background-position 0.1s;
+    }
+
+    .card-content {
+        transform: translateZ(30px);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+        z-index: 5;
+    }
+
+    .eyebrow {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.7rem;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 1rem;
+        opacity: 0;
+        animation: slideUp 0.6s 0.2s forwards;
+    }
+
+    .main-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        line-height: 1.1;
+        font-weight: 700;
+        font-style: italic;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        opacity: 0;
+        animation: slideUp 0.6s 0.3s forwards;
+    }
+
+    .body-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 300;
+        opacity: 0;
+        animation: slideUp 0.6s 0.4s forwards;
+    }
+
+    .sub-text {
+        margin-top: 1.5rem;
+        font-size: 0.95rem;
+        color: #fbcfe8;
+        font-style: italic;
+        opacity: 0.9;
+        text-shadow: 0 0 10px rgba(251, 207, 232, 0.3);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-magic {
+        position: relative;
+        background: white;
+        color: #050505;
+        padding: 16px 45px;
+        border-radius: 50px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        border: none;
+        cursor: pointer;
+        transform: translateZ(40px);
+        box-shadow: 0 10px 25px rgba(255,255,255,0.2);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: visible;
+        align-self: center;
+        margin-top: 2rem;
+    }
+    .btn-magic:active { transform: translateZ(40px) scale(0.95); }
+
+    .heart {
+        position: absolute;
+        top: 50%; left: 50%;
+        font-size: 1.2rem;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        animation: flyHeart 1s ease-out forwards;
+    }
+    @keyframes flyHeart {
+        0% { opacity: 1; transform: translate(-50%, -50%) scale(0); }
+        100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1.5); }
+    }
+
+    .progress-dots {
+        position: absolute;
+        top: 25px; left: 0; right: 0;
+        display: flex; justify-content: center; gap: 6px; z-index: 20;
+    }
+    .dot {
+        width: 4px; height: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+    .dot.active {
+        background: white; transform: scale(1.5); box-shadow: 0 0 10px white;
+    }
+
+    .book-scene {
+        perspective: 2000px;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        z-index: 10; 
+    }
+
+    .book {
+        position: relative;
+        width: 420px;
+        height: 600px;
+        transform-style: preserve-3d;
+        transform: translateX(0%);
+        transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+        box-shadow: 0 50px 70px -10px rgba(0,0,0,0.7);
+    }
+    
+    .book.open {
+        transform: translateX(50%);
+    }
+
+    .spiral-binding {
+        position: absolute;
+        top: 15px;
+        bottom: 15px;
+        left: -12px;
+        width: 24px;
+        height: calc(100% - 30px);
+        z-index: 600;
+        pointer-events: none;
+        transform: translateZ(5px);
+    }
+
+    .page {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        transform-origin: left center;
+        transform-style: preserve-3d;
+        transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        cursor: pointer;
+        border-radius: 4px 16px 16px 4px;
+    }
+    
+    .page.flipped {
+        transform: rotateY(-180deg);
+    }
+    
+    .z-top { z-index: 50; }
+    .z-mid { z-index: 40; }
+    .z-low { z-index: 30; }
+    .z-fly { z-index: 100 !important; }
+
+    .front, .back {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 4px 16px 16px 4px;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 
+            inset 4px 0 10px rgba(0,0,0,0.1), 
+            inset -2px 0 5px rgba(0,0,0,0.05), 
+            0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .front {
+        background-color: #f8f5e6;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='4' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23f8f5e6' surfaceScale='1.5'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.3'/%3E%3C/svg%3E"),
+                          linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,0) 85%, rgba(0,0,0,0.05) 100%);
+        color: #3e2a1e;
+        z-index: 2;
+    }
+
+    .front::before {
+        content: '';
+        position: absolute;
+        top: 18px; left: 18px; right: 18px; bottom: 18px;
+        border: 1px solid #c0b39d;
+        border-radius: 2px 12px 12px 2px;
+        pointer-events: none;
+        background-image: 
+            radial-gradient(circle at 0 0, #c0b39d 10%, transparent 12%),
+            radial-gradient(circle at 100% 0, #c0b39d 10%, transparent 12%),
+            radial-gradient(circle at 0 100%, #c0b39d 10%, transparent 12%),
+            radial-gradient(circle at 100% 100%, #c0b39d 10%, transparent 12%);
+        background-size: 10px 10px;
+        background-repeat: no-repeat;
+        background-position: top left, top right, bottom left, bottom right;
+    }
+
+    .front::after {
+        content: '❦';
+        position: absolute;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.2rem;
+        color: #c0b39d;
+    }
+    
+    .back {
+        background-color: #f8f5e6;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='4' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23f8f5e6' surfaceScale='1.5'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.3'/%3E%3C/svg%3E"),
+                          linear-gradient(to left, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,0) 85%, rgba(0,0,0,0.05) 100%);
+        transform: rotateY(180deg);
+        z-index: 1;
+    }
+
+    .page.cover .front {
+        background: radial-gradient(circle at 30% 30%, #2a364a, #090d14);
+        color: #fbbf24; 
+        border: 2px solid #fbbf24;
+        box-shadow: inset 0 0 60px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .page.cover .front::before { display: none; }
+    .page.cover .front::after {
+        content: '';
+        position: absolute; inset: 10px;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        border-radius: 2px 12px 12px 2px;
+        background: none;
+        transform: none;
+        font-size: 0;
+    }
+
+    .birthday-page {
+        background: #0f0c29 !important;
+        color: #fbbf24 !important;
+        border: none !important;
+        padding: 0 !important; 
+    }
+    .birthday-page::before { display: none !important; }
+    .birthday-page::after { display: none !important; }
+
+    .book-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        line-height: 1.1;
+        margin-bottom: 2rem;
+        text-align: center;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1); 
+    }
+    
+    .page.cover .book-title {
+        background: linear-gradient(to right, #cfc09f 0%, #ffecb3 25%, #bf953f 50%, #cfc09f 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.5); 
+        margin-top: 1rem;
+    }
+
+    .book-text {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: inherit;
+        text-align: left;
+    }
+
+    .hint-text {
+        position: absolute; bottom: 2rem; width: 100%; text-align: center;
+        font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .bookmark {
+        position: absolute;
+        top: -10px; right: 40px;
+        width: 40px; height: 120px;
+        background: #e11d48;
+        color: white;
+        z-index: 100;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: transform 0.3s, height 0.3s;
+        border-radius: 0 0 4px 4px;
+        font-size: 1.2rem;
+    }
+    .bookmark:hover { height: 130px; }
+    .bookmark::after {
+        content: ''; position: absolute; bottom: 0; left: 0;
+        width: 0; height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-bottom: 20px solid #050505; 
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+    @keyframes pulse-nebula {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.1); opacity: 0.7; }
+    }
+    @keyframes shimmer {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+    }
+    .animate-shimmer {
+        animation: shimmer 3s linear infinite;
+        background-size: 200% auto;
+    }
+    @keyframes float-slow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+    .animate-float-slower { animation: float-slow 8s ease-in-out infinite reverse; }
+
+    .shooting-star {
+        position: absolute;
+        width: 150px;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1));
+        animation: shoot 4s linear infinite;
+        opacity: 0;
+    }
+    .shooting-star:nth-child(1) { top: 10%; left: 0; animation-delay: 0s; }
+    .shooting-star:nth-child(2) { top: 30%; left: -10%; animation-delay: 2s; }
+    .shooting-star:nth-child(3) { top: 70%; left: -20%; animation-delay: 1.5s; }
+    
+    @keyframes shoot {
+        0% { transform: translateX(-100px) translateY(0) rotate(25deg); opacity: 1; }
+        100% { transform: translateX(120vw) translateY(200px) rotate(25deg); opacity: 0; }
+    }
+
+    @keyframes float-astro {
+        0%, 100% { transform: translate(0, 0) rotate(5deg); }
+        50% { transform: translate(-20px, -20px) rotate(-5deg); }
+    }
+    .animate-float-astro { animation: float-astro 12s ease-in-out infinite; }
+
+    @keyframes orbit-station {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(10px, -10px) rotate(2deg); }
+    }
+    .animate-orbit-station { animation: orbit-station 20s linear infinite alternate; }
+
+    @keyframes float-rock-1 {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(100px, -50px) rotate(360deg); }
+    }
+    .animate-float-rock-1 { animation: float-rock-1 60s linear infinite; }
+
+    @keyframes float-rock-2 {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(-80px, 40px) rotate(-180deg); }
+    }
+    .animate-float-rock-2 { animation: float-rock-2 50s linear infinite; }
+
+    .stone-particle {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        will-change: transform, opacity;
+    }
+    
+    .stone-svg {
+        width: 100%;
+        height: 100%;
+        fill: #94a3b8;
+        filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    }
+
+    @keyframes stone-appear {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+        100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+    }
+
+</style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="Aud.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="aurora"></div>
+    <canvas id="particles"></canvas>
+
+    <canvas id="warp-canvas"></canvas>
+    
+    <div id="mobile-root" class="mobile-only">
+        
+        <button id="navToggle" class="fixed top-6 left-6 z-[70] p-3 rounded-full shadow-lg focus:outline-none">
+            <svg id="navToggleIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+            <svg id="navToggleX" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <nav id="topNav" class="nav-panel md:hidden fixed top-0 left-0 right-0 z-[60] h-16 bg-purple-600 text-yellow-100 shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Message</a>
+            <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Music</a>
+        </nav>
+        
+        <nav id="bottomNav" class="nav-panel md:hidden fixed bottom-0 left-0 right-0 z-[60] h-16 bg-purple-600 text-yellow-100 shadow-md flex items-center justify-center space-x-2 translate-y-full">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="nav-panel md:hidden fixed left-0 top-0 bottom-0 z-[60] w-20 bg-purple-800 text-yellow-100 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="rightNav" class="nav-panel md:hidden fixed right-0 top-0 bottom-0 z-[60] w-20 bg-purple-800 text-yellow-100 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Food</a>
+        </nav>
+
+        <div id="progressDots" class="progress-dots"></div>
+
+        <div id="slideContainer"></div>
+    </div>
+
+    <div id="desktop-root" class="desktop-only">
+        
+        <button id="desktopNavToggle" class="fixed top-6 left-6 z-[70] p-3 rounded-full bg-slate-900/50 text-yellow-100 border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:bg-purple-900/80 hover:scale-110 transition-all duration-300 backdrop-blur-md group">
+            <svg id="desktopMenuIcon" class="w-6 h-6 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+            <svg id="desktopCloseIcon" class="w-6 h-6 hidden group-hover:rotate-90 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <nav id="desktopSidebar" class="fixed left-0 top-0 bottom-0 z-[60] w-[450px] bg-gradient-to-b from-[#0f0c29]/95 via-[#302b63]/95 to-[#24243e]/95 text-yellow-100 shadow-[20px_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border-r border-white/10 backdrop-blur-xl transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) -translate-x-full">
+            
+            <div class="pt-24 pb-8 px-8 text-center relative overflow-hidden shrink-0">
+                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none"></div>
+                <h2 class="text-5xl festive-text text-transparent bg-clip-text bg-gradient-to-r from-yellow-100 via-yellow-200 to-amber-100 drop-shadow-[0_0_15px_rgba(253,224,71,0.3)] transform hover:scale-105 transition-transform cursor-default">The Collection</h2>
+                <div class="w-16 h-0.5 bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto px-6 pb-12 custom-scrollbar">
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🏠</span> <span class="text-sm font-medium tracking-wide">Home</span>
+                    </a>
+                    <a href="Cake.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🎂</span> <span class="text-sm font-medium tracking-wide">Cake</span>
+                    </a>
+                    <a href="21_Wish.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🚪</span> <span class="text-sm font-medium tracking-wide">21 Door</span>
+                    </a>
+                    <a href="chat.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">☁️</span> <span class="text-sm font-medium tracking-wide">Heaven</span>
+                    </a>
+                    <a href="Diary.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">📔</span> <span class="text-sm font-medium tracking-wide">Diary</span>
+                    </a>
+                    <a href="anatomy.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🦴</span> <span class="text-sm font-medium tracking-wide">Anatomy</span>
+                    </a>
+                    <a href="Box.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">📦</span> <span class="text-sm font-medium tracking-wide">Box</span>
+                    </a>
+                    <a href="Special.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">💖</span> <span class="text-sm font-medium tracking-wide">Special</span>
+                    </a>
+                    <a href="color.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🎨</span> <span class="text-sm font-medium tracking-wide">Color</span>
+                    </a>
+                    <a href="you.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🫵</span> <span class="text-sm font-medium tracking-wide">You</span>
+                    </a>
+                    <a href="Teacher.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">👩‍🏫</span> <span class="text-sm font-medium tracking-wide">Teacher</span>
+                    </a>
+                    <a href="Universe.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🌌</span> <span class="text-sm font-medium tracking-wide">Universe</span>
+                    </a>
+                    <a href="The_River.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🌊</span> <span class="text-sm font-medium tracking-wide">River</span>
+                    </a>
+                    <a href="Mountain.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🏔️</span> <span class="text-sm font-medium tracking-wide">Mountain</span>
+                    </a>
+                    
+                    <a href="Periodik_table.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🧪</span> <span class="text-sm font-medium tracking-wide">Periodic</span>
+                    </a>
+                    <a href="Concept.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group bg-yellow-500/10 text-yellow-200 border-yellow-500/30">
+                        <span class="text-lg group-hover:scale-110 transition-transform">💡</span> <span class="text-sm font-medium tracking-wide">Concept</span>
+                    </a>
+                    <a href="Calender.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">📅</span> <span class="text-sm font-medium tracking-wide">Calendar</span>
+                    </a>
+                    <a href="Perspective.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">👁️</span> <span class="text-sm font-medium tracking-wide">View</span>
+                    </a>
+                    <a href="Santa.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🎅</span> <span class="text-sm font-medium tracking-wide">Santa</span>
+                    </a>
+                    <a href="Presence.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🎁</span> <span class="text-sm font-medium tracking-wide">Presence</span>
+                    </a>
+                    <a href="Cloud.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">☁️</span> <span class="text-sm font-medium tracking-wide">Cloud</span>
+                    </a>
+                    <a href="Ink.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🖌️</span> <span class="text-sm font-medium tracking-wide">Paint</span>
+                    </a>
+                    <a href="Butterfly.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🦋</span> <span class="text-sm font-medium tracking-wide">Butterfly</span>
+                    </a>
+                    <a href="Weather.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🌤️</span> <span class="text-sm font-medium tracking-wide">Weather</span>
+                    </a>
+                    <a href="Spotlight.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🔦</span> <span class="text-sm font-medium tracking-wide">Spotlight</span>
+                    </a>
+                    <a href="Room.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🏠</span> <span class="text-sm font-medium tracking-wide">Room</span>
+                    </a>
+                    <a href="Radio.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">📻</span> <span class="text-sm font-medium tracking-wide">Radio</span>
+                    </a>
+                    <a href="Food.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🍔</span> <span class="text-sm font-medium tracking-wide">Food</span>
+                    </a>
+                    
+                    <a href="Msg.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">📩</span> <span class="text-sm font-medium tracking-wide">Message</span>
+                    </a>
+                    <a href="letter.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">📜</span> <span class="text-sm font-medium tracking-wide">Letter</span>
+                    </a>
+                    <a href="Music.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🎵</span> <span class="text-sm font-medium tracking-wide">Music</span>
+                    </a>
+                    <a href="Skill.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">✨</span> <span class="text-sm font-medium tracking-wide">Skill</span>
+                    </a>
+                    <a href="Paper_Star.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">⭐</span> <span class="text-sm font-medium tracking-wide">Paper Star</span>
+                    </a>
+                    <a href="Carttoon.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-yellow-200/30 transition-all duration-300 group">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🦄</span> <span class="text-sm font-medium tracking-wide">Cartoon</span>
+                    </a>
+                </div>
+            </div>
+
+        </nav>
+        
+        <div id="desktopContent" class="book-scene ml-0 w-full transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)">
+            <div id="musicBookmark" class="bookmark" title="Play Music">
+                🎵
+            </div>
+
+            <div class="book" id="book3d">
+            </div>
+
+            <div id="birthday-fullscreen" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-1000 bg-black flex flex-col items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 opacity-60" style="background: radial-gradient(circle at 50% 50%, #2e1065, #000); animation: pulse-nebula 8s infinite alternate;"></div>
+                
+                <div class="shooting-stars absolute inset-0 pointer-events-none">
+                    <div class="shooting-star"></div>
+                    <div class="shooting-star"></div>
+                    <div class="shooting-star"></div>
+                </div>
+
+                
+                <div class="absolute top-10 left-[5%] w-48 h-48 opacity-90 animate-float-astro pointer-events-none z-10">
+                    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                        <g id="astronaut">
+                            <path d="M180,200 L140,280" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round"/> 
+                            <path d="M320,200 L360,280" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round"/>
+                            <path d="M200,380 L180,480" stroke="#E2E8F0" stroke-width="14" stroke-linecap="round"/>
+                            <path d="M300,380 L320,480" stroke="#E2E8F0" stroke-width="14" stroke-linecap="round"/>
+                            
+                            <rect x="160" y="180" width="180" height="220" rx="40" fill="#F8FAFC"/>
+                            <rect x="190" y="220" width="120" height="100" rx="10" fill="#E2E8F0"/>
+                            <circle cx="210" cy="250" r="10" fill="#475569"/>
+                            <circle cx="210" cy="290" r="10" fill="#EF4444"/>
+                            <circle cx="290" cy="250" r="10" fill="#3B82F6"/>
+                            
+                            <rect x="140" y="200" width="20" height="100" rx="10" fill="#CBD5E1"/> 
+                            <rect x="340" y="200" width="20" height="100" rx="10" fill="#CBD5E1"/>
+                            
+                            <path d="M170,180 L130,120" stroke="#94A3B8" stroke-width="4"/>
+                            
+                            <circle cx="250" cy="130" r="90" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="4"/>
+                            <path d="M190,120 Q250,50 310,120 Q310,180 250,200 Q190,180 190,120 Z" fill="url(#visorGradient)" stroke="#334155" stroke-width="2"/>
+                            <path d="M210,100 Q230,90 240,110" stroke="rgba(255,255,255,0.6)" stroke-width="3" fill="none"/>
+                        </g>
+                        <defs>
+                            <linearGradient id="visorGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#38BDF8"/>
+                                <stop offset="100%" stop-color="#1E3A8A"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <div class="absolute top-[20%] right-[10%] w-32 h-32 opacity-70 animate-orbit-station pointer-events-none z-0">
+                     <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1" class="text-blue-300 w-full h-full">
+                        <line x1="10" y1="50" x2="30" y2="50" stroke-width="2"/>
+                        <line x1="70" y1="50" x2="90" y2="50" stroke-width="2"/>
+                        <rect x="5" y="30" width="25" height="40" fill="rgba(59, 130, 246, 0.2)" stroke="#60A5FA"/>
+                        <rect x="70" y="30" width="25" height="40" fill="rgba(59, 130, 246, 0.2)" stroke="#60A5FA"/>
+                        
+                        <circle cx="50" cy="50" r="15" fill="#1E293B" stroke="#94A3B8" stroke-width="2"/>
+                        <circle cx="50" cy="50" r="5" fill="#60A5FA"/>
+                        <line x1="50" y1="65" x2="50" y2="85" stroke-width="2"/>
+                        <circle cx="50" cy="90" r="5" fill="#CBD5E1"/>
+                    </svg>
+                </div>
+
+                <div class="absolute bottom-[10%] left-[10%] w-16 h-16 opacity-50 animate-float-rock-1 pointer-events-none z-0">
+                    <svg viewBox="0 0 100 100" fill="#64748B" class="w-full h-full filter drop-shadow-lg">
+                        <path d="M20,30 L40,10 L70,15 L90,40 L80,80 L50,90 L20,70 L10,50 Z" />
+                    </svg>
+                </div>
+
+                <div class="absolute top-[60%] right-[20%] w-10 h-10 opacity-40 animate-float-rock-2 pointer-events-none z-0">
+                    <svg viewBox="0 0 100 100" fill="#475569" class="w-full h-full">
+                        <path d="M30,20 L70,10 L90,50 L60,90 L20,70 Z" />
+                    </svg>
+                </div>
+
+                <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-indigo-900/30 rounded-full blur-3xl z-0 pointer-events-none"></div>
+
+                <div class="relative z-20 flex flex-col items-center justify-center w-full h-full">
+                    
+                    <div id="stone-text-container" class="relative w-full h-[60vh] pointer-events-none"></div>
+
+                    <div class="flex gap-4 justify-center mt-8 relative z-30">
+                        <button onclick="window.triggerCelebration()" class="px-10 py-4 bg-yellow-400/20 hover:bg-yellow-400/40 text-yellow-100 border border-yellow-400/50 rounded-full transition-all shadow-[0_0_20px_rgba(253,224,71,0.3)] hover:shadow-[0_0_40px_rgba(253,224,71,0.5)] hover:-translate-y-1 backdrop-blur-md font-bold tracking-wider group">
+                            <span class="group-hover:animate-pulse mr-2">✨</span> Celebrate
+                        </button>
+                        <button onclick="window.closeBirthdayMode()" class="px-8 py-4 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/20 rounded-full transition-all backdrop-blur-sm tracking-widest text-sm uppercase">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+(function() {
+
+const slides = [
+    {
+        eyebrow: "The Universe Within",
+        title: "What If...",
+        text: "A quiet look into the universe within you steady, expanding, and full of light that appears even on the calmest days. There is a whole world in you, shaped by small thoughts, private dreams, and the kind of depth that doesn’t need noise to feel infinite."
+    },
+    {
+        eyebrow: "Concept 01",
+        title: "If you were a season",
+        text: "You’d be the season that doesn’t arrive it unfolds, as if the world was quietly waiting for you, shifting everything in its own quiet way. You are the sun when it starts to snow, the kind of light that makes the cold rethink itself. You are the rain when heat waves rise, the sudden calm that settles the air and steadies the world. Even time would slow down just to understand you. You’d be that unforgettable season."
+    },
+    {
+        eyebrow: "Concept 02",
+        title: "If you were a sound",
+        text: "A frequency that settles a moment before any thought can catch up. There’s a quiet certainty in it, the kind that pulls scattered ideas into a single, clear direction. It doesn’t try to heal, yet it mends the edges of a heavy day simply by existing. It doesn’t try to motivate, yet something in its tone makes movement feel natural again. It's guides in the way rare signals do subtle, steady, precise leaving the world a little more aligned each time it’s heard.."
+    },
+    {
+        eyebrow: "Concept 03",
+        title: "If you were a time",
+        text: "You would be the golden hour warm, cinematic, and effortlessly beautiful. A moment when light turns gentle, edges soften, and even ordinary scenes feel extraordinary.You’d be that brief slice of time when everything looks a little more authentic, a little more possible. A time that slows the world without stopping it, adding a quiet glow to whatever it touches. You’d be the hour that reminds the day to breathe, to pause, to notice. The kind of beauty that doesn’t fade quickly it lingers, even after the light has moved on."
+    },
+    {
+        eyebrow: "Concept 04",
+        title: "If you were a place",
+        text: "If you were a place, you’d be the kind that can’t be found on any map yet feels instantly familiar. A quiet space where noise loses its edge and thoughts fall into order. Not crowded, not empty just perfectly balanced, like the world knows how to breathe there. You’d be the place light settles differently, where time feels slower but never still. A place that becomes a destination without ever asking to be one."
+    },
+    {
+        eyebrow: "Concept 05",
+        title: "If you were a song",
+        text: "A sont that carry a structure that refuses repetition verses that shift lightly, a tone that stays original from the first second to the last. Your rhythm would move with a steady confidence, never predictable, always precise. Every note would land with intention, forming a sound that feels crafted rather than composed. You’d be the kind of track defined by detail: clear edges, sharp transitions, and a flow that stands apart without needing comparison. A song built on identity, not volume recognizable the moment it starts."
+    },
+    {
+        eyebrow: "Concept 06",
+        title: "If you were a feeling",
+        text: "A feeling that would be the comfort of reaching home after a long journey steady, grounding, and instantly relaxing. A feeling that settles the mind, slows the heartbeat, and makes everything feel calmer and clearer.A feeling like the quiet sense of ease that arrives without effort, the kind that releases tension the moment it appears. A feeling that rises during a sunrise soft, hopeful, almost like the world is starting over. And the same feeling that settles during a sunset calm, complete, and quietly unforgettable. A feeling that defines the moment."
+    },
+    {
+        eyebrow: "Concept 07",
+        title: "If you were a color",
+        text: "You would be Royal Blue bold, calm, and effortlessly elegant. A shade with its own gravity, steady in tone and clear in identity. A shade that brings focus wherever it appears, it sharpens edges, steadies the atmosphere, and adds a sense of structure without demanding space. It holds depth without fading and strength without noise.It holds its tone, and the space around it finds balance through it. A color that stays true, holds its ground, and carries a quiet authority. That is what Royal Blue does, and that is how you would exist as a color."
+    },
+    {
+        eyebrow: "Concept 08",
+        title: "If you were a star",
+        text: "You’d be the kind that lights up the universe with a steady, unmistakable glow. A light that simply expands, reaching farther than it ever needs to. You’d hold a brightness that clarifies the sky, giving shape to everything around it. The kind of star that turns distance into possibility and darkness into depth. Your presence would create direction, definition, and a sense of space that feels alive. A star that doesn’t just exist in the universe, but elevates it."
+    },
+    {
+        eyebrow: "Finally",
+        title: "But you are you",
+        text: "And that truth outshines every metaphor unique, grounded, and impossible to replicate. Not a ‘what if,’ not a comparison, but something real, steady, and unmistakably your own."
+    },
+    {
+        eyebrow: "To the one & only",
+        title: "Happy Birthday",
+        text: "May your year open like a clear night sky calm, bright, and full of new possibilities. May every month bring growth that feels right, and every day bring moments that feel like ease.",
+        subtext: "Your presence adds clarity and light wherever you go. Here’s to a year that matches your strength, your warmth, and the quiet brilliance you carry.",
+        isBirthday: true
+    }
+];
+
+    let currentSlide = 0;
+    let isTransitioning = false;
+    let celebrationInterval = null;
+    const container = document.getElementById('slideContainer');
+    const dotContainer = document.getElementById('progressDots');
+
+    function init() {
+        initNav();
+        initDesktopNav(); 
+        renderSlide(0);
+        renderDots();
+        initTilt(); 
+        initBook(); 
+        initAudio(); 
+        initWarpDrive(); 
+    }
+
+    function generateStoneText() {
+        const container = document.getElementById('stone-text-container');
+        if (!container || container.children.length > 0) return; 
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const w = container.offsetWidth;
+        const h = container.offsetHeight;
+        
+        canvas.width = w;
+        canvas.height = h;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const line1 = "HAPPY BIRTHDAY";
+        const line2 = "JUHI";
+        
+        ctx.font = '900 8vw "Inter", sans-serif'; 
+        ctx.fillStyle = 'white';
+        ctx.fillText(line1, w/2, h/2 - 60);
+
+        ctx.font = '900 12vw "Inter", sans-serif'; 
+        ctx.fillText(line2, w/2, h/2 + 80);
+
+        const imgData = ctx.getImageData(0, 0, w, h).data;
+        const skip = 8; 
+        
+        const fragment = document.createDocumentFragment();
+
+        const stonePath = "M50,5 L80,20 L95,60 L70,95 L30,90 L5,60 L15,20 Z"; 
+
+        for (let y = 0; y < h; y += skip) {
+            for (let x = 0; x < w; x += skip) {
+                const index = (y * w + x) * 4;
+                if (imgData[index + 3] > 128) { 
+                    const rx = x + (Math.random() - 0.5) * 5;
+                    const ry = y + (Math.random() - 0.5) * 5;
+                    
+                    const stone = document.createElement('div');
+                    stone.className = 'stone-particle';
+                    stone.style.left = rx + 'px';
+                    stone.style.top = ry + 'px';
+                    
+                    const size = 3 + Math.random() * 6;
+                    stone.style.width = size + 'px';
+                    stone.style.height = size + 'px';
+                    
+                    const delay = Math.random() * 2 + 's';
+                    stone.style.animation = `stone-appear 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}, float-slow 4s ease-in-out infinite alternate ${Math.random()*2}s`;
+
+                    stone.innerHTML = `<svg viewBox="0 0 100 100" class="stone-svg" style="transform: rotate(${Math.random()*360}deg);"><path d="${stonePath}" /></svg>`;
+                    
+                    fragment.appendChild(stone);
+                }
+            }
+        }
+        container.appendChild(fragment);
+    }
+
+    window.triggerCelebration = function() {
+        startCelebration();
+    };
+
+    function initAudio() {
+        const audio = document.getElementById('bgMusic');
+        if(!audio) return;
+        audio.volume = 0.5; 
+        
+        const desktopBtn = document.getElementById('musicBookmark');
+        if(desktopBtn) {
+            desktopBtn.addEventListener('click', () => {
+                if(audio.paused) {
+                    audio.play();
+                    desktopBtn.innerText = "⏸";
+                    desktopBtn.style.height = "140px";
+                } else {
+                    audio.pause();
+                    desktopBtn.innerText = "🎵";
+                    desktopBtn.style.height = "120px";
+                }
+            });
+        }
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Audio autoplay prevented. Waiting for user interaction.");
+                const startAudio = () => {
+                    audio.play();
+                    document.removeEventListener('click', startAudio);
+                    document.removeEventListener('touchstart', startAudio);
+                };
+                document.addEventListener('click', startAudio);
+                document.addEventListener('touchstart', startAudio);
+            });
+        }
+    }
+
+    function renderDots() {
+        dotContainer.innerHTML = slides.map((_, i) => 
+            `<div class="dot ${i === 0 ? 'active' : ''}"></div>`
+        ).join('');
+    }
+
+    function renderSlide(index) {
+        const data = slides[index];
+        const isLast = index === slides.length - 1;
+        
+        let btnText = "Next";
+        if (index === slides.length - 2) btnText = "Happy Birthday 🎂";
+        if (isLast) btnText = "Celebrate 🎉"; 
+        
+        const html = `
+            <div class="holo-card enter" id="activeCard">
+                <div class="holo-glare"></div>
+                <div class="card-content">
+                    <div>
+                        <div class="eyebrow">${data.eyebrow}</div>
+                        <div class="main-title" style="${data.isBirthday ? 'color:#ff9a9e; text-shadow:0 0 30px rgba(255,154,158,0.6);' : ''}">${data.title}</div>
+                        <div class="body-text">
+                            ${data.text}
+                            ${data.subtext ? `<div class="sub-text">${data.subtext}</div>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn-magic" onclick="window.triggerNextSlide(event)">${btnText}</button>
+                </div>
+            </div>
+        `;
+        container.innerHTML = html;
+    }
+
+    window.triggerNextSlide = function(e) {
+        createHearts(e.target);
+
+        if (currentSlide === slides.length - 1) {
+            randomExplosion(); 
+            return; 
+        }
+
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        const card = document.getElementById('activeCard');
+        if(card) {
+            card.classList.remove('enter');
+            card.classList.add('exit');
+        }
+
+        setTimeout(() => {
+            currentSlide++;
+            
+            if (currentSlide === slides.length - 1) {
+                startCelebration();
+            }
+
+            document.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentSlide);
+            });
+
+            renderSlide(currentSlide);
+            isTransitioning = false;
+        }, 500);
+    };
+
+    const splitContent = (text) => {
+        if (!text) return ['', ''];
+        
+        const sentences = text.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g);
+        if (!sentences || sentences.length === 0) return [text, ''];
+        if (sentences.length === 1) return [sentences[0], '']; 
+        
+        const mid = Math.ceil(sentences.length / 2);
+        const left = sentences.slice(0, mid).join(' ');
+        const right = sentences.slice(mid).join(' ');
+        return [left, right];
+    };
+
+    const getLeftPageHTML = (slide, index) => {
+        const [leftText, _] = splitContent(slide.text);
+        return `
+            <div class="relative h-full flex flex-col justify-center px-8 text-right border-r border-stone-300/30">
+                <div class="text-xs uppercase tracking-[0.2em] text-stone-500 mb-4 font-sans">${slide.eyebrow}</div>
+                <h2 class="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-stone-800 leading-tight mb-6">
+                    ${slide.title}
+                </h2>
+                <div class="font-['Inter'] text-lg text-stone-600 leading-relaxed font-light mb-4 text-left">
+                    ${leftText}
+                </div>
+                <div class="text-6xl opacity-10 absolute bottom-10 left-10 select-none text-stone-900 font-serif">
+                    ${index < 10 ? '0'+index : index}
+                </div>
+            </div>
+        `;
+    };
+
+    const getRightPageHTML = (slide, index) => {
+        const [_, rightText] = splitContent(slide.text);
+        return `
+            <div class="relative h-full flex flex-col justify-center px-8 text-left">
+                <p class="font-['Inter'] text-lg text-stone-700 leading-relaxed font-light">
+                    ${rightText}
+                </p>
+                ${slide.subtext ? `<p class="font-['Gochi_Hand'] text-xl text-stone-500 mt-8 transform rotate-1">${slide.subtext}</p>` : ''}
+                <div class="hint-text text-stone-400">Page ${index}</div>
+            </div>
+        `;
+    };
+
+    const getCoverHTML = (slide) => {
+        return `
+            <div class="relative h-full flex flex-col justify-center px-4">
+                <div class="text-xs uppercase tracking-widest opacity-60 mb-6 font-sans">${slide.eyebrow}</div>
+                <h2 class="book-title" style="${slide.isBirthday ? 'color:#d946ef' : ''}">${slide.title}</h2>
+                <p class="book-text">${slide.text}</p>
+                <div class="hint-text text-yellow-300">Click to Open</div>
+            </div>
+        `;
+    };
+
+    function initBook() {
+        const book = document.getElementById('book3d');
+        if(!book) return;
+        
+        const spiral = document.createElement('div');
+        spiral.className = 'spiral-binding';
+        let coils = '';
+        const coilCount = 20;
+        const totalH = 580;
+        const step = totalH / 25; 
+        
+        for(let y=0; y<25; y++) {
+            const yPos = y * step;
+            coils += `<path d="M 20 ${yPos+5} C 0 ${yPos+5}, 0 ${yPos+15}, 20 ${yPos+15}" fill="none" stroke="url(#spiralGradient)" stroke-width="3" />`;
+        }
+
+        spiral.innerHTML = `
+            <svg width="24" height="100%" viewBox="0 0 24 ${totalH}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="spiralGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#888;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#eee;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#888;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                ${coils}
+            </svg>
+        `;
+        book.appendChild(spiral);
+
+        const pages = [];
+        
+        
+        const totalPages = slides.length; 
+        
+        for (let i = 0; i < totalPages; i++) {
+            const page = document.createElement('div');
+            page.className = 'page';
+            if (i === 0) page.classList.add('cover');
+            
+            const front = document.createElement('div');
+            front.className = 'front';
+            
+            const back = document.createElement('div');
+            back.className = 'back';
+
+            if (i === 0) {
+                front.innerHTML = getCoverHTML(slides[0]);
+            } else {
+                const slide = slides[i];
+                if (slide) {
+                    if (slide.isBirthday) front.classList.add('birthday-page');
+                    front.innerHTML = slide.isBirthday ? '' : getRightPageHTML(slide, i);
+                }
+            }
+
+            const nextSlideIndex = i + 1;
+            if (nextSlideIndex < slides.length) {
+                const nextSlide = slides[nextSlideIndex];
+                if (nextSlide) {
+                    if (nextSlide.isBirthday) back.classList.add('birthday-page');
+                    back.innerHTML = nextSlide.isBirthday ? '' : getLeftPageHTML(nextSlide, nextSlideIndex);
+                }
+            } else {
+                back.innerHTML = `<div class="flex items-center justify-center h-full"><div class="text-sm opacity-50 font-serif italic">The End</div></div>`;
+            }
+
+            page.appendChild(front);
+            page.appendChild(back);
+            
+            page.onclick = () => flipPage(i);
+            
+            pages.push(page);
+            book.appendChild(page);
+        }
+
+        updateZIndices();
+
+        function flipPage(index) {
+            const page = pages[index];
+            const isFlipped = page.classList.contains('flipped');
+            
+            if (!isFlipped && index === pages.length - 2) {
+                setTimeout(() => {
+                    const bookEl = document.getElementById('book3d');
+                    const fullScreenEl = document.getElementById('birthday-fullscreen');
+                    
+                    if (bookEl && fullScreenEl) {
+                        bookEl.style.opacity = '0';
+                        bookEl.style.pointerEvents = 'none';
+                        
+                        fullScreenEl.classList.remove('hidden');
+                        setTimeout(() => {
+                            fullScreenEl.classList.remove('opacity-0');
+                            generateStoneText(); 
+                            startCelebration(); 
+                        }, 50);
+                    }
+                }, 400); 
+            }
+
+            if (isFlipped) {
+                page.style.zIndex = 500;
+                page.classList.remove('flipped');
+                
+                if (index === 0) book.classList.remove('open');
+
+                setTimeout(() => {
+                    updateZIndices();
+                }, 500); 
+
+            } else {
+                page.style.zIndex = 500;
+                page.classList.add('flipped');
+                
+                if (index === 0) book.classList.add('open');
+
+                setTimeout(() => {
+                    updateZIndices();
+                }, 500);
+                
+                if(index !== pages.length - 2) {
+                    createHearts(page);
+                }
+            }
+        }
+
+        window.closeBirthdayMode = function() {
+            const bookEl = document.getElementById('book3d');
+            const fullScreenEl = document.getElementById('birthday-fullscreen');
+            
+            if (fullScreenEl) {
+                fullScreenEl.classList.add('opacity-0');
+                setTimeout(() => {
+                    fullScreenEl.classList.add('hidden');
+                    if (bookEl) {
+                        bookEl.style.opacity = '1';
+                        bookEl.style.pointerEvents = 'auto';
+                    }
+                }, 1000);
+            }
+        };
+
+        function updateZIndices() {
+            
+            const total = pages.length;
+            
+            pages.forEach((page, i) => {
+                if (page.classList.contains('flipped')) {
+                    page.style.zIndex = i + 1;
+                } else {
+                    page.style.zIndex = total - i; 
+                }
+            });
+        }
+    }
+
+    function initWarpDrive() {
+        const cvs = document.getElementById('warp-canvas');
+        if(!cvs) return;
+        const ctx = cvs.getContext('2d');
+        let w, h;
+        
+        function resize() { w = cvs.width = window.innerWidth; h = cvs.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const stars = [];
+        const starCount = 1000;
+        let speed = 2; 
+        let mouseX = w/2;
+        let mouseY = h/2;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        class WarpStar {
+            constructor() {
+                this.init();
+            }
+            init() {
+                this.x = (Math.random() - 0.5) * w * 3;
+                this.y = (Math.random() - 0.5) * h * 3;
+                this.z = Math.random() * w; 
+                this.color = Math.random() > 0.8 ? '#fbbf24' : (Math.random() > 0.5 ? '#e879f9' : '#60a5fa');
+                this.size = Math.random();
+            }
+            update() {
+                this.z -= speed * 10;
+                
+                const dx = (mouseX - w/2) * 0.05;
+                const dy = (mouseY - h/2) * 0.05;
+                
+                if (this.z <= 0) {
+                    this.init();
+                    this.z = w;
+                }
+            }
+            draw() {
+                let k = 128.0 / this.z;
+                let px = (this.x) * k + w/2 + (mouseX - w/2)*0.1;
+                let py = (this.y) * k + h/2 + (mouseY - h/2)*0.1;
+
+                if (px >= 0 && px <= w && py >= 0 && py <= h) {
+                    let s = (1 - this.z / w) * 3; 
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    
+                    const prevK = 128.0 / (this.z + speed*20);
+                    const prevX = (this.x) * prevK + w/2 + (mouseX - w/2)*0.1;
+                    const prevY = (this.y) * prevK + h/2 + (mouseY - h/2)*0.1;
+
+                    ctx.moveTo(px, py);
+                    ctx.lineTo(prevX, prevY);
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = s;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        for(let i=0; i<starCount; i++) stars.push(new WarpStar());
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, 0, w, h);
+
+            const time = Date.now() * 0.001;
+            const cx = w/2 + Math.sin(time * 0.5) * 100;
+            const cy = h/2 + Math.cos(time * 0.3) * 100;
+            
+            const grad = ctx.createRadialGradient(cx, cy, 0, w/2, h/2, w);
+            grad.addColorStop(0, 'rgba(24, 24, 50, 0.2)');
+            grad.addColorStop(0.5, 'rgba(75, 0, 130, 0.1)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0,0,w,h);
+
+            stars.forEach(s => {
+                s.update();
+                s.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    function startCelebration() {
+        for(let i=0; i<5; i++) setTimeout(randomExplosion, i*300);
+        if(!celebrationInterval) {
+            celebrationInterval = setInterval(randomExplosion, 800);
+        }
+    }
+
+    function randomExplosion() {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        const dummy = document.createElement('div');
+        dummy.style.position = 'fixed'; dummy.style.left = x + 'px'; dummy.style.top = y + 'px'; dummy.style.zIndex = '9999';
+        document.body.appendChild(dummy);
+        createHearts(dummy);
+        setTimeout(() => dummy.remove(), 2000);
+    }
+
+    function createHearts(parent) {
+        const symbols = ['❤','✨','💖','⭐','🎂','🎉'];
+        for(let i=0; i<12; i++) {
+            const heart = document.createElement('div');
+            heart.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+            heart.className = 'heart';
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 80 + Math.random() * 80;
+            const tx = Math.cos(angle) * dist + 'px';
+            const ty = Math.sin(angle) * dist + 'px';
+            heart.style.setProperty('--tx', tx);
+            heart.style.setProperty('--ty', ty);
+            parent.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+
+    function initTilt() {
+        const body = document.body;
+        document.addEventListener('mousemove', (e) => {
+            const card = document.getElementById('activeCard');
+            if (!card || window.innerWidth >= 1024) return;
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            const rotateY = (x - 0.5) * 30; 
+            const rotateX = (0.5 - y) * 30;
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            const glare = card.querySelector('.holo-glare');
+            if(glare) glare.style.backgroundPosition = `${x * 100}% ${y * 100}%`;
+        });
+        document.addEventListener('touchmove', (e) => {
+            const card = document.getElementById('activeCard');
+            if (!card || window.innerWidth >= 1024) return;
+            const touch = e.touches[0];
+            const x = touch.clientX / window.innerWidth;
+            const y = touch.clientY / window.innerHeight;
+            const rotateY = (x - 0.5) * 30;
+            const rotateX = (0.5 - y) * 30;
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+    }
+
+    function initNav() {
+        const navToggle = document.getElementById('navToggle');
+        const navIcon = document.getElementById('navToggleIcon');
+        const navX = document.getElementById('navToggleX');
+        let isOpen = false;
+        if(!navToggle) return;
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isOpen = !isOpen;
+            navIcon.classList.toggle('hidden', isOpen);
+            navX.classList.toggle('hidden', !isOpen);
+            const top = document.getElementById('topNav');
+            const bot = document.getElementById('bottomNav');
+            const left = document.getElementById('leftNav');
+            const right = document.getElementById('rightNav');
+            if (isOpen) {
+                top.classList.remove('-translate-y-full');
+                bot.classList.remove('translate-y-full');
+                left.classList.remove('-translate-x-full');
+                right.classList.remove('translate-x-full');
+            } else {
+                top.classList.add('-translate-y-full');
+                bot.classList.add('translate-y-full');
+                left.classList.add('-translate-x-full');
+                right.classList.add('translate-x-full');
+            }
+        });
+        document.addEventListener('click', () => { if(isOpen) navToggle.click(); });
+    }
+
+    function initDesktopNav() {
+        const btn = document.getElementById('desktopNavToggle');
+        const sidebar = document.getElementById('desktopSidebar');
+        const content = document.getElementById('desktopContent');
+        const menuIcon = document.getElementById('desktopMenuIcon');
+        const closeIcon = document.getElementById('desktopCloseIcon');
+        
+        let isOpen = false;
+
+        if(!btn) return;
+
+        function setNavState(open) {
+            isOpen = open;
+            if(isOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                content.style.marginLeft = '450px'; // Matching the new sidebar width
+                content.style.width = 'calc(100% - 450px)';
+                menuIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                content.style.marginLeft = '0';
+                content.style.width = '100%';
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }
+        }
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setNavState(!isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (isOpen && !sidebar.contains(e.target) && !btn.contains(e.target)) {
+                setNavState(false);
+            }
+        });
+    }
+
+    init();
+
+})();
+
+(function() {
+    const cvs = document.getElementById('particles');
+    if(!cvs) return;
+    const ctx = cvs.getContext('2d');
+    let w, h;
+    let stars = [];
+    function resize() { w = cvs.width = innerWidth; h = cvs.height = innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+    class Star {
+        constructor() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.size = Math.random() * 2;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if(this.x < 0) this.x = w;
+            if(this.x > w) this.x = 0;
+            if(this.y < 0) this.y = h;
+            if(this.y > h) this.y = 0;
+        }
+        draw() {
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+            ctx.fill();
+        }
+    }
+    for(let i=0; i<60; i++) stars.push(new Star());
+    function animateParticles() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 0.5;
+        for(let i=0; i<stars.length; i++) {
+            const s1 = stars[i];
+            s1.update();
+            s1.draw();
+            for(let j=i+1; j<stars.length; j++) {
+                const s2 = stars[j];
+                const dist = Math.hypot(s1.x - s2.x, s1.y - s2.y);
+                if(dist < 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(s1.x, s1.y);
+                    ctx.lineTo(s2.x, s2.y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+})();
+</script>
+</body>
+</html>

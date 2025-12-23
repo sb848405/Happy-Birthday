@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Juhi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .festive-text { font-family: 'VT323', monospace; font-size: 1.25rem; }
+        h1, h2, h3 { font-family: 'VT323', monospace; font-weight: normal; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: 'VT323', monospace; }
+        
+        :root {
+            --cake-body: #C0C0C0; 
+            --frosting: #000080; 
+            --photo-frame-border: #808080; 
+        }
+
+        body {
+            background-color: #008080; 
+            background-image: linear-gradient(rgba(0,0,0,0.2) 1px, transparent 1px);
+            background-size: 100% 3px; 
+            display: block; 
+        }
+
+        .cursor-vintage, .cursor-vintage * {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1l15 15-6 0 3 7-3 1-3-8-4 4L1 1z' fill='black' stroke='white' stroke-width='1'/%3E%3C/svg%3E"), auto !important;
+        }
+
+        #navToggle { transition: all 0.3s ease-in-out; z-index: 1000; }
+        .nav-panel, #mainContent { transition: all 0.3s ease-in-out; }
+        
+        #mainContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            
+            width: 100%; height: 100%;
+            position: absolute; inset: 0; overflow: auto; padding: 20px;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        #mainContent::before, #mainContent::after {
+            content: '';
+            flex-grow: 1;
+            margin: auto;
+        }
+        #mainContent::-webkit-scrollbar { display: none; }
+
+        @media (min-width: 768px) {
+            .body-nav-open #mainContent { top: 4rem; bottom: 4rem; left: 6rem; right: 6rem; padding: 0; }
+        }
+        @media (max-width: 767px) {
+            .body-nav-open #mainContent { top: 4rem; bottom: 4rem; left: 0; right: 0; opacity: 0.8; }
+        }
+
+        .letter-container {
+            position: relative; width: 220px; height: 150px;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+            transform: scale(0.9); opacity: 0; z-index: 15; display: none; 
+        }
+        .letter-container.active-letter { display: block; opacity: 1; transform: scale(1.1); }
+        .envelope { position: relative; width: 100%; height: 100%; }
+        .envelope-body { position: absolute; bottom: 0; width: 100%; height: 100%; background: var(--cake-body); border: 2px outset #FFFFFF; z-index: 16; }
+        .envelope-flap {
+            position: absolute; top: 0; left: 0; width: 100%; height: 75px; 
+            background: var(--cake-body); clip-path: polygon(0 0, 100% 0, 50% 100%);
+            z-index: 17; transform-origin: top; transition: transform 0.5s ease-in-out;
+            border-bottom: 1px solid #808080;
+        }
+        .letter-container.open .envelope-flap { transform: rotateX(180deg); }
+
+        .page {
+            display: none; width: 100%; max-width: 420px; padding: 25px;
+            background: var(--cake-body); border: 2px outset #FFFFFF; text-align: left;
+            opacity: 0; transform: scale(0.9); transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            z-index: 15; max-height: 85vh; overflow-y: auto; box-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+            margin: auto; 
+        }
+        .page.active-page { display: block; opacity: 1; transform: scale(1); }
+        .page-content { font-family: 'VT323', monospace; font-size: 1.5rem; line-height: 1.6; color: #000000; }
+        .page-content p { margin-bottom: 1.5rem; }
+        .page-content span {
+            display: block; font-size: 1.4rem; font-weight: bold; color: var(--frosting); 
+            font-style: normal; margin-bottom: 0.5rem; border-bottom: 1px dashed var(--frosting); padding-bottom: 5px;
+        }
+        .page h2 { color: var(--frosting); text-align: center; margin-bottom: 1rem; font-size: 2.5rem; text-shadow: 1px 1px 0px #fff; }
+        .page-signature { font-size: 1.5rem; text-align: right; margin-top: 1.5rem; color: #000000; }
+
+        .photo-frame { display: block; width: 100%; height: 100%; object-fit: cover; border: 4px outset var(--photo-frame-border); padding: 2px; background-color: #FFFFFF; }
+        #image-wrapper {
+            display: none; opacity: 0; transition: opacity 0.5s ease-in-out;
+            width: 200px; height: 130px; position: absolute; z-index: 20; 
+            top: 50%; left: 50%; transform: translate(-50%, -50%); cursor: pointer; 
+        }
+        #button-container {
+            position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(120px); 
+            display: flex; flex-direction: column; gap: 15px; z-index: 16; width: 90%; max-width: 300px;
+        }
+        #start-button-container { position: relative; z-index: 16; width: 90%; max-width: 400px; text-align: center; margin: auto; }
+        .action-button {
+            padding: 12px 28px; background: var(--cake-body); color: #000000; 
+            font-size: 1.25rem; font-weight: normal; border: 2px outset #FFFFFF; 
+            cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; font-family: 'VT323', monospace;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.3); white-space: normal; line-height: 1.2; width: 100%;
+        }
+        .action-button:active { border-style: inset; transform: translateY(22px); }
+        .action-button.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .page-nav-button {
+            display: block; max-width: 250px; margin: 1rem auto 0 auto; 
+            background: var(--cake-body); color: #000000; font-family: 'VT323', monospace;
+            font-size: 1.25rem; font-weight: normal; padding: 10px 24px; border: 2px outset #FFFFFF;
+            cursor: pointer; text-align: center; transition: background-color 0.2s;
+        }
+        .page-nav-button:hover { background-color: #A0A0A0; }
+        .page-nav-button:active { border-style: inset; }
+
+        #mobile-wrapper { display: block; width: 100%; height: 100%; }
+        #desktop-wrapper { display: none; }
+        @media (min-width: 768px) {
+            #mobile-wrapper { display: none !important; }
+            #desktop-wrapper { display: block !important; }
+            body { background-color: #008080 !important; background-image: none !important; }
+        }
+
+        .retro-outset {
+            border-top: 2px solid #ffffff; border-left: 2px solid #ffffff;
+            border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+            background-color: #c0c0c0; box-shadow: 1px 1px 0 #000000;
+        }
+        .retro-inset {
+            border-top: 2px solid #404040; border-left: 2px solid #404040;
+            border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff;
+            background-color: #ffffff; box-shadow: inset 1px 1px 0 #000000;
+        }
+        .desktop-icon {
+            width: 80px; display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; color: white; text-align: center; padding: 4px; 
+            border: 1px solid transparent; text-decoration: none; position: relative; 
+        }
+        .desktop-icon:hover { border: 1px dotted #ffff00; background-color: rgba(0, 0, 128, 0.3); }
+        .desktop-icon-img { width: 32px; height: 32px; margin-bottom: 4px; }
+        .desktop-icon-text { font-size: 1rem; padding: 2px 4px; line-height: 1.1; background-color: transparent; }
+        .desktop-icon:hover .desktop-icon-text { background-color: #000080; }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .taskbar {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 34px;
+            background-color: #c0c0c0; border-top: 2px solid #ffffff;
+            display: flex; align-items: center; padding: 2px; z-index: 100;
+        }
+        .start-btn {
+            display: flex; align-items: center; padding: 2px 6px; height: 26px;
+            margin-right: 8px; font-weight: bold; font-size: 1.1rem; gap: 4px; cursor: pointer;
+        }
+        .start-btn:active, .start-btn.active {
+            border-top: 2px solid #404040; border-left: 2px solid #404040; 
+            border-right: 2px solid #fff; border-bottom: 2px solid #fff; background-color: #d4d0c8;
+        }
+        .task-tab {
+            padding: 2px 10px; height: 26px; background-color: #e0e0e0;
+            border-top: 2px solid #fff; border-left: 2px solid #fff; 
+            border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+            display: flex; align-items: center; gap: 6px; width: 180px; font-weight: bold;
+            cursor: pointer; margin-right: 4px; overflow: hidden;
+        }
+        .task-tab:active {
+            border-top: 2px solid #404040; border-left: 2px solid #404040; 
+            border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+            background-color: #d4d0c8;
+        }
+        .tray-clock { margin-left: auto; height: 26px; padding: 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+        .retro-window {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 600px; height: 450px; display: flex; flex-direction: column; padding: 3px;
+            transition: all 0.1s ease-out; z-index: 50;
+        }
+        .retro-window.maximized { top: 0; left: 0; transform: none; width: 100%; height: calc(100% - 34px); }
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0); color: white; padding: 2px 4px;
+            display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 1.1rem;
+        }
+        .title-controls button {
+            width: 16px; height: 14px; background: #c0c0c0; border: 1px outset #fff; 
+            margin-left: 2px; font-size: 8px; line-height: 10px; text-align: center; color: black; cursor: pointer;
+        }
+        .title-controls button:active { border-style: inset; }
+        .window-content { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .desktop-page { display: none; min-height: 100%; flex-direction: column; }
+        .desktop-page.active { display: flex; }
+        .desktop-next-btn {
+            align-self: flex-start; margin-top: 20px; padding: 4px 12px; font-size: 1rem;
+            background: #c0c0c0; border: 2px outset #fff; cursor: pointer;
+        }
+        .desktop-next-btn:active { border-style: inset; }
+
+        #start-menu {
+            position: absolute;
+            bottom: 36px;
+            left: 99px; 
+            width: 280px; 
+            height: auto; 
+            max-height: calc(100vh - 42px);
+            min-height: 450px; 
+            background: #c0c0c0;
+            display: none; 
+            flex-direction: row; 
+            z-index: 9999;
+            padding: 2px;
+            border-top: 2px solid #fff; 
+            border-left: 2px solid #fff; 
+            border-right: 2px solid #404040; 
+            border-bottom: 2px solid #404040;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+        }
+        
+        .start-menu-sidebar {
+            width: 32px;
+            min-width: 32px;
+            background: linear-gradient(to bottom, #000080, #1084d0);
+            display: flex;
+            align-items: center;       
+            justify-content: center; 
+            color: white;
+            flex-shrink: 0;           
+        }
+        
+        .sidebar-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .start-menu-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: #c0c0c0;
+            padding: 2px 0 2px 2px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .start-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: black;
+            font-size: 1.1rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .start-menu-item:hover { background-color: #000080; color: white; }
+        .start-menu-item:hover svg { stroke: white; fill: white; }
+        .start-menu-item svg { 
+            width: 24px; height: 24px; margin-right: 12px; flex-shrink: 0; stroke: #000080; 
+        }
+        .start-divider { 
+            height: 2px; border-top: 1px solid #808080; border-bottom: 1px solid #ffffff; margin: 6px 4px; 
+        }
+
+        .toolbar {
+            padding: 4px; border-bottom: 1px solid #808080;
+            display: flex; gap: 8px; background: #c0c0c0;
+        }
+        .toolbar-btn {
+            display: flex; align-items: center; gap: 4px;
+            padding: 2px 6px; border: 1px outset #fff; cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .toolbar-btn:active { border-style: inset; }
+        
+        .file-grid {
+            display: flex; flex-wrap: wrap; gap: 16px; align-content: flex-start;
+        }
+        .file-item {
+            width: 70px; display: flex; flex-direction: column; align-items: center; text-align: center;
+            cursor: pointer; padding: 4px; border: 1px solid transparent;
+        }
+        .file-item:hover { background-color: #000080; color: white; }
+        .file-item:hover svg { stroke: white; fill: none; }
+        .file-item svg { width: 32px; height: 32px; margin-bottom: 4px; stroke: #000000; }
+        .file-name { font-size: 0.9rem; line-height: 1.1; }
+
+    </style>
+</head>
+<body class="font-sans overflow-hidden">
+
+    <div id="mobile-wrapper">
+        <button id="navToggle" class="fixed top-6 left-6 z-[110] p-2 shadow-lg focus:outline-none"
+            style="border-radius: 0; background: #C0C0C0; border: 2px outset #FFFFFF; color: #000;">
+            <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+            <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        
+        
+        <nav id="leftNav" class="nav-panel fixed left-0 top-16 bottom-16 z-[60] w-24 text-yellow-100 flex flex-col items-center space-y-1 -translate-x-full overflow-y-auto py-10" style="background-color: #C0C0C0; color: #000000; border-right: 2px outset #fff;">
+            <a href="index.html" class="nav-link px-3 py-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 text-yellow-100 flex items-center justify-center space-x-2 translate-y-full" style="background-color: #C0C0C0; color: #000000; border-top: 2px outset #fff;">
+            <a href="Skill.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Cartoon.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="rightNav" class="nav-panel fixed right-0 top-16 bottom-16 z-[60] w-24 text-yellow-100 flex flex-col items-center space-y-1 translate-x-full overflow-y-auto py-10" style="background-color: #C0C0C0; color: #000000; border-left: 2px outset #fff;">
+            <a href="Periodik_table.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Periodic_Table</a>
+            <a href="Concept.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Calendar</a>
+            <a href="Perspective.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Food</a>
+        </nav>
+
+        <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 text-yellow-100 flex items-center justify-center space-x-2 -translate-y-full" style="background-color: #C0C0C0; color: #000000; border-bottom: 2px outset #fff;">
+            <a href="Msg.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Message</a>
+            <a href="letter.html" class="nav-link px-3 py-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text ">Letter</a>
+            <a href="Music.html" class="nav-link p-2 text-sm font-medium hover:bg-gray-500 hover:text-white transition-colors duration-200 festive-text">Music</a>
+        </nav>
+
+        <main id="mainContent">
+            <div id="start-button-container"><button id="start-button" class="action-button visible">A message from the heart...</button></div>
+            <div id="letter-container" class="letter-container"><div class="envelope"><div class="envelope-flap"></div><div class="envelope-body"></div></div></div>
+            <div id="image-wrapper"><img id="birthday-photo" class="photo-frame" src="Letter.png" alt="Photo" onerror="this.src='https://placehold.co/150x150/C0C0C0/000080?text=June';"></div>
+            <div id="button-container"><button id="open-letter-button" class="action-button">Open the letter</button></div>
+
+            <div id="page-1" class="page">
+                <h2 class="text-3xl">Happy Birthday Juhi</h2>
+                <div class="page-content"><p><span>Part 1: The Wish</span> First off, just a huge, happy, happy birthday. I hope your day is filled with tons of fun, amazing surprises, and everything that makes you smile.</p></div>
+                <button class="page-nav-button next-button" data-target="2">Next</button>
+            </div>
+            <div id="page-2" class="page">
+                <h2 class="text-3xl">Part 2</h2>
+                <div class="page-content"><p><span>Who you are?</span> Kabhi socha hai kon ho tum? Kisi ke liye beti, kisi ke liye behen, kisi ke liye pyaar, kisi ke liye dost. Kisi ke liye student, to kisi ke liye teacher. Lekin asal mein...tum kaun ho tum? Tumhara kya impact hai dusro k jivan mai?</p></div>
+                <button class="page-nav-button next-button" data-target="3">Next</button>
+            </div>
+            <div id="page-3" class="page">
+                <h2 class="text-3xl">Part 3</h2>
+                <div class="page-content"><p><span>Your impact in everyone’s life</span> Kabhi kabhi ek insan ki kami se puri kainat kami lagti hai, aur tum to sach me kisi ki kainat ho. Kisi ki umeed ki kiran tum ho, kabhi kisi ka hasne ka karan ban jaati ho. Kabhi tumhari ek chhoti si baat dil me gehra asar chhod jaati hai. Aur kabhi tum bas saamne ho, to sab kuch thoda behtar lagne lagta hai.</p></div>
+                <button class="page-nav-button next-button" data-target="4">Next</button>
+            </div>
+            <div id="page-4" class="page">
+                <h2 class="text-3xl">Part 4</h2>
+                <div class="page-content"><p>Apne liye kaun ho tum? <span>You are Carbon.</span> You have a very simple and calm nature. You don’t talk too much, but whatever you say always feels special. You care for people quietly, in small ways, without trying to show it. Your behaviour is soft, and your heart is clean and that’s what makes you different from others. Tum Carbon ho. Carbon ki tarah tum alag alag roop mein khoobsurat lagti ho. Jab zindagi tough hoti hai, tum diamond ki tarah strong ban jaati ho, bilkul clear, bilkul steady. Aur jab kisi ko halka sa support chahiye hota hai, tab tum graphite ki tarah soft aur samajhdaar ban jaati ho. Carbon ka kaam hota hai dusron ko jodna… aur tum bhi waise hi ho, log tumse aasaani se jud jaate hain. Carbon life banata hai… aur tum apne aas–paas ke logon ki life thodi si better kar deti ho, sirf apni achhi nature ki wajah se. Hamesha aise hi rehna, simple, strong, aur apne jaise.</p></div>
+                <button class="page-nav-button next-button" data-target="5">Next</button>
+            </div>
+            <div id="page-5" class="page">
+                <h2 class="text-3xl">Part 5</h2>
+                <div class="page-content"><p><span>Who you are for me</span> Mere liye tum kaun ho? Dharkanon ka geet ho, jeevan ka ek sangeet ho. Roshni jaisi ho, taazgi jaisi ho, aur khushiyon ki wajah jaisi ho. Tum meri life ka wo hissa ho jo bina koshish ke dil me jagah bana leta hai.</p></div>
+                <p class="page-signature" style="text-align: center;">Tumhara Subhchintak</p>
+            </div>
+        </main> 
+    </div>
+
+    <div id="desktop-wrapper">
+         <div class="absolute top-4 left-4 flex flex-col gap-2">
+            <div class="desktop-icon" onclick="openMsgWindow()">
+                <div id="letter-notification" class="notification-badge">1</div>
+                <svg class="desktop-icon-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z" fill="#F0E68C" stroke="black" stroke-width="1"/></svg>
+                <div class="desktop-icon-text">Read Letter</div>
+            </div>
+            <div class="desktop-icon" onclick="openRecycleWindow()">
+                <svg class="desktop-icon-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 4H15.5L14.5 2H9.5L8.5 4H5V6H19V4ZM6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19Z" fill="#C0C0C0" stroke="black"/><path d="M10 17H14" stroke="green" stroke-width="2"/><path d="M8 12L12 16L16 12" stroke="green" stroke-width="2"/></svg>
+                <div class="desktop-icon-text">Recycle Bin</div>
+            </div>
+        </div>
+
+        <div id="start-menu" class="retro-window retro-outset">
+            <div class="start-menu-sidebar">
+                <span class="sidebar-text">Juhi 98</span>
+            </div>
+            <div id="start-menu-items" class="start-menu-content retro-inset" style="border:none; box-shadow:none;">
+                
+            </div>
+        </div>
+
+        <div id="recycle-window" class="retro-window retro-outset" style="display:none; z-index: 60;">
+            <div class="title-bar">
+                <div class="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 4H5V6H19V4ZM6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19Z" fill="white" stroke="white"/></svg>
+                    <span>Recycle Bin</span>
+                </div>
+                <div class="title-controls flex">
+                    <button onclick="minimizeRecycleWindow()">_</button>
+                    <button onclick="maximizeRecycleWindow()">□</button>
+                    <button onclick="closeRecycleWindow()" style="font-weight:bold; color:black;">X</button>
+                </div>
+            </div>
+            <div class="menu-bar">
+                <span class="menu-item">File</span><span class="menu-item">Edit</span><span class="menu-item">View</span><span class="menu-item">Go</span><span class="menu-item">Favorites</span><span class="menu-item">Help</span>
+            </div>
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="emptyRecycleBin()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    Empty Recycle Bin
+                </button>
+            </div>
+            <div id="recycle-content" class="window-content retro-inset file-grid">
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Overthinking.tmp</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Tension.log</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Pressure.sys</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Pain.dat</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Bad_Time.old</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Stress.ini</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Fear.bat</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Negativity.dll</div>
+                </div>
+                 <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Laziness.vbs</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Guilt.bak</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Sadness.png</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">SelfDoubt.reg</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Anger.log</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Frustration.tmp</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Regrets.iso</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Mistakes.err</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Insecurity.dll</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Loneliness.jpg</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Failure.txt</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Thik Thak_Vibes.bin</div>
+                </div>
+                <div class="file-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <div class="file-name">Procrastination.exe</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="msg-window" class="retro-window retro-outset" style="display:none; z-index: 50;">
+            <div class="title-bar">
+                <div class="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="white" fill="white"/></svg>
+                    <span>Message Viewer - Happy Birthday.msg</span>
+                </div>
+                <div class="title-controls flex">
+                    <button onclick="minimizeMsgWindow()">_</button>
+                    <button onclick="maximizeMsgWindow()">□</button>
+                    <button onclick="closeMsgWindow()" style="font-weight:bold; color:black;">X</button>
+                </div>
+            </div>
+            <div class="menu-bar">
+                <span class="menu-item">File</span><span class="menu-item">Edit</span><span class="menu-item">View</span>
+            </div>
+            <div class="window-content retro-inset">
+                <div style="text-align:center; color:#000080; border-bottom: 2px solid #000080; margin-bottom: 20px; padding-bottom:5px;">
+                    <h2 style="font-size: 2rem;">Happy Birthday, Juhi</h2>
+                </div>
+                <div id="desktop-page-1" class="desktop-page active">
+                    <h3 class="text-xl font-bold mb-2">Part 1: The Wish</h3>
+                    <div style="font-size: 1.25rem; line-height: 1.5;">Wishing you a very Happy Birthday from the big vintage screen. May your day be as wonderful and bright as you are. I hope your day is filled with tons of fun, amazing surprises, and everything that makes you smile.</div>
+                    <button class="desktop-next-btn" onclick="desktopNextPage(2)">Next ></button>
+                </div>
+                <div id="desktop-page-2" class="desktop-page">
+                    <h3 class="text-xl font-bold mb-2">Part 2: Who you are?</h3>
+                    <div style="font-size: 1.25rem; line-height: 1.5;">Kabhi socha hai kon ho tum?<br>
+                    Kisi ke liye beti, kisi ke liye behen. <br>
+                    Kisi ke liye pyaar, kisi ke liye dost.<br>
+                    Kisi ke liye student, toh kisi ke liye teacher.<br>
+                    Kisi ke liye himmat, toh kisi ke liye sukoon.<br>
+                    Kisi ke liye sahara, toh kisi ke liye raasta.<br>
+                    Kisi ke liye muskaan, toh kisi ke liye khamoshi ka jawaab.<br>
+                    Kisi ke liye ek aadat, toh kisi ke liye ek zaroorat.<br>
+                    Kisi ke liye yaad, toh kisi ke liye roz ka ehsaas. <br>
+                    Lekin asal mein...tum kaun ho tum? Tumhara kya impact hai dusro k jivan mai?</div>
+                    <button class="desktop-next-btn" onclick="desktopNextPage(3)">Next ></button>
+                </div>
+                <div id="desktop-page-3" class="desktop-page">
+                    <h3 class="text-xl font-bold mb-2">Part 3: Impact</h3>
+                    <div style="font-size: 1.25rem; line-height: 1.5;">Kabhi kabhi ek insaan ki kami se poori kainaat adhoori si lagne lagti hai, aur tum toh sach mein kisi ki kainaat ho. Tum sirf maujood nahi ho, tum kisi ke din ka matlab ban jaati ho. Kisi ke liye umeed ki pehli kiran tum ho, jo bina shor ke andhere ko halka kar deti hai. Kabhi tum kisi ke chehre par muskaan le aati ho, bina yeh jaane ki woh muskaan uske liye kitni zaroori thi. Kabhi tumhari ek chhoti si baat, bas ek simple sa line, dil ke andar kahin gehra sa asar chhod jaata hai. Aur kabhi tum kuch kehti bhi nahi ho, bas saamne hoti ho, aur cheezein apne aap thodi theek si lagne lagti hain. Jaise uljhanon ka bojh halka ho gaya ho, jaise sochne ki raftaar dheemi pad gayi ho. Tumhari maujoodgi jawaab nahi hoti, par sukoon ban jaati hai.Tum sirf kisi ki zindagi ka hissa nahi hoti, tum uski soch ka hissa ban jaati ho. Tumhare hone se din ko ek shape mil jaata hai, bina kisi announcement ke. Tum umeed nahi bolti, tum umeed jaise behave karti ho. Kabhi kisi ke chehre par hasi ban kar, kabhi kisi ke mann mein thoda sa confidence ban kar. Tumhari baatein lambi nahi hoti, par unka asar rukta nahi. Ek chhoti si line, ek normal sa reaction, aur saamne wala khud ko thoda zyada samjha hua mehsoos karta hai. Kabhi tum kuch karti ho, kabhi sirf maujood hoti ho, aur dono hi cheezein apni jagah kaam kar jaati hain. Tumhara impact noise se nahi aata, woh clarity se aata hai. Aur shayad isi wajah se tumhari presence mehsoos hoti hai,<B> Ek Impact chor jata ta hai</B>.</div>
+                    <button class="desktop-next-btn" onclick="desktopNextPage(4)">Next ></button>
+                </div>
+                <div id="desktop-page-4" class="desktop-page">
+                    <h3 class="text-xl font-bold mb-2">Part 4: You are Carbon</h3>
+                    <div style="font-size: 1.25rem; line-height: 1.5;">You have a very simple and calm nature. You don’t talk too much, but whatever you say always feels special. You care for people quietly, in small ways. Tum carbon ho. Carbon ki tarah tum alag alag roop mein khoobsurat lagti ho. Jab zindagi tough hoti hai, tum diamond ki tarah strong ban jaati ho. Aur jab kisi ko halka sa support chahiye hota hai, tab tum graphite ki tarah soft aur samajhdaar ban jaati ho. Kabhi tum charcoal jaisi ho, jo bina dikhe cheezon ko shape de deti ho. Kabhi carbon fiber jaisi, jo weight kam rakhti hai par responsibility poori utha leti hai. Tumhari khaas baat ye nahi hai ki tum har situation sambhaal leti ho, balki ye hai ki tum kabhi is baat ka show nahi karti. Tum madad karti ho jaise woh tumhara kaam hi nahi, balki tumhari aadat ho. Shayad sabse khaas baat ye hai ki tum kabhi apne roles ginati nahi ho. Tum bas jo zaroori hota hai, woh ban jaati ho. Strong rehna ho toh reh leti ho, samajhna ho toh samajh leti ho. Tumhe khud ko prove karne ki zarurat nahi padti, kyunki tumhari presence hi kaafi hoti hai. Tumhari simplicity hi tumhari sabse badi depth hai, aur wahi cheez tumhe quietly unforgettable bana deti hai.Shayad isi liye tum yaad rehti ho, kisi ek kaam ki wajah se nahi, balki us feeling ki wajah se jo tum chhod jaati ho.</div>
+                    <button class="desktop-next-btn" onclick="desktopNextPage(5)">Next ></button>
+                </div>
+                <div id="desktop-page-5" class="desktop-page">
+                    <h3 class="text-xl font-bold mb-2">Part 5: For Me</h3>
+                    <div style="font-size: 1.25rem; line-height: 1.5;">Tumhe likhta hu to lafz ho tum,<br>
+                                                                       Tumhe mangta hu to , dua ho tum,<br>
+                                                                       Tumhe sochta hu to , khayal ho tum,<br>
+                                                                       Tum hai puch ta hu to , sawal ho tum,<br>
+                                                                       Tumhe kaheta ta hu to bat ho tum,<br>
+                                                                       Tum he tarasta hu to, barsat ho tum,<br>
+                                                                       Tum hai pardha ta hu to kitab ho tum<br>
+                                                                       Sach kahu to , asman ka pari ho tum.<br><br><p style="text-align: right; margin-top:20px; font-weight:bold;">- Tumhara Subhchintak</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="taskbar retro-outset">
+            <button class="start-btn retro-outset" onclick="toggleStartMenu()">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1px;">
+                    <div style="width:4px; height:4px; background:red;"></div><div style="width:4px; height:4px; background:green;"></div>
+                    <div style="width:4px; height:4px; background:blue;"></div><div style="width:4px; height:4px; background:yellow;"></div>
+                </div>
+                Start
+            </button>
+            <div style="width: 2px; height: 22px; border-left: 1px solid #404040; border-right: 1px solid #ffffff; margin: 0 4px;"></div>
+            <div id="taskbar-tab-msg" class="task-tab" style="display:none;" onclick="toggleMsgWindow()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="black"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="black" fill="none"/></svg>
+                Message Viewer
+            </div>
+
+            <div id="taskbar-tab-recycle" class="task-tab" style="display:none;" onclick="toggleRecycleWindow()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="black"><path d="M19 4H5V6H19V4ZM6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19Z" fill="black"/></svg>
+                Recycle Bin
+            </div>
+
+            <div class="tray-clock retro-inset" id="clock">12:00 PM</div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            initMobileFunctions();
+            initDesktopFunctions();
+        };
+
+        function initMobileFunctions() {
+            const body = document.body;
+            const startButtonContainer = document.getElementById('start-button-container');
+            const startButton = document.getElementById('start-button');
+            const letterContainer = document.getElementById('letter-container');
+            const openLetterButton = document.getElementById('open-letter-button');
+            const buttonContainer = document.getElementById('button-container'); 
+            const imageWrapper = document.getElementById('image-wrapper');
+            const pageElements = document.querySelectorAll('.page');
+            const nextButtons = document.querySelectorAll('#mobile-wrapper .next-button');
+            
+            function showPage(pageNumber) {
+                document.getElementById('mainContent').scrollTop = 0;
+                pageElements.forEach(page => {
+                    page.classList.remove('active-page');
+                    page.style.display = 'none'; 
+                });
+                if (pageNumber > 0) {
+                    const targetPage = document.getElementById(`page-${pageNumber}`);
+                    if (targetPage) {
+                        targetPage.style.display = 'block'; 
+                        setTimeout(() => targetPage.classList.add('active-page'), 50);
+                    }
+                }
+            }
+            
+            function openLetterSequence() {
+                openLetterButton.classList.remove('visible'); 
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#000080', '#C0C0C0', '#ffffff', '#ff0000'] });
+                letterContainer.classList.add('open');
+                imageWrapper.style.opacity = '0'; 
+                setTimeout(() => {
+                    letterContainer.classList.remove('active-letter');
+                    letterContainer.style.opacity = '0'; 
+                    imageWrapper.style.display = 'none';
+                    setTimeout(() => {
+                        letterContainer.style.display = 'none';
+                        showPage(1); 
+                    }, 500); 
+                }, 800); 
+            }
+            
+            startButton.addEventListener('click', () => {
+                startButton.classList.remove('visible');
+                startButtonContainer.style.display = 'none'; 
+                letterContainer.style.display = 'block';
+                setTimeout(() => letterContainer.classList.add('active-letter'), 50);
+                imageWrapper.style.display = 'block';
+                setTimeout(() => imageWrapper.style.opacity = '1', 100);
+                setTimeout(() => openLetterButton.classList.add('visible'), 550);
+            });
+
+            openLetterButton.addEventListener('click', openLetterSequence);
+            imageWrapper.addEventListener('click', openLetterSequence);
+
+            nextButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetPageNumber = button.getAttribute('data-target');
+                    showPage(targetPageNumber);
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+
+            let areNavsOpen = false;
+
+            function openAllNavs() {
+                topNav.classList.remove('-translate-y-full'); bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full'); rightNav.classList.remove('translate-x-full');
+                document.body.classList.add('body-nav-open');
+                navToggleIcon.classList.add('hidden'); navToggleX.classList.remove('hidden'); areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                topNav.classList.add('-translate-y-full'); bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full'); rightNav.classList.add('translate-x-full');
+                document.body.classList.remove('body-nav-open');
+                navToggleIcon.classList.remove('hidden'); navToggleX.classList.add('hidden'); areNavsOpen = false;
+            }
+
+            function toggleAllNavs() { if (areNavsOpen) closeAllNavs(); else openAllNavs(); }
+
+            navToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleAllNavs(); });
+            mainContent.addEventListener('click', (e) => { if (e.target.closest('button')) return; if (areNavsOpen) closeAllNavs(); });
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetHash = e.currentTarget.getAttribute('href');
+                    if (targetHash.startsWith('#')) { e.preventDefault(); if (areNavsOpen) closeAllNavs(); }
+                    if (areNavsOpen) closeAllNavs();
+                });
+            });
+            closeAllNavs();
+        }
+
+        function initDesktopFunctions() {
+            function updateClock() {
+                const now = new Date();
+                let hours = now.getHours(); const minutes = now.getMinutes(); const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12; hours = hours ? hours : 12; 
+                const strTime = hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + ampm;
+                document.getElementById('clock').innerText = strTime;
+            }
+            setInterval(updateClock, 1000); updateClock();
+            
+            generateStartMenuApps();
+
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('start-menu');
+                const btn = document.querySelector('.start-btn');
+                const isClickInside = menu.contains(event.target) || btn.contains(event.target);
+                if (!isClickInside && menu.style.display === 'flex') { toggleStartMenu(); }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                
+                if (e.key === 'Meta' || e.code === 'MetaLeft' || e.code === 'MetaRight') {
+                    e.preventDefault(); 
+                    toggleStartMenu();
+                }
+                if (e.key === 'Delete') {
+                    const recycleWindow = document.getElementById('recycle-window');
+                    if (recycleWindow && recycleWindow.style.display === 'flex') {
+                        emptyRecycleBin();
+                    }
+                }
+                
+                
+                if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                    const desktopWrapper = document.getElementById('desktop-wrapper');
+                    
+                    if (window.getComputedStyle(desktopWrapper).display !== 'none') {
+                         const msgWindow = document.getElementById('msg-window');
+                         
+                         if (msgWindow.style.display !== 'none') {
+                             const activePage = msgWindow.querySelector('.desktop-page.active');
+                             if (activePage) {
+                                 const nextBtn = activePage.querySelector('.desktop-next-btn');
+                                 if (nextBtn) {
+                                     
+                                     nextBtn.click();
+                                 }
+                             }
+                         }
+                    }
+                }
+            });
+        }
+
+        function generateStartMenuApps() {
+            const mobileLinks = Array.from(document.querySelectorAll('#mobile-wrapper .nav-link'));
+            const menuContainer = document.getElementById('start-menu-items');
+            if (!menuContainer) return;
+            menuContainer.innerHTML = '';
+            
+            const programsHeader = document.createElement('div');
+            programsHeader.style.padding = '4px 8px'; programsHeader.style.fontWeight = 'bold';
+            programsHeader.style.borderBottom = '1px solid #808080'; programsHeader.style.marginBottom = '4px';
+            programsHeader.innerText = 'Programs';
+            menuContainer.appendChild(programsHeader);
+
+            
+            let linkData = mobileLinks.map(link => ({
+                title: link.innerText,
+                href: link.getAttribute('href')
+            }));
+
+            
+            const msgIndex = linkData.findIndex(l => l.title.trim() === 'Message');
+            const musicIndex = linkData.findIndex(l => l.title.trim() === 'Music');
+
+            if (msgIndex > -1 && musicIndex > -1) {
+                
+                [linkData[msgIndex], linkData[musicIndex]] = [linkData[musicIndex], linkData[msgIndex]];
+            }
+
+            linkData.forEach(data => {
+                const title = data.title; 
+                const href = data.href;
+                const item = document.createElement('a');
+                item.className = 'start-menu-item'; item.href = href;
+                
+                item.addEventListener('click', function() {
+                    setTimeout(() => toggleStartMenu(), 200); 
+                });
+
+                item.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg><span>${title}</span>`;
+                menuContainer.appendChild(item);
+            });
+            
+            const divider = document.createElement('div'); divider.className = 'start-divider'; menuContainer.appendChild(divider);
+            const shutdown = document.createElement('div'); shutdown.className = 'start-menu-item';
+            shutdown.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg><span>Shut Down...</span>`;
+            menuContainer.appendChild(shutdown);
+        }
+
+        window.toggleStartMenu = function() {
+            const menu = document.getElementById('start-menu');
+            const btn = document.querySelector('.start-btn');
+            if (menu.style.display === 'flex') {
+                menu.style.display = 'none'; btn.classList.remove('active');
+            } else {
+                menu.style.display = 'flex'; btn.classList.add('active'); menu.style.zIndex = 1000;
+            }
+        };
+
+        let isMsgMaximized = false;
+        window.minimizeMsgWindow = function() { document.getElementById('msg-window').style.display = 'none'; };
+        window.maximizeMsgWindow = function() {
+            const win = document.getElementById('msg-window');
+            isMsgMaximized = !isMsgMaximized;
+            if (isMsgMaximized) win.classList.add('maximized'); else win.classList.remove('maximized');
+        };
+        window.closeMsgWindow = function() {
+            document.getElementById('msg-window').style.display = 'none';
+            document.getElementById('taskbar-tab-msg').style.display = 'none';
+        };
+        window.openMsgWindow = function() {
+            const win = document.getElementById('msg-window');
+            win.style.display = 'flex'; win.style.zIndex = 60;
+            document.getElementById('taskbar-tab-msg').style.display = 'flex';
+            document.getElementById('recycle-window').style.zIndex = 50;
+            document.getElementById('letter-notification').style.display = 'none';
+        };
+        window.toggleMsgWindow = function() {
+            const win = document.getElementById('msg-window');
+            if (win.style.display === 'none') { 
+                win.style.display = 'flex'; win.style.zIndex = 60; 
+                document.getElementById('recycle-window').style.zIndex = 50;
+                document.getElementById('letter-notification').style.display = 'none';
+            } else { 
+                win.style.display = 'none'; 
+            }
+        };
+
+        let isRecycleMaximized = false;
+        window.openRecycleWindow = function() {
+            const win = document.getElementById('recycle-window');
+            win.style.display = 'flex'; win.style.zIndex = 60;
+            document.getElementById('taskbar-tab-recycle').style.display = 'flex';
+            document.getElementById('msg-window').style.zIndex = 50;
+        };
+        window.closeRecycleWindow = function() {
+            document.getElementById('recycle-window').style.display = 'none';
+            document.getElementById('taskbar-tab-recycle').style.display = 'none';
+        };
+        window.minimizeRecycleWindow = function() {
+            document.getElementById('recycle-window').style.display = 'none';
+        };
+        window.maximizeRecycleWindow = function() {
+            const win = document.getElementById('recycle-window');
+            isRecycleMaximized = !isRecycleMaximized;
+            if (isRecycleMaximized) win.classList.add('maximized'); else win.classList.remove('maximized');
+        };
+        window.toggleRecycleWindow = function() {
+            const win = document.getElementById('recycle-window');
+            if (win.style.display === 'none') {
+                win.style.display = 'flex'; win.style.zIndex = 60;
+                document.getElementById('msg-window').style.zIndex = 50;
+            } else {
+                win.style.display = 'none';
+            }
+        };
+        window.emptyRecycleBin = function() {
+            const content = document.getElementById('recycle-content');
+            content.innerHTML = ''; 
+            
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#00FF00', '#FFFF00', '#FF0000']
+            });
+            
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.width = '100%'; emptyMsg.style.textAlign = 'center'; emptyMsg.style.padding = '20px';
+            emptyMsg.innerHTML = "<i>Recycle Bin is empty</i>";
+            content.appendChild(emptyMsg);
+        };
+
+        window.desktopNextPage = function(pageNum) {
+            confetti({ particleCount: 50, spread: 40, origin: { y: 0.6 }, colors: ['#000080', '#008080'] });
+            
+            
+            document.body.classList.add('cursor-vintage');
+            
+            const pages = document.querySelectorAll('.desktop-page');
+            pages.forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(`desktop-page-${pageNum}`);
+            if(target) target.classList.add('active');
+        };
+    </script>
+</body>
+</html>

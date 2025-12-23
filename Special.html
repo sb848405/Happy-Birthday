@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>365 Reasons Why You're Special</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@300;400;500;600&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX, #desktopNav {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #mainContent, .nav-panel, aside, #desktopNav {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        aside::-webkit-scrollbar,
+        #desktopNav::-webkit-scrollbar {
+            display: none;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Pacifico', cursive;
+        }
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+        .serif-text {
+            font-family: 'Playfair Display', serif;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .rose-nav-style {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(225, 29, 72, 0.15);
+            color: #1F2937;
+        }
+        .rose-nav-style a.nav-link {
+            color: #1F2937;
+            transition: color 0.2s, background-color 0.2s;
+        }
+        .rose-nav-style a.nav-link:hover {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: #E11D48;
+        }
+
+        /* Desktop specific styles */
+        #desktopNav {
+            box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+        }
+        
+        .desktop-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background-color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            color: #4B5563;
+        }
+        .desktop-nav-btn:hover {
+            background-color: #FFF1F2;
+            border-color: #FECDD3;
+            color: #E11D48;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.08);
+        }
+        .desktop-nav-btn span:first-child {
+            font-size: 1.2rem;
+        }
+
+        .tilt-container {
+            perspective: 1000px;
+        }
+        
+        #reason-card {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+        
+        .card-inner-element {
+            transform: translateZ(20px);
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card-enter {
+            animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate {
+            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes ambientFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .blob {
+            animation: ambientFloat 15s infinite ease-in-out;
+            will-change: transform;
+        }
+
+        .month-card {
+            transition: all 0.3s ease;
+        }
+        .month-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .mini-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4B5563;
+        }
+        .mini-day:hover {
+            background-color: #FECDD3;
+            color: #BE123C;
+            font-weight: bold;
+        }
+        .mini-day.today {
+            background-color: #E11D48;
+            color: white;
+            font-weight: bold;
+        }
+        .mini-day.empty {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        button {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.5);
+        }
+
+        /* Overlay for desktop nav */
+        #desktopNavOverlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="antialiased bg-gray-50 overflow-hidden text-gray-800 h-screen w-screen relative flex">
+
+    <!-- Mobile Nav Toggle (Hamburger) -->
+    <button id="navToggle" class="lg:hidden fixed top-6 left-6 z-[80] p-3 bg-rose-500 text-white rounded-full shadow-xl hover:bg-rose-600 active:scale-95 transition-transform duration-200">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+    <!-- Mobile Navigation Panels (Top, Bottom, Left, Right) -->
+    <nav id="topNav" class="lg:hidden nav-panel fixed top-0 left-0 right-0 z-[70] h-20 flex items-center justify-center space-x-2 -translate-y-full rose-nav-style border-b border-rose-200">
+        <a href="Msg.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Message</a>
+        <a href="letter.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">Letter</a>
+        <a href="Music.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Music</a>
+    </nav>
+
+    <nav id="bottomNav" class="lg:hidden nav-panel fixed bottom-0 left-0 right-0 z-[70] h-20 flex items-center justify-center space-x-1 translate-y-full rose-nav-style border-t border-rose-200">
+        <a href="Skill.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="lg:hidden nav-panel fixed left-0 top-0 bottom-0 z-[70] w-24 flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-24 rose-nav-style border-r border-rose-200">
+        <a href="index.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">Home</a>
+        <a href="Cake.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Cake</a>
+        <a href="21_Wish.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">21_Door</a>
+        <a href="chat.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">Heaven</a>
+        <a href="Diary.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Diary</a>
+        <a href="anatomy.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">Anatomy</a>
+        <a href="Box.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Box</a>
+        <a href="Special.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">Special</a>
+        <a href="color.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Color</a>
+        <a href="you.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">You</a>
+        <a href="Teacher.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Teacher</a>
+        <a href="Universe.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Universe</a>
+        <a href="The_River.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">River</a>
+        <a href="Mountain.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Mountain</a>
+    </nav>
+
+    <nav id="rightNav" class="lg:hidden nav-panel fixed right-0 top-0 bottom-0 z-[70] w-24 flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-24 rose-nav-style border-l border-rose-200">
+        <a href="Periodik_table.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Elements</a>
+        <a href="Concept.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Calendar</a>
+        <a href="Perspective.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">View</a>
+        <a href="Santa.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Butterfly</a>
+        <a href="Weather.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Room</a>
+        <a href="Radio.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Radio</a>
+        <a href="Food.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Food</a>
+    </nav>
+
+    <!-- Desktop Nav Overlay (Background dimmer) -->
+    <div id="desktopNavOverlay" class="hidden lg:block fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+    <!-- Desktop Sidebar (Collapsible, Double Column) -->
+    <aside id="desktopNav" class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-[100] w-[500px] bg-white/90 backdrop-blur-xl border-r border-rose-100 transform -translate-x-full h-full overflow-y-auto">
+        <div class="p-8 pb-4">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-100 to-pink-50 flex items-center justify-center text-xl shadow-sm ring-1 ring-white">✨</div>
+                    <div>
+                        <h2 class="brand-font text-2xl text-gray-800 leading-none">All Pages</h2>
+                        <p class="text-[10px] text-rose-500 font-bold tracking-[0.2em] uppercase mt-1">Explore</p>
+                    </div>
+                </div>
+                <button id="closeDesktopNavBtn" class="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 pb-8">
+                <a href="index.html" class="desktop-nav-btn"><span>🏠</span> <span>Home</span></a>
+                <a href="Cake.html" class="desktop-nav-btn"><span>🍰</span> <span>Cake</span></a>
+                <a href="21_Wish.html" class="desktop-nav-btn"><span>🚪</span> <span>21 Door</span></a>
+                <a href="chat.html" class="desktop-nav-btn"><span>💭</span> <span>Heaven</span></a>
+                <a href="Diary.html" class="desktop-nav-btn"><span>📔</span> <span>Diary</span></a>
+                <a href="anatomy.html" class="desktop-nav-btn"><span>🦴</span> <span>Anatomy</span></a>
+                <a href="Box.html" class="desktop-nav-btn"><span>📦</span> <span>Box</span></a>
+                <a href="Special.html" class="desktop-nav-btn bg-yellow-500/10 text-yellow-200 border-yellow-500/30"><span>✨</span> <span>Special</span></a>
+                <a href="color.html" class="desktop-nav-btn"><span>🌈</span> <span>Color</span></a>
+                <a href="you.html" class="desktop-nav-btn"><span>🫵</span> <span>You</span></a>
+                <a href="Teacher.html" class="desktop-nav-btn"><span>👩‍🏫</span> <span>Teacher</span></a>
+                <a href="Universe.html" class="desktop-nav-btn"><span>🪐</span> <span>Universe</span></a>
+                <a href="The_River.html" class="desktop-nav-btn"><span>🌊</span> <span>River</span></a>
+                <a href="Mountain.html" class="desktop-nav-btn"><span>🏔️</span> <span>Mountain</span></a>
+                <a href="Skill.html" class="desktop-nav-btn"><span>🎯</span> <span>Skill</span></a>
+                <a href="Paper_Star.html" class="desktop-nav-btn"><span>⭐</span> <span>Paper Star</span></a>
+                <a href="Carttoon.html" class="desktop-nav-btn"><span>🎨</span> <span>Cartoon</span></a>
+                <a href="Periodik_table.html" class="desktop-nav-btn"><span>🧪</span> <span>Elements</span></a>
+                <a href="Concept.html" class="desktop-nav-btn"><span>💡</span> <span>Concept</span></a>
+                <a href="Calender.html" class="desktop-nav-btn"><span>📅</span> <span>Calendar</span></a>
+                <a href="Perspective.html" class="desktop-nav-btn"><span>👁️</span> <span>View</span></a>
+                <a href="Santa.html" class="desktop-nav-btn"><span>🎅</span> <span>Santa</span></a>
+                <a href="Presence.html" class="desktop-nav-btn"><span>🎁</span> <span>Presence</span></a>
+                <a href="Cloud.html" class="desktop-nav-btn"><span>☁️</span> <span>Cloud</span></a>
+                <a href="Ink.html" class="desktop-nav-btn"><span>🖌️</span> <span>Paint</span></a>
+                <a href="Butterfly.html" class="desktop-nav-btn"><span>🦋</span> <span>Butterfly</span></a>
+                <a href="Weather.html" class="desktop-nav-btn"><span>🌤️</span> <span>Weather</span></a>
+                <a href="Spotlight.html" class="desktop-nav-btn"><span>🔦</span> <span>Spotlight</span></a>
+                <a href="Room.html" class="desktop-nav-btn"><span>🏠</span> <span>Room</span></a>
+                <a href="Radio.html" class="desktop-nav-btn"><span>📻</span> <span>Radio</span></a>
+                <a href="Food.html" class="desktop-nav-btn"><span>🍔</span> <span>Food</span></a>
+                <a href="Music.html" class="desktop-nav-btn"><span>🎵</span> <span>Music</span></a>
+                <a href="letter.html" class="desktop-nav-btn"><span>💌</span> <span>Letter</span></a>
+                <a href="Msg.html" class="desktop-nav-btn"><span>💬</span> <span>Message</span></a>
+            </div>
+            
+            <div class="mt-auto border-t border-gray-100 pt-6 text-center">
+                <p class="text-xs text-gray-400">Navigation • 34 Pages</p>
+            </div>
+        </div>
+    </aside>
+
+    
+    <main id="mainContent" class="absolute inset-0 bg-rose-50/50 p-6 pt-28 overflow-y-auto transition-all duration-300 lg:static lg:w-full lg:p-0 lg:h-full lg:bg-[#fafafa] relative isolate">
+        
+        <!-- Desktop Menu Toggle Button (Visible only on LG) -->
+        <button id="desktopMenuToggle" class="hidden lg:flex fixed top-8 left-8 z-[60] items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm hover:shadow-md hover:border-rose-200 hover:text-rose-500 transition-all group">
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span class="text-sm font-medium text-gray-600 group-hover:text-rose-600">Menu</span>
+        </button>
+
+        <div class="hidden lg:block absolute inset-0 z-[-1] overflow-hidden">
+            <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-rose-200/20 rounded-full blur-[120px] blob"></div>
+            <div class="absolute bottom-[-10%] left-[10%] w-[500px] h-[500px] bg-indigo-100/30 rounded-full blur-[100px] blob" style="animation-delay: -3s;"></div>
+            <div class="absolute top-[30%] left-[40%] w-[300px] h-[300px] bg-amber-100/30 rounded-full blur-[80px] blob" style="animation-delay: -7s;"></div>
+        </div>
+
+        <main class="container mx-auto px-4 py-8 relative z-10 max-w-7xl h-full flex flex-col lg:px-20 lg:py-12">
+            
+            <header class="text-center mb-8 lg:mb-8 lg:text-left lg:flex lg:justify-between lg:items-end lg:pb-6 lg:border-b lg:border-gray-100 lg:pl-12">
+                <div>
+                    <h1 class="text-4xl lg:text-6xl font-extrabold text-gray-900 mb-4 tracking-tight leading-none brand-font lg:text-transparent lg:bg-clip-text lg:bg-gradient-to-br lg:from-rose-500 lg:via-rose-600 lg:to-orange-500">
+                        365 Reasons
+                        <br class="lg:hidden"/> 
+                        <span class="text-gray-800 text-3xl lg:text-4xl lg:font-thin lg:text-gray-400 lg:tracking-tight lg:block lg:mt-2 lg:bg-none lg:text-current serif-text">Why You're Special</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 font-light lg:text-xl lg:text-gray-500 lg:mt-2">
+                        A daily reminder of your wonderful existence.
+                    </p>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <form id="jump-form-desktop" class="relative group flex items-center bg-white/50 backdrop-blur-sm border border-gray-200 rounded-full px-2 py-1 focus-within:ring-2 focus-within:ring-rose-200 transition-all">
+                        <label for="jump-date-desktop" class="sr-only">Jump to Date</label>
+                        <input type="date" id="jump-date-desktop" class="bg-transparent border-none text-sm font-medium text-gray-600 px-3 py-2 focus:ring-0 outline-none w-36 cursor-pointer" required>
+                        <button type="submit" class="p-2 text-rose-500 hover:bg-rose-100 rounded-full transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                        </button>
+                    </form>
+                    
+                    <button id="toggle-view-btn-desktop" class="group bg-white border border-gray-200 text-gray-600 font-medium py-2.5 px-6 rounded-full shadow-sm hover:shadow-lg hover:border-rose-200 hover:text-rose-600 transition-all duration-300 flex items-center gap-2">
+                        <span class="text-xs uppercase tracking-widest font-bold" id="toggle-btn-text">See All Reasons</span>
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-rose-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Mobile View Controls -->
+            <div class="lg:hidden w-full mb-6">
+                <button id="see-all-mobile-btn" class="w-full bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-3 text-center text-sm font-bold text-rose-500 uppercase tracking-widest hover:bg-rose-50 hover:shadow-md transition-all shadow-sm">
+                    View Daily Card
+                </button>
+            </div>
+
+            <!-- Single Card View (Hidden by default on mobile now) -->
+            <div id="deck-view" class="hidden min-h-[50vh] flex-col justify-center lg:hidden">
+                <div class="relative w-full max-w-xl mx-auto tilt-container">
+                    <div id="reason-card" class="relative z-10 bg-white/60 backdrop-blur-xl p-8 rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-white/80 text-center w-full min-h-[350px] flex flex-col justify-center items-center group cursor-default">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/80 to-transparent rounded-[3rem] opacity-50 pointer-events-none"></div>
+                        <div class="relative card-inner-element">
+                            <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 text-xs font-bold text-rose-400 font-mono tracking-[0.3em] uppercase bg-rose-50/80 px-4 py-1.5 rounded-full border border-rose-100/50 shadow-sm whitespace-nowrap">
+                                Reason <span id="counter-display">1</span>
+                            </div>
+                            <span class="text-6xl my-8 block animate-pulse filter drop-shadow-md">✨</span>
+                            <p class="text-xl font-medium text-gray-800 leading-relaxed serif-text italic festive-text drop-shadow-sm">"Loading reason..."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full flex flex-col gap-6 mt-10 px-4">
+                    <div class="flex justify-between items-center w-full">
+                        <button id="prev-btn" class="flex items-center space-x-2 text-gray-400 hover:text-rose-500 transition-colors disabled:opacity-30"><span class="text-2xl">←</span> <span class="hidden sm:inline font-medium">Previous</span></button>
+                        <button id="random-btn" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-rose-200 hover:shadow-rose-300 transition-all transform hover:-translate-y-1 active:scale-95">Shuffle ✨</button>
+                        <button id="next-btn" class="flex items-center space-x-2 text-gray-400 hover:text-rose-500 transition-colors disabled:opacity-30"><span class="hidden sm:inline font-medium">Next</span> <span class="text-2xl">→</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendar-dashboard" class="hidden lg:flex flex-col h-full w-full overflow-hidden pl-4">
+                <div class="flex-1 overflow-y-auto pr-2 pb-10" id="calendar-scroll-container">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" id="year-grid">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid View (Visible by default on mobile) -->
+            <div id="grid-view" class="flex-1 overflow-y-auto pb-10 h-full w-full lg:hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="all-reasons-grid">
+                </div>
+            </div>
+            
+        </main>
+
+        <footer class="text-center py-8 mt-auto border-t border-rose-100/50 lg:hidden">
+            <p class="text-xs text-rose-300">Made with ❤️ just for you.</p>
+        </footer>
+
+        <div id="reason-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+            <div class="relative bg-white/90 backdrop-blur-xl w-full max-w-2xl p-12 rounded-[3rem] shadow-2xl border border-white transform transition-all modal-animate flex flex-col items-center text-center">
+                <button onclick="closeModal()" class="absolute top-6 right-6 p-2 text-gray-400 hover:text-rose-500 transition-colors bg-white rounded-full shadow-sm hover:shadow-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                
+                <div class="mb-8">
+                    <span id="modal-date-display" class="block text-gray-400 text-sm font-medium mb-1 tracking-wider uppercase">January 1st</span>
+                    <span class="inline-block px-4 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-rose-500 text-xs font-bold tracking-[0.2em] uppercase">Reason <span id="modal-counter">1</span></span>
+                </div>
+                
+                <span id="modal-emoji" class="text-8xl mb-8 block animate-bounce">✨</span>
+                
+                <p id="modal-text" class="text-4xl font-medium text-gray-800 leading-tight serif-text italic festive-text">
+                    "Loading..."
+                </p>
+                
+                <div class="mt-10 flex gap-3">
+                    <button onclick="changeModalReason(-1)" class="p-3 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button onclick="changeModalReason(1)" class="p-3 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const reasons = [
+            "You make ordinary moments feel unforgettable.",
+            "You turn worries into hope without even trying.",
+            "You make kindness look effortless.",
+            "You carry a softness that strengthens others.",
+            "You give meaning to the smallest gestures.",
+            "You heal people simply with your presence.",
+            "You have a heart that understands without questions.",
+            "You never give up on the people you love.",
+            "You notice when someone needs help before they ask.",
+            "You bring comfort the way sunlight warms a room.",
+            "You have a grace that can’t be taught.",
+            "You make people believe in good days again.",
+            "You keep promises like they’re sacred.",
+            "You bring balance wherever you go.",
+            "You make silence feel peaceful, not empty.",
+            "You inspire others to be better without saying a word.",
+            "You make honesty look beautiful.",
+            "You turn stress into calm with just your presence.",
+            "You carry elegance in the way you think.",
+            "You make people feel safe just by being you.",
+            "You bring the best out of chaos.",
+            "You understand feelings most people ignore.",
+            "You’re strong enough to stay soft.",
+            "You make time feel worth living.",
+            "You choose goodness even when it’s hard.",
+            "You believe in people when they stop believing in themselves.",
+            "You forgive in ways that show real strength.",
+            "You make hearts feel light again.",
+            "You bring joy to days that don’t deserve it.",
+            "You carry wisdom beyond your age.",
+            "You brighten rooms without saying anything.",
+            "You learn from pain instead of letting it break you.",
+            "You’re brave in the quietest ways.",
+            "You understand the value of peace.",
+            "You make trust feel natural.",
+            "You hold so much beauty in the way you care.",
+            "You choose love over ego.",
+            "You know how to cheer someone up at the right time.",
+            "You make others feel valued.",
+            "You appreciate real connections.",
+            "You protect people’s feelings.",
+            "You turn imperfections into uniqueness.",
+            "You bring clarity when minds are confused.",
+            "You make life feel like a blessing.",
+            "You’re a soft place for wounded hearts.",
+            "You’re a reminder that good people still exist.",
+            "You respect every soul you meet.",
+            "You offer kindness even when you’re tired.",
+            "You know how to handle emotions with care.",
+            "You give strength to those who feel weak.",
+            "You give hope to broken spirits.",
+            "You inspire without forcing.",
+            "You carry a beautiful patience inside you.",
+            "You make emotions feel safe to express.",
+            "You help others grow.",
+            "You never underestimate anyone.",
+            "You show love through actions.",
+            "You bring meaning to every interaction.",
+            "You choose courage over fear quietly.",
+            "You see beauty where others see nothing.",
+            "You make laughter feel precious.",
+            "You show people how to love better.",
+            "You understand limits but still push yourself.",
+            "You make every space warmer.",
+            "You stay calm when everything is falling apart.",
+            "You choose peace over winning arguments.",
+            "You remind people of their worth.",
+            "You bring a sense of belonging.",
+            "You have thoughts deeper than oceans.",
+            "You make kindness fashionable.",
+            "You trust your heart.",
+            "You show up and that matters the most.",
+            "You protect your loved ones quietly.",
+            "You always find a reason to smile.",
+            "You take responsibility for your actions.",
+            "You create happiness out of little things.",
+            "You’re honest in a world that pretends.",
+            "You make effort that often goes unseen and still keep doing it.",
+            "You make the world softer for others.",
+            "You remind people they’re not alone.",
+            "You handle situations with maturity.",
+            "You have a beautiful way of thinking.",
+            "You spread warmth without noise.",
+            "You make people feel lucky to know you.",
+            "You uplift others instead of judging them.",
+            "You accept people as they are.",
+            "You never try to dim others to shine.",
+            "You see through hearts, not appearances.",
+            "You support dreams, not just people.",
+            "You never mislead anyone’s feelings.",
+            "You bring calmness like a soft breeze.",
+            "You are a blessing disguised as a person.",
+            "You keep learning that’s powerful.",
+            "You create beautiful memories effortlessly.",
+            "You care genuinely and that’s rare.",
+            "You help people believe in love again.",
+            "You make hard days survivable.",
+            "You’re sunshine wrapped in humanity.",
+            "You have a mind full of golden thoughts.",
+            "You spread love simply by existing.",
+            "You treat hearts like fragile art.",
+            "You have a comforting way of talking.",
+            "You’re unstoppable when you decide something.",
+            "You make dreams feel reachable.",
+            "You understand silence like poetry.",
+            "You are gentle with yourself, and that matters.",
+            "You teach compassion by example.",
+            "You are rare truly rare.",
+            "You are the good part of life.",
+            "You don’t let the world change your goodness.",
+            "You inspire confidence in others.",
+            "You make relationships feel safe.",
+            "You prefer peace over drama and that’s elegance.",
+            "You think with your heart and act with your mind.",
+            "You create hope in places where it’s forgotten.",
+            "You give the comfort of home without walls.",
+            "You make ordinary people feel like stars.",
+            "You turn bad days into lessons.",
+            "You respect emotions deeply.",
+            "You choose loyalty every time.",
+            "You cherish even the smallest moments.",
+            "You stay true even under pressure.",
+            "You make everyone feel included.",
+            "You’re beautifully balanced — real yet dreamy.",
+            "You love purely without conditions.",
+            "You look for good in every situation.",
+            "You believe in yourself even quietly.",
+            "You bring stability.",
+            "You appreciate silence like art.",
+            "You understand the heart better than words.",
+            "You make time feel gentle.",
+            "You carry beauty in the way you think.",
+            "You’re a soft reminder that love still exists.",
+            "You choose your battles wisely.",
+            "You have a heart that protects.",
+            "You are a living example of grace.",
+            "You never run away from responsibility.",
+            "You turn pressure into strength.",
+            "You speak with meaning.",
+            "You motivate others to keep going.",
+            "You are thoughtful in ways that matter.",
+            "You make trust feel easy.",
+            "You give your best quietly.",
+            "You are honest even with yourself.",
+            "You handle life with patience.",
+            "You never let darkness take away your light.",
+            "You give hope without words.",
+            "You’re soothing like a calm night sky.",
+            "You make doubts disappear.",
+            "You make others feel seen.",
+            "You are a reason someone didn’t give up.",
+            "You know how to love gently.",
+            "You’re brave enough to be vulnerable.",
+            "You spread peace effortlessly.",
+            "You make effort feel beautiful.",
+            "You give more than you take.",
+            "You turn kindness into your superpower.",
+            "You understand what really matters.",
+            "You keep your heart alive, always.",
+            "You deserve everything beautiful.",
+            "You make ordinary mornings feel like beginnings.",
+            "You make people believe in themselves.",
+            "You hold your emotions with dignity.",
+            "You uplift hearts just by being around.",
+            "You keep love alive in a loveless world.",
+            "You believe in second chances.",
+            "You repair what others break.",
+            "You give patience, even when tired.",
+            "You respect boundaries.",
+            "You listen with your soul.",
+            "You make every goodbye feel hopeful.",
+            "You fight your battles silently.",
+            "You make courage look calm.",
+            "You never let negativity win.",
+            "You improve every place you walk into.",
+            "You show love through little things.",
+            "You’re a silent supporter.",
+            "You are rare enough to be unforgettable.",
+            "You glow differently when you care.",
+            "You see dreams with open eyes.",
+            "You always find ways to love.",
+            "You have a heart big enough to heal others.",
+            "You stay kind even after being hurt.",
+            "You trust the process.",
+            "You make every moment meaningful.",
+            "You forgive like a hero.",
+            "You accept flaws beautifully.",
+            "You never fake your emotions.",
+            "You choose inner peace.",
+            "You bring smiles withoutasking for credit.",
+            "You inspire silent admiration.",
+            "You are refreshing like a new start.",
+            "You believe in happiness.",
+            "You’re thoughtful in the purest way.",
+            "You give love that feels real.",
+            "You fill life with new colors.",
+            "You carry dreams with strength.",
+            "You speak love fluently.",
+            "You make every heartbeat count.",
+            "You deserve all the joy in the world.",
+            "You grow through everything you face.",
+            "You have a soul made of light.",
+            "You show real beauty without trying.",
+            "You understand compassion deeply.",
+            "You give others a reason to smile.",
+            "You make the world kinder.",
+            "You are stronger than life’s storms.",
+            "You shine in a simple, natural way.",
+            "You hold on to hope at all times.",
+            "You express emotions gracefully.",
+            "You bring harmony to hearts.",
+            "You remind people to breathe.",
+            "You handle setbacks with dignity.",
+            "You choose truth even when it hurts.",
+            "You carry courage in silence.",
+            "You make love feel safe.",
+            "You find beauty in imperfections.",
+            "You lighten heavy hearts.",
+            "You give hugs that heal.",
+            "You keep loyalty alive.",
+            "You grow love in every space you occupy.",
+            "You are the reason someone smiles right now.",
+            "You care deeply and that’s brave.",
+            "You are poetry in human form.",
+            "You make people feel understood.",
+            "You love like sunshine warm and steady.",
+            "You create peace within storms.",
+            "You stand like a warrior with a gentle soul.",
+            "You make laughter feel honest.",
+            "You carry stories in your eyes.",
+            "You heal hearts without medicine.",
+            "You are thoughtful without seeking praise.",
+            "You give comfort by just being yourself.",
+            "You believe in goodness.",
+            "You love without pretending.",
+            "You know how to calm overthinking minds.",
+            "You turn sadness into understanding.",
+            "You bring light to the darkest corners.",
+            "You respect love as if it’s holy.",
+            "You have a heart that doesn’t give up.",
+            "You value people genuinely.",
+            "You remind others of their purpose.",
+            "You hold truths gently.",
+            "You make the world feel like home.",
+            "You understand love more than words.",
+            "You handle heartbreak with grace.",
+            "You make weaknesses look courageous.",
+            "You are full of life.",
+            "You protect what you love with all your heart.",
+            "You know how to rebuild yourself.",
+            "You make people feel lucky to exist.",
+            "You stay real in a world of filters.",
+            "You respect time and emotions.",
+            "You are someone worth celebrating every day.",
+            "You are love, disguised as a person.",
+            "You make calmness contagious.",
+            "You turn fears into lessons.",
+            "You appreciate hearts, not appearances.",
+            "You express care beautifully.",
+            "You stand strong through storms.",
+            "You bring clarity to confusion.",
+            "You give people reasons to believe.",
+            "You fill spaces with your goodness.",
+            "You inspire quiet admiration.",
+            "You lift spirits just by being there.",
+            "You are unforgettable in the softest way.",
+            "You keep going no matter what.",
+            "You are love’s favourite story.",
+            "You make every second worth remembering.",
+            "You understand hearts more than words can.",
+            "You are pure hearted.",
+            "You show strength through kindness.",
+            "You give life a softer meaning.",
+            "You’re proof that gentle people are powerful.",
+            "You make people feel they matter.",
+            "You carry love gracefully.",
+            "You are a warm welcome.",
+            "You create happiness quietly.",
+            "You stay hopeful always.",
+            "You hold emotions responsibly.",
+            "You keep love alive in everything you do.",
+            "You bring outsmiles like sunshine.",
+            "You make hearts feel safe.",
+            "You value truth more than winning.",
+            "You are beautifully human.",
+            "You remind people what love should feel like.",
+            "You share happiness naturally.",
+            "You hold grace in the way you speak.",
+            "You protect others’ feelings silently.",
+            "You have a soft yet unbreakable heart.",
+            "You turn tears into courage.",
+            "You bring joy to tired souls.",
+            "You always care deeply.",
+            "You turn problems into possibilities.",
+            "You make hearts heal faster.",
+            "You give meaning to relationships.",
+            "You deserve love that feels like peace.",
+            "You help others find their light.",
+            "You choose kindness again and again.",
+            "You carry beauty in your soul.",
+            "You are motivation wrapped in warmth.",
+            "You make the world a better place quietly.",
+            "You make people feel loved without doubt.",
+            "You’re the smile someone needed today.",
+            "You are gentle strength.",
+            "You make hope feel real.",
+            "You give life a heartbeat.",
+            "You turn hurt into healing.",
+            "You see beyond the surface.",
+            "You remind people of goodness.",
+            "You carry love like it’s part of your DNA.",
+            "You are the calm after a storm.",
+            "You make dreams feel protected.",
+            "You help others shine.",
+            "You treat every heart with respect.",
+            "You offer warmth without conditions.",
+            "You make even moon jealous you glow quietly.",
+            "You give courage to fears.",
+            "You keep faith alive.",
+            "You create connections that matter.",
+            "You are a safe space in human form.",
+            "You share love generously.",
+            "You give life its sweetest chapters.",
+            "You turn loneliness into comfort.",
+            "You are someone’s favorite thought.",
+            "You show kindness like art.",
+            "You make mistakes look like learning.",
+            "You lift hearts with your existence.",
+            "You bring light where others bring noise.",
+            "You are inspiring in silence.",
+            "You make the world softer to live in.",
+            "You keep beauty alive.",
+            "You understand what love truly means.",
+            "You are exactly what someone prayed for.",
+            "You prove that goodness still wins.",
+            "You carry healing in your hugs.",
+            "You feel like a miracle in progress.",
+            "You turn heavy days into lighter ones.",
+            "You give hope a heartbeat.",
+            "You make love look easy.",
+            "You deserve every beautiful thing coming your way.",
+            "You make people’s lives brighter.",
+            "You bring magic into moments.",
+            "You make compassion look powerful.",
+            "You are a reason someone believes in blessings.",
+            "You keep your soul beautiful.",
+            "You turn frowns into smiles.",
+            "You spread peace like petals in the wind.",
+            "You make others feel enough.",
+            "You lift the sky for tired hearts.",
+            "You are proof that angels exist in human form.",
+            "You leave a spark wherever you go.",
+            "You deserve pure, forever love.",
+            "You’re a story that warms the heart.",
+            "You make everything feel worth trying.",
+            "You carry light that never fades.",
+            "You heal the world with tenderness.",
+            "You give life meaning through your love.",
+            "You deserve celebration every day.",
+            "You bring smiles even in memories.",
+            "You are exactly what the world needs more of.",
+            "You turn life into a beautiful journey.",
+            "You’re a blessing World’ll always be grateful for.",
+            "You make the world feel like home.",
+            "You are special and that will never change. ❤️"
+        ];
+
+        const emojis = ['✨', '❤️', '🌟', '💖', '☀️', '🌸', '💫', '💎', '🎉', '💝', '⭐', '🎈', '🌻', '🎀'];
+
+        const card = document.getElementById('reason-card');
+        const counterDisplay = document.getElementById('counter-display');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const randomBtn = document.getElementById('random-btn');
+        
+        const jumpFormDesktop = document.getElementById('jump-form-desktop');
+        const jumpDateDesktop = document.getElementById('jump-date-desktop');
+        
+        const seeAllMobileBtn = document.getElementById('see-all-mobile-btn');
+
+        const toggleViewBtn = document.getElementById('toggle-view-btn');
+        const toggleViewBtnDesktop = document.getElementById('toggle-view-btn-desktop');
+        const deckView = document.getElementById('deck-view');
+        
+        const calendarDashboard = document.getElementById('calendar-dashboard');
+        const yearGrid = document.getElementById('year-grid');
+        const gridView = document.getElementById('grid-view');
+        const allReasonsGrid = document.getElementById('all-reasons-grid');
+        
+        const modal = document.getElementById('reason-modal');
+        const modalCounter = document.getElementById('modal-counter');
+        const modalText = document.getElementById('modal-text');
+        const modalEmoji = document.getElementById('modal-emoji');
+        const modalDateDisplay = document.getElementById('modal-date-display');
+
+        let currentReasonIndex = 0;
+        // Initialize based on screen size: Mobile (<1024) defaults to Grid, Desktop defaults to Calendar (False)
+        let isGridView = window.innerWidth < 1024;
+        let isCalendarView = true;
+        let modalIndex = 0;
+
+        function openModal(index) {
+            modalIndex = index;
+            const reason = reasons[index];
+            const emoji = emojis[index % emojis.length];
+            
+            const date = new Date(new Date().getFullYear(), 0, 1);
+            date.setDate(index + 1);
+            const dateString = date.toLocaleDateString('default', { month: 'long', day: 'numeric' });
+
+            modalDateDisplay.textContent = dateString;
+            modalCounter.textContent = index + 1;
+            modalText.textContent = `"${reason}"`;
+            modalEmoji.textContent = emoji;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+        
+        function changeModalReason(delta) {
+            let newIndex = modalIndex + delta;
+            if (newIndex < 0) newIndex = reasons.length - 1;
+            if (newIndex >= reasons.length) newIndex = 0;
+            openModal(newIndex);
+        }
+
+        function showReason(index) {
+            if (index < 0) index = 0;
+            if (index >= reasons.length) index = reasons.length - 1;
+            
+            currentReasonIndex = index;
+            
+            const reason = reasons[index];
+            const emoji = emojis[index % emojis.length];
+            const counterText = `${index + 1}`;
+            
+            if(counterDisplay) counterDisplay.textContent = counterText;
+            
+            card.innerHTML = `
+                <div class="absolute inset-0 bg-gradient-to-br from-white/80 to-transparent rounded-[3rem] opacity-50 pointer-events-none"></div>
+                
+                <div class="relative card-inner-element">
+                    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 text-xs font-bold text-rose-400 font-mono tracking-[0.3em] uppercase bg-rose-50/80 px-4 py-1.5 rounded-full border border-rose-100/50 shadow-sm whitespace-nowrap">
+                        Reason <span id="counter-display">${counterText}</span>
+                    </div>
+                    
+                    <span class="text-6xl my-8 block animate-pulse filter drop-shadow-md transform transition-transform group-hover:scale-110 duration-500">${emoji}</span>
+                    
+                    <p class="text-xl font-medium text-gray-800 leading-relaxed serif-text italic festive-text drop-shadow-sm">
+                        "${reason}"
+                    </p>
+                </div>
+            `;
+            
+            card.classList.remove('card-enter');
+            void card.offsetWidth; 
+            card.classList.add('card-enter');
+            
+            const isFirst = index === 0;
+            const isLast = index === reasons.length - 1;
+
+            if(prevBtn) prevBtn.disabled = isFirst;
+            if(nextBtn) nextBtn.disabled = isLast;
+        }
+
+        function jumpToDateDesktop(event) {
+            event.preventDefault();
+            const dateVal = jumpDateDesktop.value;
+            if(!dateVal) return;
+            
+            const date = new Date(dateVal);
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            
+            if (dayOfYear >= 1 && dayOfYear <= reasons.length) {
+                openModal(dayOfYear - 1);
+            }
+        }
+
+        if(jumpFormDesktop) jumpFormDesktop.addEventListener('submit', jumpToDateDesktop);
+
+        function nextReason() {
+            if (currentReasonIndex < reasons.length - 1) {
+                currentReasonIndex++;
+                showReason(currentReasonIndex);
+            }
+        }
+
+        function prevReason() {
+            if (currentReasonIndex > 0) {
+                currentReasonIndex--;
+                showReason(currentReasonIndex);
+            }
+        }
+
+        function randomReason() {
+            let newIndex = currentReasonIndex;
+            while (newIndex === currentReasonIndex) {
+                newIndex = Math.floor(Math.random() * reasons.length);
+            }
+            currentReasonIndex = newIndex;
+            showReason(currentReasonIndex);
+        }
+
+        function renderYearCalendar() {
+            yearGrid.innerHTML = '';
+            const year = new Date().getFullYear();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            let dayAccumulator = 0;
+
+            for (let m = 0; m < 12; m++) {
+                const monthCard = document.createElement('div');
+                monthCard.className = 'month-card bg-white p-5 rounded-3xl shadow-sm border border-rose-50';
+                
+                const monthTitle = document.createElement('h3');
+                monthTitle.className = 'text-lg font-bold text-gray-700 mb-4 brand-font text-center';
+                monthTitle.textContent = monthNames[m];
+                monthCard.appendChild(monthTitle);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-7 gap-1 text-center';
+                
+                ['S','M','T','W','T','F','S'].forEach(d => {
+                    const el = document.createElement('div');
+                    el.className = 'text-[10px] font-bold text-gray-400 uppercase';
+                    el.textContent = d;
+                    grid.appendChild(el);
+                });
+
+                const daysInMonth = new Date(year, m + 1, 0).getDate();
+                const firstDay = new Date(year, m, 1).getDay();
+
+                for(let i=0; i<firstDay; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'mini-day empty';
+                    grid.appendChild(empty);
+                }
+
+                for(let d=1; d<=daysInMonth; d++) {
+                    const dayEl = document.createElement('div');
+                    const reasonIdx = dayAccumulator + d - 1;
+                    
+                    const isToday = new Date().getDate() === d && new Date().getMonth() === m;
+                    
+                    dayEl.className = `mini-day ${isToday ? 'today' : ''}`;
+                    dayEl.textContent = d;
+                    
+                    if (reasonIdx < reasons.length) {
+                        dayEl.onclick = () => openModal(reasonIdx);
+                    } else {
+                        dayEl.classList.add('empty', 'opacity-30');
+                    }
+                    
+                    grid.appendChild(dayEl);
+                }
+                dayAccumulator += daysInMonth;
+                
+                monthCard.appendChild(grid);
+                yearGrid.appendChild(monthCard);
+            }
+        }
+
+        function renderAllReasonsGrid() {
+            allReasonsGrid.innerHTML = '';
+            reasons.forEach((reason, index) => {
+                const emoji = emojis[index % emojis.length];
+                const cardEl = document.createElement('div');
+                cardEl.className = 'bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-rose-50 flex flex-col justify-between h-full group cursor-pointer';
+                cardEl.onclick = () => openModal(index);
+                cardEl.innerHTML = `
+                    <div class="mb-4 flex justify-between items-start">
+                        <span class="text-3xl group-hover:scale-125 transition-transform">${emoji}</span>
+                        <span class="text-xs font-bold text-rose-300">#${index + 1}</span>
+                    </div>
+                    <p class="text-gray-700 font-medium leading-relaxed font-serif text-sm">"${reason}"</p>
+                `;
+                allReasonsGrid.appendChild(cardEl);
+            });
+        }
+
+        function toggleViewMode() {
+            isGridView = !isGridView;
+            
+            const btnTextDesktop = document.getElementById('toggle-btn-text');
+            const btnMobile = document.getElementById('see-all-mobile-btn');
+            
+            const deck = document.getElementById('deck-view');
+            const grid = document.getElementById('grid-view');
+            const calendar = document.getElementById('calendar-dashboard'); 
+            
+            if (isGridView) {
+                // Show Grid Mode
+                if(calendar) calendar.classList.add('hidden', 'lg:hidden');
+                if(deck) {
+                    deck.classList.add('hidden');
+                    deck.classList.remove('flex'); // Ensure flex is removed
+                }
+                
+                grid.classList.remove('hidden', 'lg:hidden');
+                
+                if(btnTextDesktop) btnTextDesktop.textContent = "Back to Calendar";
+                if(btnMobile) btnMobile.textContent = "View Daily Card";
+                
+                if (document.getElementById('all-reasons-grid').children.length === 0) {
+                    renderAllReasonsGrid();
+                }
+            } else {
+                // Show Calendar (Desktop) or Deck (Mobile) Mode
+                grid.classList.add('hidden', 'lg:hidden');
+                
+                if(calendar) calendar.classList.remove('hidden', 'lg:hidden'); 
+                
+                if(deck) {
+                    deck.classList.remove('hidden');
+                    deck.classList.add('flex'); // Restore flex display
+                }
+                
+                if(btnTextDesktop) btnTextDesktop.textContent = "See All Reasons";
+                if(btnMobile) btnMobile.textContent = "See All Reasons";
+            }
+        }
+
+        if(toggleViewBtnDesktop) toggleViewBtnDesktop.addEventListener('click', toggleViewMode);
+        if(seeAllMobileBtn) seeAllMobileBtn.addEventListener('click', toggleViewMode);
+
+        function toggleMobileView() {
+        }
+
+        const startDay = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        currentReasonIndex = (startDay - 1) % reasons.length;
+        if(currentReasonIndex < 0) currentReasonIndex = 0;
+        showReason(currentReasonIndex);
+
+        // Desktop Nav Logic
+        const desktopMenuToggle = document.getElementById('desktopMenuToggle');
+        const desktopNav = document.getElementById('desktopNav');
+        const desktopNavOverlay = document.getElementById('desktopNavOverlay');
+        const closeDesktopNavBtn = document.getElementById('closeDesktopNavBtn');
+        let isDesktopNavOpen = false;
+
+        function toggleDesktopNav() {
+            isDesktopNavOpen = !isDesktopNavOpen;
+            if (isDesktopNavOpen) {
+                desktopNav.classList.remove('-translate-x-full');
+                desktopNavOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                desktopNavOverlay.classList.add('active');
+            } else {
+                desktopNav.classList.add('-translate-x-full');
+                desktopNavOverlay.classList.add('opacity-0', 'pointer-events-none');
+                desktopNavOverlay.classList.remove('active');
+            }
+        }
+
+        if(desktopMenuToggle) desktopMenuToggle.addEventListener('click', toggleDesktopNav);
+        if(closeDesktopNavBtn) closeDesktopNavBtn.addEventListener('click', toggleDesktopNav);
+        if(desktopNavOverlay) desktopNavOverlay.addEventListener('click', toggleDesktopNav);
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.lg\\:hidden .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            // ... existing nav selectors ...
+
+            let areNavsOpen = false;
+
+            // Initialize Grid for Mobile
+            if (window.innerWidth < 1024) {
+                renderAllReasonsGrid();
+                const btnMobile = document.getElementById('see-all-mobile-btn');
+                if(btnMobile) btnMobile.textContent = "View Daily Card";
+            } else {
+                renderYearCalendar();
+            }
+
+            function closeAllNavs() {
+                if (window.innerWidth >= 1024) return;
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                rightNav.classList.add('translate-x-full');
+                mainContent.classList.remove('scale-95', 'opacity-50');
+                mainContent.classList.add('pt-28');
+                mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    if (window.innerWidth >= 1024) return;
+                    topNav.classList.remove('-translate-y-full');
+                    bottomNav.classList.remove('translate-y-full');
+                    leftNav.classList.remove('-translate-x-full');
+                    rightNav.classList.remove('translate-x-full');
+                    mainContent.classList.add('scale-95', 'opacity-50');
+                    mainContent.classList.remove('pt-28');
+                    mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                    navToggleIcon.classList.add('hidden');
+                    navToggleX.classList.add('hidden');
+                    areNavsOpen = true;
+                }
+            }
+
+            if(navToggle) navToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleAllNavs(); });
+            mainContent.addEventListener('click', () => { if (areNavsOpen) closeAllNavs(); });
+            navLinks.forEach(link => link.addEventListener('click', () => { if (areNavsOpen) closeAllNavs(); }));
+            
+            if(prevBtn) prevBtn.addEventListener('click', prevReason);
+            if(nextBtn) nextBtn.addEventListener('click', nextReason);
+            if(randomBtn) randomBtn.addEventListener('click', randomReason);
+        });
+    </script>
+</body>
+</html>

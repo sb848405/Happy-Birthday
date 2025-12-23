@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Bright Birthday</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+    <style>
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX, #sun, #desktopNav {
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        #mainContent, .nav-panel, #desktopNav {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        #desktopNav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+            letter-spacing: 0.05em;
+        }
+        body {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto; 
+            height: 100vh; 
+            
+            background-color: transparent; 
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            transition: background-color 6s ease-in-out;
+            position: relative; 
+            z-index: 10; 
+        }
+        h1, h2, h3 {
+            font-family: 'Pacifico', cursive;
+        }
+
+        #sky {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #1c263c; 
+            transition: background-color 6s ease-in-out;
+            z-index: 1; 
+        }
+
+        #topNav { top: -100vh; }
+        #bottomNav { bottom: -100vh; }
+        #leftNav { left: -100vw; } 
+        #rightNav { right: -100vw; }
+
+        body.nav-open #topNav { top: 0; }
+        body.nav-open #bottomNav { bottom: 0; }
+        body.nav-open #leftNav { left: 0; } 
+        body.nav-open #rightNav { right: 0; }
+
+        #desktopNav { left: -100vw; }
+        body.nav-open #desktopNav { left: 0; }
+
+        #topNav, #bottomNav {
+            background-color: #111827;
+            color: #fcd34d;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            position: fixed; 
+            left: 0; 
+            right: 0; 
+        }
+        #leftNav, #rightNav {
+            background-color: #111827;
+            color: #fcd34d;
+            width: 5rem;
+            position: fixed; 
+            top: 0; 
+            bottom: 0; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        @media (min-width: 640px) {
+            #leftNav, #rightNav {
+                width: 6rem;
+            }
+        }
+        
+        #leftNav .nav-link, #rightNav .nav-link {
+            font-size: 0.75rem;
+            padding: 0.75rem 0.25rem;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(6, 182, 212, 0.5);
+            border-radius: 0.5rem;
+        }
+        #navToggle {
+            position: fixed; 
+            top: 1rem;
+            left: 1rem; 
+            background-color: #facc15;
+            color: #111827;
+            box-shadow: 0 4px 12px rgba(250, 204, 21, 0.6);
+            z-index: 100;
+            cursor: pointer;
+        }
+        #navToggle:hover {
+            background-color: #fcd34d;
+        }
+
+        .cloud {
+            position: absolute;
+            width: 200px;
+            height: 60px;
+            background: #f0f8ff;
+            border-radius: 100px;
+            opacity: 0.9;
+            transition: transform 1.5s, opacity 1.5s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+        .cloud::before {
+            width: 110px; height: 110px; top: -55px; left: 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .cloud::after {
+            width: 85px; height: 85px; top: -40px; right: 20px;
+            box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .static-cloud {
+            position: absolute;
+            width: 250px;
+            height: 80px;
+            background: #e0f2f1;
+            border-radius: 120px;
+            opacity: 0.7;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            z-index: 8;
+            transition: all 4s ease-in-out; 
+            transform-origin: center;
+        }
+        .static-cloud::before, .static-cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+        .static-cloud::before {
+            width: 130px; height: 130px; top: -65px; left: 20px;
+            box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3);
+        }
+        .static-cloud::after {
+            width: 100px; height: 100px; top: -50px; right: 30px;
+            box-shadow: -3px 3px 7px rgba(0, 0, 0, 0.3);
+        }
+
+
+        #rain-layer {
+            position: absolute;
+            width: 100%; 
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 5;
+            opacity: 0.8;
+            transition: opacity 2s ease-out;
+        }
+
+        .drop {
+            position: absolute;
+            width: 1px;
+            height: 30px;
+            background: rgba(173, 216, 230, 0.7);
+            animation: rainFall 0.7s linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        #message-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #e0f2f1;
+            font-size: clamp(1.2rem, 5vw, 2.5rem); 
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out; 
+            text-align: center;
+            font-weight: 700;
+            padding: 1rem;
+            width: 100%;
+            max-width: 800px;
+            z-index: 40; 
+            font-family: 'Inter', sans-serif;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
+            line-height: 1.5;
+        }
+
+        #sun {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background-color: #ffcc00;
+            box-shadow: 0 0 0 rgba(255, 204, 0, 0);
+            transition: all 6s ease-in-out; 
+            z-index: 30;
+        }
+
+        #sun.bright {
+            width: clamp(300px, 90vw, 650px);
+            height: clamp(300px, 90vw, 650px);
+            box-shadow: 0 0 120px 80px #ffeb3b, 
+                        0 0 250px 150px rgba(255, 165, 0, 0.5);
+        }
+        
+        #sun.final-position {
+            width: 80px;
+            height: 80px;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: auto; 
+            right: auto;
+            box-shadow: 0 0 10px 5px #ffcc00; 
+        }
+
+        #final-message {
+            position: fixed; 
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%); 
+            width: 90%;
+            max-width: 500px; 
+            text-align: center;
+            padding: 2rem; 
+            border-radius: 1rem; 
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            
+            color: #883300;
+            transition: opacity 2s ease-in; 
+            font-size: clamp(1rem, 3vw, 1.25rem); 
+            font-weight: 700;
+            text-shadow: none;
+            opacity: 0;
+            z-index: 50;
+        }
+        
+        #final-message h2 {
+            font-size: clamp(1.5rem, 8vw, 2.75rem);
+            font-weight: 900;
+            margin-bottom: 0.75rem;
+            color: #d97706; 
+        }
+
+        .rainbow-container {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 4s ease-in;
+            pointer-events: none;
+        }
+        
+        .rainbow {
+            width: 150vw;
+            height: 150vw;
+            border-radius: 50%;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 
+                0 0 0 20px rgba(255, 0, 0, 0.15),
+                0 0 0 40px rgba(255, 165, 0, 0.15),
+                0 0 0 60px rgba(255, 255, 0, 0.15),
+                0 0 0 80px rgba(0, 128, 0, 0.15),
+                0 0 0 100px rgba(0, 0, 255, 0.15),
+                0 0 0 120px rgba(75, 0, 130, 0.15),
+                0 0 0 140px rgba(238, 130, 238, 0.15);
+            filter: blur(8px);
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 40px;
+            height: 50px;
+            border-radius: 50%;
+            z-index: 20;
+            opacity: 0.9;
+            box-shadow: inset -5px -5px 0 rgba(0,0,0,0.1);
+            animation: floatUp var(--float-duration, 10s) linear forwards;
+        }
+        
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 12px;
+            background: rgba(255,255,255,0.7);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+            100% { transform: translateY(-120vh) rotate(10deg); opacity: 0.7; }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px white;
+            opacity: 0;
+            animation: twinkle 3s infinite ease-in-out;
+            z-index: 3;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        #landscape-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35vh;
+            z-index: 4; 
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .hill-bg {
+            position: absolute;
+            bottom: -5vh;
+            left: -10%;
+            width: 120%;
+            height: 30vh;
+            border-radius: 50% 50% 0 0;
+            background-color: #064e3b; 
+            transition: background-color 6s ease-in-out;
+            z-index: 1;
+        }
+        
+        .hill-fg {
+            position: absolute;
+            bottom: -10vh;
+            right: -20%;
+            width: 140%;
+            height: 35vh;
+            border-radius: 50% 50% 0 0;
+            background-color: #065f46; 
+            transition: background-color 6s ease-in-out;
+            z-index: 2;
+        }
+
+        .day-mode .hill-bg { background-color: #22c55e; } 
+        .day-mode .hill-fg { background-color: #16a34a; } 
+        
+        .hut-container {
+            position: absolute;
+            bottom: 12vh;
+            right: 20%;
+            z-index: 3;
+            transform: scale(0.8);
+        }
+        
+        .hut-body {
+            width: 120px;
+            height: 100px;
+            background-color: #3e2723; 
+            transition: background 6s ease-in-out, background-color 6s ease-in-out;
+        }
+        
+        .day-mode .hut-body { 
+            background: linear-gradient(90deg, #6D4C41 0%, #8D6E63 50%, #5D4037 100%); 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .hut-roof {
+            width: 0; 
+            height: 0; 
+            border-left: 70px solid transparent;
+            border-right: 70px solid transparent;
+            border-bottom: 70px solid #271c19; 
+            position: absolute;
+            top: -70px;
+            left: -10px;
+            transition: border-bottom-color 6s ease-in-out;
+        }
+        
+        .day-mode .hut-roof { border-bottom-color: #4E342E; } 
+        
+        .hut-door {
+            width: 40px;
+            height: 60px;
+            background-color: #1a120b;
+            position: absolute;
+            bottom: 0;
+            left: 40px;
+            border-radius: 4px 4px 0 0;
+            transition: background-color 6s ease-in-out;
+        }
+        .day-mode .hut-door { 
+            background-color: #3E2723; 
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .tree {
+            position: absolute;
+            bottom: 12vh; 
+            z-index: 2;
+            width: 80px; 
+            height: 120px;
+            pointer-events: none;
+        }
+        .tree-trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 50px;
+            background-color: #3e2723;
+            border-radius: 2px;
+            transition: background-color 6s ease-in-out;
+        }
+        .tree-trunk::before {
+            content: ''; position: absolute;
+            width: 6px; height: 20px;
+            background: inherit;
+            bottom: 25px; left: -4px;
+            transform: rotate(-35deg);
+            border-radius: 2px;
+        }
+        .tree-trunk::after {
+            content: ''; position: absolute;
+            width: 5px; height: 18px;
+            background: inherit;
+            bottom: 30px; right: -3px;
+            transform: rotate(35deg);
+            border-radius: 2px;
+        }
+        .day-mode .tree-trunk { background-color: #5d4037; }
+
+        .tree-leaves {
+            position: absolute;
+            bottom: 40px; 
+            left: 50%;
+            width: 0; height: 0; 
+        }
+        
+        .tree-leaf-cluster {
+            position: absolute;
+            background-color: #064e3b;
+            border-radius: 50%;
+            transition: background-color 6s ease-in-out;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .day-mode .tree-leaf-cluster { background-color: #22c55e; } 
+        .day-mode .tree-leaf-cluster.dark { background-color: #15803d; } 
+        .day-mode .tree-leaf-cluster.light { background-color: #4ade80; } 
+
+        .cluster-1 { width: 60px; height: 60px; left: -30px; bottom: 0; z-index: 2; } 
+        .cluster-2 { width: 50px; height: 50px; left: -50px; bottom: 10px; z-index: 1; } 
+        .cluster-3 { width: 50px; height: 50px; left: 0px; bottom: 15px; z-index: 1; } 
+        .cluster-4 { width: 45px; height: 45px; left: -22px; bottom: 35px; z-index: 3; } 
+
+        .flower {
+            position: absolute;
+            bottom: 5vh;
+            width: 10px;
+            height: 30px;
+            background: #1e293b; 
+            transition: background-color 6s ease-in-out;
+            z-index: 4;
+        }
+        .day-mode .flower { background: #166534; } 
+        
+        .flower-head {
+            width: 20px;
+            height: 20px;
+            background: #334155;
+            border-radius: 50%;
+            position: absolute;
+            top: -15px;
+            left: -5px;
+            transition: background-color 6s ease-in-out;
+        }
+        .day-mode .flower-head { background: #ec4899; } 
+        
+        .flower:nth-child(odd) .flower-head { transform: scale(0.8); }
+        .day-mode .flower:nth-child(even) .flower-head { background: #eab308; } 
+        .day-mode .flower:nth-child(3n) .flower-head { background: #a855f7; } 
+
+    </style>
+</head>
+<body class="antialiased overflow-hidden text-gray-800">
+
+    <audio id="bgMusic" loop>
+        <source src="Rain.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="sky">
+        <div id="rain-layer"></div>
+        <div id="rainbow-container" class="rainbow-container">
+            <div class="rainbow"></div>
+        </div>
+    </div>
+    
+    <div id="landscape-container" class="hidden lg:block">
+        <div class="hill-bg"></div>
+        <div class="hill-fg"></div>
+        
+        <div class="hut-container">
+            <div class="hut-roof"></div>
+            <div class="hut-body">
+                <div class="hut-door"></div>
+            </div>
+        </div>
+        
+        <!-- Far Background Trees (smaller) -->
+        <div class="tree" style="left: 5%; bottom: 18vh; transform: scale(0.5); z-index: 0;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="left: 35%; bottom: 19vh; transform: scale(0.45); z-index: 0;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2"></div>
+                <div class="tree-leaf-cluster cluster-3 dark"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="left: 55%; bottom: 17vh; transform: scale(0.5); z-index: 0;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4"></div>
+            </div>
+        </div>
+        <div class="tree" style="right: 5%; bottom: 18vh; transform: scale(0.5); z-index: 0;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2"></div>
+                <div class="tree-leaf-cluster cluster-3 dark"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+
+        <!-- Mid-ground Trees -->
+        <div class="tree" style="left: 10%; bottom: 12vh;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="left: 18%; bottom: 13vh; transform: scale(0.8);">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2"></div>
+                <div class="tree-leaf-cluster cluster-3 dark"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="left: 30%; bottom: 11vh; transform: scale(0.9);">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4"></div>
+            </div>
+        </div>
+        <div class="tree" style="left: 45%; bottom: 10vh; transform: scale(0.85); z-index: 1;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2"></div>
+                <div class="tree-leaf-cluster cluster-3 dark"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="right: 35%; bottom: 14vh; transform: scale(0.8);">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="right: 15%; bottom: 12vh; transform: scale(1.1);">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4"></div>
+            </div>
+        </div>
+
+        <!-- Foreground Trees -->
+        <div class="tree" style="left: -2%; bottom: 8vh; transform: scale(1.3); z-index: 3;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2"></div>
+                <div class="tree-leaf-cluster cluster-3 dark"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4 light"></div>
+            </div>
+        </div>
+        <div class="tree" style="right: -2%; bottom: 8vh; transform: scale(1.4); z-index: 3;">
+            <div class="tree-trunk"></div>
+            <div class="tree-leaves">
+                <div class="tree-leaf-cluster cluster-2 dark"></div>
+                <div class="tree-leaf-cluster cluster-3"></div>
+                <div class="tree-leaf-cluster cluster-1"></div>
+                <div class="tree-leaf-cluster cluster-4"></div>
+            </div>
+        </div>
+        
+        <div class="flower" style="left: 25%; bottom: 6vh;"><div class="flower-head"></div></div>
+        <div class="flower" style="left: 27%; bottom: 4vh;"><div class="flower-head"></div></div>
+        <div class="flower" style="left: 29%; bottom: 5vh;"><div class="flower-head"></div></div>
+        <div class="flower" style="right: 35%; bottom: 5vh;"><div class="flower-head"></div></div>
+        <div class="flower" style="right: 33%; bottom: 7vh;"><div class="flower-head"></div></div>
+    </div>
+    
+    <div id="message-container"></div> 
+
+    <div id="sun"></div>
+    <div id="final-message"></div>
+
+    <button id="navToggle" 
+            class="p-4 rounded-full shadow-2xl focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-offset-2"
+            aria-label="Toggle Navigation Menu" 
+            aria-expanded="false">
+        <svg id="navToggleIcon" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-7 h-7 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    
+    <nav id="topNav" class="nav-panel z-[61] h-16 shadow-lg flex items-center justify-center space-x-1 sm:space-x-8 lg:hidden">
+        <a href="Msg.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Message</a>
+        <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text hover:text-cyan-400">Letter</a>
+        <a href="Music.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Music</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel z-[61] h-16 shadow-lg flex items-center justify-center space-x-1 sm:space-x-8 lg:hidden">
+        <a href="Skill.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Cartoon</a>
+    </nav>
+    
+    <nav id="leftNav" class="nav-panel z-[60] shadow-2xl flex flex-col items-center space-y-0.9 overflow-y-auto pt-20 pb-20 lg:hidden">
+        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text hover:text-cyan-400">Home</a>
+        <a href="Cake.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Cake</a>
+        <a href="21_Wish.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">21_Door</a>
+        <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text hover:text-cyan-400">Heaven</a>
+        <a href="Diary.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Diary</a>
+        <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text hover:text-cyan-400">Anatomy</a>
+        <a href="Box.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Box</a>
+        <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text hover:text-cyan-400">Special</a>
+        <a href="color.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Color</a>
+        <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text hover:text-cyan-400">You</a>
+        <a href="Teacher.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Teacher</a>
+        <a href="Universe.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Universe</a>
+        <a href="The_River.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">River</a>
+        <a href="Mountain.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Mountain</a>
+    </nav>
+    
+    <nav id="rightNav" class="nav-panel z-[60] shadow-2xl flex flex-col items-center space-y-0.9 overflow-y-auto pt-20 pb-20 lg:hidden">
+        <a href="Periodik_table.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Periodic_table</a>
+        <a href="Concept.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Concept</a>
+        <a href="Calender.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Calendar</a>
+        <a href="Perspective.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Perspective</a>
+        <a href="Santa.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Santa</a>
+        <a href="Presence.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Presence</a>
+        <a href="Cloud.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Cloud</a>
+        <a href="Ink.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Paint</a>
+        <a href="Butterfly.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Butterfly</a>
+        <a href="Weather.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Weather</a>
+        <a href="Spotlight.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Spotlight</a>
+        <a href="Room.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Room</a>
+        <a href="Radio.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Radio</a>
+        <a href="Food.html" class="nav-link p-2 rounded-md font-medium transition-colors duration-200 festive-text">Food</a>
+    </nav>
+
+    <nav id="desktopNav" class="nav-panel fixed inset-y-0 z-[60] w-[600px] bg-gray-900 text-amber-300 shadow-2xl pt-24 pb-12 px-8 hidden lg:grid grid-cols-2 gap-4 content-start overflow-y-auto">
+        <div class="col-span-2 text-center pb-4">
+             <h3 class="text-3xl font-bold text-amber-400 mb-2">Navigation</h3>
+             <div class="h-1 w-24 bg-amber-500 mx-auto rounded-full"></div>
+        </div>
+
+        <a href="index.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🏠</span><span>Home</span></a>
+        <a href="Cake.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🎂</span><span>Cake</span></a>
+        <a href="21_Wish.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🚪</span><span>21_Door</span></a>
+        <a href="chat.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>☁️</span><span>Heaven</span></a>
+        <a href="Diary.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>📔</span><span>Diary</span></a>
+        <a href="anatomy.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🧬</span><span>Anatomy</span></a>
+        <a href="Box.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>📦</span><span>Box</span></a>
+        <a href="Special.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>✨</span><span>Special</span></a>
+        <a href="color.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🎨</span><span>Color</span></a>
+        <a href="you.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>👤</span><span>You</span></a>
+        <a href="Teacher.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>👨‍🏫</span><span>Teacher</span></a>
+        <a href="Universe.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🌌</span><span>Universe</span></a>
+        <a href="The_River.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🌊</span><span>River</span></a>
+        <a href="Mountain.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>⛰️</span><span>Mountain</span></a>
+        <a href="Paper_Star.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>⭐</span><span>Paper Star</span></a>
+        <a href="Skill.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>💡</span><span>Skill</span></a>
+        <a href="Carttoon.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>📺</span><span>Cartoon</span></a>
+        <a href="Periodik_table.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🧪</span><span>Periodic_table</span></a>
+        <a href="Concept.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🧠</span><span>Concept</span></a>
+        <a href="Calender.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>📅</span><span>Calendar</span></a>
+        <a href="Perspective.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>👁️</span><span>Perspective</span></a>
+        <a href="Santa.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🎅</span><span>Santa</span></a>
+        <a href="Presence.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🎁</span><span>Presence</span></a>
+        <a href="Cloud.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400 bg-yellow-500/10 text-yellow-200 border-yellow-500/30"><span>☁️</span><span>Cloud</span></a>
+        <a href="Ink.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🖋️</span><span>Paint</span></a>
+        <a href="Butterfly.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🦋</span><span>Butterfly</span></a>
+        <a href="Weather.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>⛅</span><span>Weather</span></a>
+        <a href="Spotlight.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🔦</span><span>Spotlight</span></a>
+        <a href="Room.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🏠</span><span>Room</span></a>
+        <a href="Radio.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>📻</span><span>Radio</span></a>
+        <a href="Food.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🍕</span><span>Food</span></a>
+        <a href="Music.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>🎵</span><span>Music</span></a>
+        <a href="letter.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>📜</span><span>Letter</span></a>
+        <a href="Msg.html" class="nav-link p-4 rounded-xl bg-gray-800/50 hover:bg-cyan-600/30 transition-all duration-300 flex items-center space-x-3 festive-text text-lg border border-gray-700 hover:border-cyan-400"><span>💬</span><span>Message</span></a>
+    </nav>
+
+    <div id="mainContent" class="absolute inset-0 z-[5] overflow-y-auto">
+    </div>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const CRUSH_NAME = "Juhi";
+
+            const LINES = [
+                "✨ When the Rain Remembers You ✨",
+                "There’s something about the rain",
+                "the way it arrives without permission,",
+                "yet somehow makes everything feel clear again.",
+                "It reminds me of how you step into a moment quietly,",
+                "but leaving it changed in ways no one expects.",
+                "The sky falls, but you rise in it.",
+                "Not loudly, not brightly just in that steady, unforgettable way",
+                "that makes people feel a little less lost.",
+                "You carry that rare kind of presence that doesn’t ask to be seen…",
+                "and still becomes the feeling everyone remembers.",
+                "So on your birthday,",
+                "I hope every raindrop brings something you deserve:",
+                "clarity after confusion,",
+                "ease after heaviness,",
+                "and a future that opens for you the way clouds open to light.",
+                "Because rain may touch everything,",
+                "but only you have a way of touching hearts without even trying.",
+                "Maybe that’s why even the rain pauses for a moment around you,",
+                "as if it senses a gentleness it rarely gets to witness.",
+                "There’s a quiet grace in the way you move through the world,",
+                "the kind that makes life feel softer just by passing through it.",
+                "And now, it's time for the sun to shine, just like you.",
+            ];
+
+            const TOTAL_LINES = LINES.length;
+            const LINE_DURATION_MS = 3800; 
+            
+            const SKY = document.getElementById('sky');
+            const SUN = document.getElementById('sun');
+            const RAIN_LAYER = document.getElementById('rain-layer');
+            const MESSAGE_CONTAINER = document.getElementById('message-container');
+            const FINAL_MESSAGE_EL = document.getElementById('final-message');
+            const RAINBOW_CONTAINER = document.getElementById('rainbow-container');
+            const bgMusic = document.getElementById('bgMusic');
+            
+            let lineIndex = 0;
+            let lineInterval = null;
+            let areNavsOpen = false;
+
+            function tryPlayMusic() {
+                bgMusic.volume = 0.5;
+                bgMusic.play().catch(e => {
+                    console.log("Autoplay prevented. Waiting for user interaction.");
+                    document.body.addEventListener('click', function unlockAudio() {
+                        bgMusic.play();
+                        document.body.removeEventListener('click', unlockAudio);
+                    }, { once: true });
+                });
+            }
+
+            tryPlayMusic();
+
+            function createRainDrops() {
+                const isBigScreen = window.innerWidth >= 1024;
+                const dropCount = isBigScreen ? 500 : 100; // Increased density for big screen
+
+                for (let i = 0; i < dropCount; i++) {
+                    const drop = document.createElement('div');
+                    drop.classList.add('drop');
+                    drop.style.left = Math.random() * 100 + 'vw';
+                    drop.style.animationDelay = Math.random() * 5 + 's';
+                    drop.style.height = Math.random() * 40 + 20 + 'px';
+                    RAIN_LAYER.appendChild(drop);
+                }
+            }
+
+            function createStaticClouds() {
+                const cloudPositions = [
+                    {left: '-10%', top: '0px', dir: 'left'}, 
+                    {left: '5%', top: '10px', dir: 'left'},
+                    {left: '40%', top: '30px', dir: 'right'},
+                    {left: '70%', top: '5px', dir: 'right'},
+                    {left: '20%', top: '50px', dir: 'left'},
+                ];
+
+                cloudPositions.forEach((pos) => {
+                    const cloud = document.createElement('div');
+                    cloud.classList.add('static-cloud');
+                    cloud.style.left = pos.left;
+                    cloud.style.top = pos.top;
+                    cloud.setAttribute('data-dir', pos.dir);
+                    cloud.setAttribute('data-scale', 1); 
+                    SKY.appendChild(cloud);
+                });
+
+                if (window.innerWidth >= 1024) {
+                    for (let i = 0; i < 40; i++) {
+                        const cloud = document.createElement('div');
+                        cloud.classList.add('static-cloud');
+                        
+                        const scale = 0.4 + Math.random() * 0.5; 
+                        const opacity = 0.2 + Math.random() * 0.4;
+                        const topPos = Math.random() * 25 - 5 + '%'; 
+                        const leftPos = Math.random() * 120 - 10 + '%'; 
+                        const dir = Math.random() > 0.5 ? 'left' : 'right';
+
+                        cloud.style.transform = `scale(${scale})`;
+                        cloud.style.left = leftPos;
+                        cloud.style.top = topPos;
+                        cloud.style.opacity = opacity;
+                        cloud.setAttribute('data-dir', dir);
+                        cloud.setAttribute('data-scale', scale); 
+                        
+                        SKY.appendChild(cloud);
+                    }
+                }
+            }
+            
+            function createSparkles() {
+                if (window.innerWidth < 1024) return;
+                
+                const container = document.body;
+                for (let i = 0; i < 30; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = Math.random() * 100 + 'vw';
+                    sparkle.style.top = Math.random() * 60 + 'vh';
+                    sparkle.style.animationDelay = Math.random() * 3 + 's';
+                    container.appendChild(sparkle);
+                }
+            }
+
+            function startBalloons() {
+                const balloonColors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5'];
+                const container = document.body;
+
+                let count = 0;
+                const maxBalloons = window.innerWidth >= 1024 ? 40 : 15; 
+
+                const balloonInterval = setInterval(() => {
+                    if (count >= maxBalloons) {
+                        clearInterval(balloonInterval);
+                        return;
+                    }
+
+                    const balloon = document.createElement('div');
+                    balloon.classList.add('balloon');
+                    balloon.style.left = Math.random() * 90 + 5 + 'vw';
+                    balloon.style.backgroundColor = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+                    balloon.style.setProperty('--float-duration', (8 + Math.random() * 5) + 's');
+                    
+                    container.appendChild(balloon);
+                    count++;
+
+                    setTimeout(() => {
+                        balloon.remove();
+                    }, 15000);
+
+                }, 400);
+            }
+            
+            function updateMessageAndCloud() {
+                if (lineIndex >= TOTAL_LINES) {
+                    clearInterval(lineInterval);
+                    setTimeout(revealSun, LINE_DURATION_MS / 2); 
+                    return;
+                }
+
+                MESSAGE_CONTAINER.style.opacity = 0;
+                
+                const dynamicCloud = document.createElement('div');
+                dynamicCloud.classList.add('cloud');
+                dynamicCloud.style.left = Math.random() * 50 + 10 + 'vw';
+                dynamicCloud.style.top = Math.random() * 10 - 200 + 'px';
+                SKY.appendChild(dynamicCloud);
+
+                setTimeout(() => {
+                    MESSAGE_CONTAINER.textContent = LINES[lineIndex];
+                    MESSAGE_CONTAINER.style.opacity = 1; 
+                }, 50); 
+                
+                setTimeout(() => {
+                    dynamicCloud.style.opacity = 0;
+                    dynamicCloud.style.transform = 'translate(100vw, 50vh)';
+                    
+                    setTimeout(() => {
+                        if (dynamicCloud.parentNode) dynamicCloud.remove();
+                    }, 1500);
+                }, LINE_DURATION_MS - 1500);
+
+                lineIndex++;
+            }
+
+            function revealSun() {
+                let vol = bgMusic.volume;
+                const fadeOut = setInterval(() => {
+                    if (vol > 0.05) {
+                        vol -= 0.05;
+                        bgMusic.volume = vol;
+                    } else {
+                        clearInterval(fadeOut);
+                        bgMusic.pause();
+                        bgMusic.currentTime = 0;
+                    }
+                }, 100);
+                
+                document.getElementById('sky').style.backgroundColor = '#87ceeb'; 
+                
+                RAIN_LAYER.style.opacity = 0;
+                RAIN_LAYER.innerHTML = '';
+                MESSAGE_CONTAINER.style.display = 'none';
+
+                const staticClouds = document.querySelectorAll('.static-cloud');
+                staticClouds.forEach(cloud => {
+                    const direction = cloud.getAttribute('data-dir');
+                    const scale = cloud.getAttribute('data-scale') || 1;
+                    cloud.style.opacity = 0;
+
+                    if (direction === 'left') {
+                        cloud.style.transform = `translate(-100vw, -10vh) scale(${scale})`;
+                    } else {
+                        cloud.style.transform = `translate(100vw, -10vh) scale(${scale})`;
+                    }
+                    
+                    setTimeout(() => cloud.remove(), 4000);
+                });
+                
+                SUN.classList.add('bright');
+
+                setTimeout(() => {
+                    SUN.classList.remove('bright');
+                    SUN.classList.add('final-position');
+
+                    RAINBOW_CONTAINER.style.opacity = 1;
+
+                    createSparkles();
+                    
+                    const landscape = document.getElementById('landscape-container');
+                    if (landscape) landscape.classList.add('day-mode');
+
+                    setTimeout(() => {
+                        FINAL_MESSAGE_EL.innerHTML = `<h2>Happy Birthday, ${CRUSH_NAME}!</h2>A New Journey Begins.<br>The whole world is waiting for you. <br>Your journey has a long, beautiful path ahead, and I’d be honoured to support you and walk alongside you whenever you need.`;
+                        FINAL_MESSAGE_EL.style.opacity = 1;
+                        
+                        startBalloons();
+                    }, 6500);
+                    
+                }, 6000);
+            }
+            
+            createRainDrops();
+            createStaticClouds();
+            
+            setTimeout(() => {
+                updateMessageAndCloud();
+                lineInterval = setInterval(updateMessageAndCloud, LINE_DURATION_MS);
+            }, 500);
+
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+            const body = document.body;
+
+            function openAllNavs() {
+                body.classList.add('nav-open');
+                navToggleIcon.classList.add('hidden');
+                navToggleX.classList.remove('hidden');
+                navToggle.setAttribute('aria-expanded', 'true');
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                body.classList.remove('nav-open');
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                navToggle.setAttribute('aria-expanded', 'false');
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                toggleAllNavs();
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!areNavsOpen) return;
+
+                const navPanels = document.querySelectorAll('.nav-panel');
+                let clickedInsideNav = false;
+                
+                if (navToggle.contains(e.target)) {
+                    clickedInsideNav = true;
+                } else {
+                    navPanels.forEach(panel => {
+                        if (panel.contains(e.target)) {
+                            clickedInsideNav = true;
+                        }
+                    });
+                }
+
+                if (!clickedInsideNav) {
+                    closeAllNavs();
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (areNavsOpen) {
+                        setTimeout(closeAllNavs, 100); 
+                    }
+                });
+            });
+            
+        });
+    </script>
+</body>
+</html>

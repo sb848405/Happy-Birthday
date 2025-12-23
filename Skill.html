@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Decuple Stream of Sovereignty</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Gochi+Hand&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        'title-serif': ['Playfair Display', 'Georgia', 'serif'],
+                        'divine': ['Cinzel Decorative', 'serif'],
+                    },
+                    colors: {
+                        'primary-gold': '#FFD700',
+                        'accent-pink': '#EC4899',
+                        'durga-red': '#8B0000',
+                        'deep-maroon': '#4a0404',
+                        'copper': '#B87333',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'flicker': 'flicker 3s infinite alternate',
+                        'smoke': 'smoke 3s infinite ease-out',
+                        'arti-move': 'artiOrbit 10s linear infinite',
+                        'arti-local': 'artiCircle 3s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        flicker: {
+                            '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                            '50%': { opacity: 0.8, transform: 'scale(0.95)' },
+                            '70%': { opacity: 0.9, transform: 'scale(1.05)' },
+                        },
+                        smoke: {
+                            '0%': { transform: 'translateY(0) scale(1)', opacity: 0 },
+                            '20%': { opacity: 0.6 },
+                            '100%': { transform: 'translateY(-40px) scale(1.5)', opacity: 0 },
+                        },
+                        artiOrbit: {
+                            '0%': { transform: 'rotate(0deg) translateX(400px) rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg) translateX(400px) rotate(-360deg)' }
+                        },
+                        artiCircle: {
+                            '0%': { transform: 'rotate(0deg) translateX(50px) rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg) translateX(50px) rotate(-360deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0c0a09;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            color: white;
+            min-height: 100vh;
+            transition: background 2s ease-in-out;
+        }
+
+        body.worship-bg {
+            background: radial-gradient(circle at center, #700b0b 0%, #3a0202 50%, #1a0000 100%);
+        }
+
+        .bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffd700' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .nav-panel, #mainContent, #desktopSidebarScroll, #navToggleIcon, #navToggleX {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        #mainContent, .nav-panel, #desktopSidebarScroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        #desktopSidebarScroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+        
+        .nav-panel-style {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+            color: white;
+        }
+        
+        .nav-panel a.nav-link, .desktop-nav-link {
+            color: white;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            font-weight: 700;
+        }
+        
+        .nav-panel a.nav-link:hover, .desktop-nav-link:hover {
+            background-color: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            transform: scale(1.05);
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: radial-gradient(circle at center, #600000 0%, #300000 50%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.5s ease-in-out;
+            padding: 1rem;
+        }
+        
+        #intro-screen.hidden-intro {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .intro-border {
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            pointer-events: none;
+        }
+        
+        @media (min-width: 640px) {
+            .intro-border { top: 30px; left: 30px; right: 30px; bottom: 30px; }
+        }
+        
+        .intro-border-inner {
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .intro-corner {
+            position: absolute;
+            width: 40px; height: 40px;
+            border-color: #FFD700;
+            border-style: solid;
+            opacity: 0.8;
+        }
+        
+        @media (min-width: 640px) {
+            .intro-corner { width: 60px; height: 60px; }
+        }
+        
+        .tl { top: 15px; left: 15px; border-width: 3px 0 0 3px; }
+        .tr { top: 15px; right: 15px; border-width: 3px 3px 0 0; }
+        .bl { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; }
+        .br { bottom: 15px; right: 15px; border-width: 0 3px 3px 0; }
+        
+        @media (min-width: 640px) {
+            .tl { top: 30px; left: 30px; }
+            .tr { top: 30px; right: 30px; }
+            .bl { bottom: 30px; left: 30px; }
+            .br { bottom: 30px; right: 30px; }
+        }
+
+        #content-overlay {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            min-height: calc(100vh - 112px); 
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        @media (min-width: 1024px) {
+            #content-overlay {
+                min-height: auto;
+                height: 100vh;
+                padding-top: 0;
+                padding-bottom: 0;
+                justify-content: center;
+            }
+        }
+        
+        #content-overlay.visible-content {
+            opacity: 1;
+        }
+
+        .gold-text {
+            color: #FFD700;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+        }
+
+        .divine-glow {
+            text-shadow: 0 0 20px rgba(255, 69, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4);
+        }
+        
+        .stream-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stream-container:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 3px; height: 1em;
+            margin-left: 2px;
+            background-color: #FFD700;
+            animation: blink 0.7s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: #FFD700; }
+        }
+
+        .message-card {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            width: 90%;
+            max-width: 400px;
+            background: rgba(10, 5, 5, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 2px solid #FFD700;
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+            transform: translate(120%, -50%);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 5000; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2.5rem;
+            border-radius: 20px 0 0 20px;
+        }
+        
+        .message-card.active {
+            transform: translate(0, -50%);
+        }
+
+        @media (min-width: 1280px) {
+            .message-card {
+                position: fixed;
+                top: auto;
+                right: auto;
+                bottom: 3rem; 
+                left: 50%;
+                transform: translateX(-50%) translateY(20px) scale(0.95);
+                width: auto;
+                min-width: 500px;
+                max-width: 700px; 
+                
+                background: linear-gradient(160deg, rgba(20, 5, 5, 0.95) 0%, rgba(50, 10, 10, 0.9) 100%);
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-top: 1px solid rgba(255, 215, 0, 0.6);
+                border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+                border-radius: 24px;
+                
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.9),
+                    0 0 30px rgba(255, 69, 0, 0.1) inset,
+                    0 0 0 1px rgba(255, 215, 0, 0.1) inset;
+
+                padding: 2.5rem;
+                opacity: 0; 
+                transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+                pointer-events: none;
+                z-index: 5000; 
+                text-align: center;
+            }
+
+            .message-card.active {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+                pointer-events: auto;
+            }
+            
+            .message-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 20%;
+                right: 20%;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, #FFD700, transparent);
+                opacity: 0.8;
+            }
+            
+            .message-card button.absolute {
+                top: 1rem;
+                right: 1rem;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 50%;
+                padding: 0.5rem;
+                transition: background 0.3s ease, transform 0.2s ease;
+            }
+            
+            .message-card button.absolute:hover {
+                background: rgba(255, 215, 0, 0.2);
+                transform: rotate(90deg);
+            }
+        }
+
+        .durga-image-container {
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #FFD700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 0, 0, 0.8) inset;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            aspect-ratio: 1 / 1;
+        }
+
+        .durga-image {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 5s ease-in-out;
+        }
+        
+        .durga-image-container:hover .durga-image {
+            transform: scale(1.1);
+        }
+        
+        .reveal-btn {
+            background: linear-gradient(45deg, rgba(139, 0, 0, 0.8), rgba(255, 215, 0, 0.2));
+            backdrop-filter: blur(5px);
+            border: 1px solid #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .reveal-btn:hover {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(139, 0, 0, 0.8));
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            transform: scale(1.05);
+            letter-spacing: 2px;
+        }
+
+        #desktopSidebar {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .desktop-nav-link {
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(0,0,0,0.4);
+        }
+
+        .hand-trigger {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%);
+            border: 1px solid rgba(255, 215, 0, 0.8);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 69, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.3);
+            
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .hand-trigger:hover {
+            transform: scale(1.2) translate(-50%, -50%) !important;
+            background: radial-gradient(circle, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0.1) 80%);
+            box-shadow: 0 0 35px #FFD700, 0 0 60px #FF4500;
+            border-color: #FFD700;
+        }
+        
+        .hand-trigger.right-hand:hover {
+             transform: scale(1.2) translate(50%, -50%) !important;
+        }
+
+        .hand-label {
+            position: absolute;
+            width: 140px;
+            text-align: center;
+            color: #FFD700;
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.6);
+            padding: 4px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        .hand-trigger:hover .hand-label {
+            opacity: 1;
+        }
+
+        .left-hand .hand-label { right: 100%; margin-right: 10px; }
+        .right-hand .hand-label { left: 100%; margin-left: 10px; }
+
+        .durga-halo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 215, 0, 0.1);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .durga-halo-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .arch-path {
+            fill: none;
+            stroke: #FFD700;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+        }
+        
+        .arch-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .shrine-frame {
+            border: 2px solid rgba(184, 115, 51, 0.6);
+            background: radial-gradient(circle at center, rgba(139, 0, 0, 0.4), rgba(0,0,0,0.6));
+            border-radius: 100px 100px 0 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .incense-stick {
+            width: 2px;
+            height: 40px;
+            background: #8B4513;
+            position: relative;
+        }
+        
+        .smoke-puff {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: rgba(200, 200, 200, 0.4);
+            border-radius: 50%;
+            filter: blur(4px);
+            transform: translateX(-50%);
+        }
+
+        .final-nav-link {
+            font-family: 'Cinzel Decorative', serif;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .final-nav-link:hover {
+            color: #FFD700;
+            border-color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .curtain-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 3600; 
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='120' viewBox='0 0 100 120' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='fold' cx='50%25' cy='0%25' r='100%25'%3E%3Cstop offset='0%25' stop-color='%238B0000' /%3E%3Cstop offset='50%25' stop-color='%23600000' /%3E%3Cstop offset='100%25' stop-color='%23300000' /%3E%3C/radialGradient%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23B8860B' /%3E%3Cstop offset='50%25' stop-color='%23FFD700' /%3E%3Cstop offset='100%25' stop-color='%23B8860B' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,0 C30,110 70,110 100,0 Z' fill='url(%23fold)' /%3E%3Cpath d='M0,0 C30,110 70,110 100,0' fill='none' stroke='black' stroke-width='2' opacity='0.3' /%3E%3Cpath d='M0,0 C30,110 70,110 100,0' fill='none' stroke='url(%23gold)' stroke-width='4' stroke-dasharray='2,1' /%3E%3Ccircle cx='50' cy='85' r='4' fill='%23FFD700' /%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 160px 140px; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
+        }
+
+        .curtain-top::before {
+             content: '';
+             position: absolute;
+             top: 0; left: 0; width: 100%; height: 25px;
+             background: linear-gradient(to bottom, #300000, #8B0000, #300000);
+             border-bottom: 2px solid #FFD700;
+             box-shadow: 0 5px 10px rgba(0,0,0,0.7);
+             z-index: 3601;
+        }
+
+        .red-floor-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15vh;
+            z-index: 5;
+            background: linear-gradient(to top, #4a0404 0%, #8B0000 70%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .text-overlay-container {
+            position: relative;
+            z-index: 4000; 
+        }
+
+    </style>
+</head>
+<body class="text-white select-none">
+
+    <div id="canvas-container"></div>
+
+    <div id="final-tableau" class="fixed inset-0 z-[3500] flex flex-col items-center opacity-0 pointer-events-none transition-opacity duration-[3000ms] overflow-hidden">
+        
+        <div class="curtain-top"></div>
+
+        <div class="absolute inset-0 bg-pattern opacity-20 z-0 pointer-events-none"></div>
+        
+        <div class="relative z-10 flex-grow w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 items-end pb-0 lg:pb-0 h-full">
+            
+            <div class="hidden lg:flex col-span-3 flex-col items-center justify-end h-full pb-16 relative">
+                 <div class="shrine-frame w-48 h-80 flex items-center justify-center relative group">
+                    <svg class="absolute -top-12 w-64 h-auto pointer-events-none" viewBox="0 0 100 60">
+                        <path d="M10 60 Q 10 10 50 10 Q 90 10 90 60" class="arch-path" />
+                        <path d="M50 10 L 50 15 M 30 15 L 30 20 M 70 15 L 70 20" stroke="#B87333" stroke-width="1" />
+                    </svg>
+                    <div class="w-32 h-48 bg-black/40 rounded-t-full border border-yellow-500/20 overflow-hidden flex items-center justify-center relative">
+                        <img src="Durga_Main1.jpg" 
+                             class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" 
+                             alt="Devi"
+                             onerror="this.src='https://placehold.co/150x250/4a0404/FFD700?text=Devi';">
+                    </div>
+                    <div class="arti-thali absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50000] opacity-0 transition-opacity duration-2000 pointer-events-none scale-75">
+                        <div class="animate-arti-local">
+                            <svg width="120" height="120" viewBox="0 0 100 100" class="overflow-visible drop-shadow-[0_0_30px_rgba(255,215,0,0.8)]">
+                                <defs>
+                                    <radialGradient id="plateGold" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style="stop-color:#FFFFA0;stop-opacity:1" />
+                                        <stop offset="70%" style="stop-color:#FFD700;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+                                    </radialGradient>
+                                    <filter id="flameGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                                        <feMerge>
+                                            <feMergeNode in="blur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <circle cx="50" cy="50" r="45" fill="url(#plateGold)" stroke="#B87333" stroke-width="2" />
+                                <circle cx="50" cy="50" r="35" fill="none" stroke="#B8860B" stroke-width="1" stroke-dasharray="2 2" />
+                                <circle cx="25" cy="35" r="5" fill="orange" />
+                                <circle cx="75" cy="35" r="5" fill="orange" />
+                                <circle cx="35" cy="70" r="5" fill="#FF4500" />
+                                <circle cx="65" cy="70" r="5" fill="#FF4500" />
+                                <path d="M35 50 Q 50 65 65 50" stroke="#8B4513" stroke-width="1" fill="#8B4513" />
+                                <ellipse cx="50" cy="50" rx="15" ry="5" fill="#FFD700" />
+                                <path d="M50 50 Q 45 40 50 25 Q 55 40 50 50" fill="#FF4500" filter="url(#flameGlow)">
+                                    <animate attributeName="d" values="M50 50 Q 45 40 50 25 Q 55 40 50 50; M50 50 Q 42 38 48 22 Q 58 38 50 50; M50 50 Q 45 40 50 25 Q 55 40 50 50" dur="0.5s" repeatCount="indefinite" />
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="absolute top-4 w-6 h-8 bg-gradient-to-b from-yellow-600 to-yellow-800 rounded-t-full rounded-b-lg shadow-lg animate-pulse-slow"></div>
+                    <div class="absolute -bottom-4 w-full flex justify-center">
+                         <div class="w-16 h-8 bg-gradient-to-t from-yellow-900 to-yellow-600 rounded-b-full border-t-2 border-yellow-400 relative">
+                             <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-5 bg-orange-500 rounded-full blur-sm animate-flicker"></div>
+                         </div>
+                    </div>
+                 </div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-6 flex flex-col items-center justify-end h-full relative">
+                
+                <div class="relative z-20 w-full h-[70vh] flex flex-col items-center justify-end mb-8">
+                    
+                    <div class="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vh] h-[60vh] rounded-full border border-yellow-500/20 shadow-[0_0_100px_rgba(255,215,0,0.15)] animate-spin-slow" style="animation-duration: 60s;"></div>
+                    <div class="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vh] h-[50vh] rounded-full border border-orange-500/20 animate-spin-slow" style="animation-duration: 40s; animation-direction: reverse;"></div>
+
+                    <div class="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] z-20 pointer-events-none flex justify-center items-center">
+                        <div class="absolute w-[65vh] h-[65vh] bg-gradient-radial from-yellow-600/20 via-red-900/5 to-transparent rounded-full blur-2xl animate-pulse-slow"></div>
+                        <svg viewBox="0 0 300 400" class="h-[95%] w-auto opacity-80 drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]">
+                            <defs>
+                                <linearGradient id="archGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#B8860B;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#FFD700;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="40" y="220" width="20" height="180" fill="url(#archGrad)" />
+                            <rect x="240" y="220" width="20" height="180" fill="url(#archGrad)" />
+                            <rect x="35" y="210" width="30" height="10" fill="#8B0000" />
+                            <rect x="235" y="210" width="30" height="10" fill="#8B0000" />
+                            
+                            <path d="M30 220 Q 30 20 150 20 Q 270 20 270 220" fill="none" stroke="url(#archGrad)" stroke-width="12" />
+                            <path d="M30 220 Q 30 20 150 20 Q 270 20 270 220" fill="none" stroke="#FFD700" stroke-width="2" stroke-dasharray="10,5" opacity="0.6"/>
+                            
+                            <path d="M150 10 L 125 40 L 150 55 L 175 40 Z" fill="#8B0000" stroke="#FFD700" />
+                            <circle cx="150" cy="35" r="6" fill="#FFD700" />
+                            
+                            <g stroke="#FFD700" stroke-width="2" stroke-linecap="round">
+                                <line x1="90" y1="60" x2="80" y2="40" />
+                                <line x1="210" y1="60" x2="220" y2="40" />
+                                <line x1="50" y1="130" x2="35" y2="120" />
+                                <line x1="250" y1="130" x2="265" y2="120" />
+                            </g>
+                        </svg>
+                    </div>
+
+                    <img src="Durga_Main.png" 
+                         class="relative z-30 h-[90%] w-auto object-contain drop-shadow-[0_0_50px_rgba(255,165,0,0.6)] mask-image-gradient" 
+                         alt="Goddess Durga"
+                         onerror="this.src='https://placehold.co/600x800/8B0000/FFD700?text=Ma+Durga';">
+                    
+                    <div class="arti-thali absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50000] opacity-0 transition-opacity duration-2000 pointer-events-none scale-125">
+                        <div class="animate-arti-local">
+                            <svg width="120" height="120" viewBox="0 0 100 100" class="overflow-visible drop-shadow-[0_0_30px_rgba(255,215,0,0.8)]">
+                                <circle cx="50" cy="50" r="45" fill="url(#plateGold)" stroke="#B87333" stroke-width="2" />
+                                <circle cx="50" cy="50" r="35" fill="none" stroke="#B8860B" stroke-width="1" stroke-dasharray="2 2" />
+                                <circle cx="25" cy="35" r="5" fill="orange" />
+                                <circle cx="75" cy="35" r="5" fill="orange" />
+                                <circle cx="35" cy="70" r="5" fill="#FF4500" />
+                                <circle cx="65" cy="70" r="5" fill="#FF4500" />
+                                <path d="M35 50 Q 50 65 65 50" stroke="#8B4513" stroke-width="1" fill="#8B4513" />
+                                <ellipse cx="50" cy="50" rx="15" ry="5" fill="#FFD700" />
+                                <path d="M50 50 Q 45 40 50 25 Q 55 40 50 50" fill="#FF4500" filter="url(#flameGlow)">
+                                    <animate attributeName="d" values="M50 50 Q 45 40 50 25 Q 55 40 50 50; M50 50 Q 42 38 48 22 Q 58 38 50 50; M50 50 Q 45 40 50 25 Q 55 40 50 50" dur="0.5s" repeatCount="indefinite" />
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-[45%] left-1/2 -translate-x-1/2 w-[50%] h-[35%] border-b-[12px] border-red-600 rounded-b-full drop-shadow-lg z-40 opacity-90"></div>
+                
+                </div>
+
+                <div class="absolute bottom-0 w-full flex justify-center items-end pb-6 z-40">
+                    <div class="relative flex items-end gap-8 lg:gap-16 px-12 py-4 bg-gradient-to-t from-black via-black/80 to-transparent w-full justify-center">
+                        
+                        <div class="flex flex-col items-center transform scale-90 lg:scale-100">
+                             <div class="w-24 h-6 bg-yellow-700 rounded-[50%] border border-yellow-500 flex justify-center items-end relative shadow-lg">
+                                 <div class="w-6 h-6 bg-red-500 rounded-full absolute bottom-2 left-4 shadow-inner"></div>
+                                 <div class="w-8 h-8 bg-yellow-500 rounded-full absolute bottom-2 right-6 shadow-inner"></div>
+                             </div>
+                        </div>
+
+                        <div class="flex flex-col items-center -mt-8">
+                             <div class="w-4 h-8 bg-orange-400 rounded-full blur-md animate-flicker mb-1"></div>
+                             <div class="w-20 h-10 bg-gradient-to-r from-yellow-800 via-yellow-600 to-yellow-800 rounded-b-full border-t-4 border-yellow-400 shadow-[0_0_30px_rgba(255,140,0,0.6)]"></div>
+                        </div>
+
+                        <div class="flex flex-col items-center mx-4">
+                            <div class="flex space-x-3 mb-1">
+                                <div class="w-[2px] h-16 bg-gray-400/80 relative">
+                                    <div class="smoke-puff animate-smoke" style="animation-delay: 0s;"></div>
+                                    <div class="absolute top-0 w-1 h-1 bg-red-500 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="w-[2px] h-12 bg-gray-400/80 relative">
+                                    <div class="smoke-puff animate-smoke" style="animation-delay: 1s;"></div>
+                                    <div class="absolute top-0 w-1 h-1 bg-red-500 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="w-[2px] h-14 bg-gray-400/80 relative">
+                                    <div class="smoke-puff animate-smoke" style="animation-delay: 0.5s;"></div>
+                                    <div class="absolute top-0 w-1 h-1 bg-red-500 rounded-full animate-pulse"></div>
+                                </div>
+                            </div>
+                            <div class="w-16 h-6 bg-gray-800 rounded-sm border-t border-gray-600 shadow-lg"></div>
+                        </div>
+
+                        <div class="flex flex-col items-center -mt-8">
+                            <div class="w-4 h-8 bg-orange-400 rounded-full blur-md animate-flicker mb-1" style="animation-delay: 0.2s;"></div>
+                            <div class="w-20 h-10 bg-gradient-to-r from-yellow-800 via-yellow-600 to-yellow-800 rounded-b-full border-t-4 border-yellow-400 shadow-[0_0_30px_rgba(255,140,0,0.6)]"></div>
+                       </div>
+
+                       <div class="flex flex-col items-center transform scale-90 lg:scale-100">
+                           <div class="w-24 h-6 bg-yellow-700 rounded-[50%] border border-yellow-500 flex justify-center items-end relative overflow-hidden shadow-lg">
+                               <div class="w-full h-full bg-red-600/50 absolute top-2 rounded-[50%] blur-sm"></div>
+                           </div>
+                       </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex col-span-3 flex-col items-center justify-end h-full pb-16 relative">
+                 <div class="shrine-frame w-48 h-80 flex items-center justify-center relative group">
+                    <svg class="absolute -top-12 w-64 h-auto pointer-events-none" viewBox="0 0 100 60">
+                        <path d="M10 60 Q 10 10 50 10 Q 90 10 90 60" class="arch-path" />
+                        <path d="M50 10 L 50 15 M 30 15 L 30 20 M 70 15 L 70 20" stroke="#B87333" stroke-width="1" />
+                    </svg>
+                    <div class="w-32 h-48 bg-black/40 rounded-t-full border border-yellow-500/20 overflow-hidden flex items-center justify-center relative">
+                        <img src="durga.jpg" 
+                             class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" 
+                             alt="Shakti"
+                             onerror="this.src='https://placehold.co/150x250/4a0404/FFD700?text=Shakti';">
+                    </div>
+                    <div class="arti-thali absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50000] opacity-0 transition-opacity duration-2000 pointer-events-none scale-75">
+                        <div class="animate-arti-local">
+                            <svg width="120" height="120" viewBox="0 0 100 100" class="overflow-visible drop-shadow-[0_0_30px_rgba(255,215,0,0.8)]">
+                                <circle cx="50" cy="50" r="45" fill="url(#plateGold)" stroke="#B87333" stroke-width="2" />
+                                <circle cx="50" cy="50" r="35" fill="none" stroke="#B8860B" stroke-width="1" stroke-dasharray="2 2" />
+                                <circle cx="25" cy="35" r="5" fill="orange" />
+                                <circle cx="75" cy="35" r="5" fill="orange" />
+                                <circle cx="35" cy="70" r="5" fill="#FF4500" />
+                                <circle cx="65" cy="70" r="5" fill="#FF4500" />
+                                <path d="M35 50 Q 50 65 65 50" stroke="#8B4513" stroke-width="1" fill="#8B4513" />
+                                <ellipse cx="50" cy="50" rx="15" ry="5" fill="#FFD700" />
+                                <path d="M50 50 Q 45 40 50 25 Q 55 40 50 50" fill="#FF4500" filter="url(#flameGlow)">
+                                    <animate attributeName="d" values="M50 50 Q 45 40 50 25 Q 55 40 50 50; M50 50 Q 42 38 48 22 Q 58 38 50 50; M50 50 Q 45 40 50 25 Q 55 40 50 50" dur="0.5s" repeatCount="indefinite" />
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                      <div class="absolute top-4 w-6 h-8 bg-gradient-to-b from-yellow-600 to-yellow-800 rounded-t-full rounded-b-lg shadow-lg animate-pulse-slow" style="animation-delay: 1s;"></div>
+                    <div class="absolute -bottom-4 w-full flex justify-center">
+                        <div class="w-16 h-8 bg-gradient-to-t from-yellow-900 to-yellow-600 rounded-b-full border-t-2 border-yellow-400 relative">
+                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-5 bg-orange-500 rounded-full blur-sm animate-flicker" style="animation-delay: 0.5s;"></div>
+                        </div>
+                   </div>
+                 </div>
+            </div>
+
+        </div>
+
+        <div class="red-floor-bottom"></div>
+    </div>
+
+    <div id="intro-screen">
+        <div class="intro-corner tl"></div>
+        <div class="intro-corner tr"></div>
+        <div class="intro-corner bl"></div>
+        <div class="intro-corner br"></div>
+        <div class="intro-border">
+            <div class="intro-border-inner"></div>
+        </div>
+
+        <div class="hidden lg:block absolute left-12 bottom-12 w-24 h-24 z-10 animate-float pointer-events-none">
+             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+                <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+                <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+                <g class="animate-pulse">
+                    <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-l1)" />
+                    <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+                </g>
+                <defs>
+                    <filter id="glow-l1" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+             </svg>
+        </div>
+
+        <div class="hidden lg:block absolute left-48 bottom-24 w-20 h-20 z-10 animate-float pointer-events-none" style="animation-delay: 2s;">
+             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+                <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+                <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+                <g class="animate-pulse">
+                    <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-l2)" />
+                    <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+                </g>
+                <defs>
+                    <filter id="glow-l2" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+             </svg>
+        </div>
+
+         <div class="hidden lg:block absolute left-16 bottom-56 w-20 h-20 z-10 animate-float pointer-events-none" style="animation-delay: 1s;">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+               <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+               <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+               <g class="animate-pulse">
+                   <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-l3)" />
+                   <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+               </g>
+               <defs>
+                   <filter id="glow-l3" x="-50%" y="-50%" width="200%" height="200%">
+                       <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                       <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                   </filter>
+               </defs>
+            </svg>
+       </div>
+
+        <div class="hidden lg:block absolute left-64 bottom-12 w-24 h-24 z-10 animate-float pointer-events-none" style="animation-delay: 3s;">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+               <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+               <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+               <g class="animate-pulse">
+                   <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-l4)" />
+                   <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+               </g>
+               <defs>
+                   <filter id="glow-l4" x="-50%" y="-50%" width="200%" height="200%">
+                       <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                       <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                   </filter>
+               </defs>
+            </svg>
+       </div>
+
+        <div class="hidden lg:block absolute right-12 bottom-12 w-24 h-24 z-10 animate-float pointer-events-none" style="animation-delay: 0.5s;">
+             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+                <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+                <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+                <g class="animate-pulse">
+                    <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-r1)" />
+                    <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+                </g>
+                <defs>
+                    <filter id="glow-r1" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+             </svg>
+        </div>
+
+        <div class="hidden lg:block absolute right-48 bottom-24 w-20 h-20 z-10 animate-float pointer-events-none" style="animation-delay: 2.5s;">
+             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+                <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+                <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+                <g class="animate-pulse">
+                    <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-r2)" />
+                    <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+                </g>
+                <defs>
+                    <filter id="glow-r2" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+             </svg>
+        </div>
+
+        <div class="hidden lg:block absolute right-16 bottom-56 w-20 h-20 z-10 animate-float pointer-events-none" style="animation-delay: 1.5s;">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+               <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+               <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+               <g class="animate-pulse">
+                   <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-r3)" />
+                   <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+               </g>
+               <defs>
+                   <filter id="glow-r3" x="-50%" y="-50%" width="200%" height="200%">
+                       <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                       <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                   </filter>
+               </defs>
+            </svg>
+       </div>
+
+        <div class="hidden lg:block absolute right-64 bottom-12 w-24 h-24 z-10 animate-float pointer-events-none" style="animation-delay: 3.5s;">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_-10px_20px_rgba(255,100,0,0.5)]">
+               <path d="M40 120 C 40 160, 160 160, 160 120 C 160 120, 100 140, 40 120" fill="#8B4513" stroke="#FFD700" stroke-width="2"/>
+               <ellipse cx="100" cy="120" rx="60" ry="15" fill="#654321" stroke="#FFD700" stroke-width="1"/>
+               <g class="animate-pulse">
+                   <path d="M100 125 Q 70 80, 100 30 Q 130 80, 100 125" fill="#FF4500" filter="url(#glow-r4)" />
+                   <path d="M100 120 Q 85 85, 100 50 Q 115 85, 100 120" fill="#FFD700" />
+               </g>
+               <defs>
+                   <filter id="glow-r4" x="-50%" y="-50%" width="200%" height="200%">
+                       <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                       <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                   </filter>
+               </defs>
+            </svg>
+       </div>
+
+        <div class="text-center p-4 max-w-2xl relative z-10 flex flex-col items-center justify-center w-full">
+            
+            <div class="mb-4 sm:mb-6 animate-float durga-image-container w-40 h-40 sm:w-56 sm:h-56 md:w-60 md:h-60 lg:w-64 lg:h-64 shrink-0">
+                <img src="durga.jpg" 
+                     alt="Goddess Durga" 
+                     class="durga-image"
+                     onerror="this.src='https://placehold.co/400x400/8B0000/FFD700?text=Ma+Durga';">
+            </div>
+            
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-divine text-primary-gold mb-4 sm:mb-6 divine-glow tracking-wide px-2">
+                The Divine Reflection
+            </h1>
+            
+            <div class="space-y-4 mb-8 sm:mb-10 max-w-lg">
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-100 leading-relaxed font-title-serif italic">
+                    Just as Ma Durga wields power in her ten hands,<br>
+                    you too hold ten distinct gifts.
+                </p>
+                
+                <div class="h-px w-24 sm:w-32 bg-gradient-to-r from-transparent via-primary-gold to-transparent mx-auto opacity-50"></div>
+                
+                <p class="text-base sm:text-lg text-red-200 font-light tracking-wider px-4">
+                    EACH HAND DEFINES A SKILL.<br>EACH SKILL DEFINES A PART OF YOUR SOUL.
+                </p>
+            </div>
+
+            <button onclick="enterExperience()" 
+                class="reveal-btn px-8 py-3 sm:px-12 sm:py-4 text-primary-gold font-bold text-lg sm:text-xl rounded-sm uppercase tracking-widest">
+                Reveal Your Powers
+            </button>
+        </div>
+    </div>
+
+    <button id="navToggle" class="fixed top-6 left-6 z-[5000] p-2 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2 nav-panel-style transition-opacity duration-1000">
+        <svg id="navToggleIcon" class="w-6 h-6 gold-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden gold-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+    <div class="lg:hidden">
+        <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[4500] h-16 shadow-md flex items-center justify-center space-x-2 -translate-y-full nav-panel-style">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Message</a>
+            <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Music</a>
+        </nav>
+        
+        <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[4500] h-16 shadow-md flex items-center justify-center space-x-2 translate-y-full nav-panel-style">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[4500] w-20 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20 nav-panel-style">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">21 Wishes</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[4500] w-22 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20 nav-panel-style">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium-transition-colors duration-200 festive-text">Food</a>
+        </nav>
+    </div>
+
+    <nav id="desktopSidebar" class="hidden lg:flex fixed top-0 left-0 h-full w-96 z-[4500] -translate-x-full nav-panel-style flex-col pt-24 pb-8">
+        <div class="px-6 pb-4 border-b border-yellow-500/30 mb-4">
+            <h2 class="text-2xl font-divine text-primary-gold text-center">Navigation</h2>
+        </div>
+        
+        <div id="desktopSidebarScroll" class="flex-1 overflow-y-auto px-4">
+            <div class="grid grid-cols-2 gap-3">
+                <a href="index.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Home</a>
+                <a href="Cake.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Cake</a>
+                <a href="21_Wish.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">21 Wishes</a>
+                <a href="chat.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Heaven</a>
+                <a href="Diary.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Diary</a>
+                <a href="anatomy.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Anatomy</a>
+                <a href="Box.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Box</a>
+                <a href="Special.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Special</a>
+                <a href="you.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">You</a>
+                <a href="color.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Color</a>
+                <a href="Teacher.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Teacher</a>
+                <a href="Universe.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Universe</a>
+                <a href="The_River.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">River</a>
+                <a href="Mountain.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Mountain</a>
+                <a href="Skill.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Skill</a>
+                <a href="Paper_Star.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Paper Star</a>
+                <a href="Carttoon.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Cartoon</a>
+                <a href="Periodik_table.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Periodik Table</a>
+                <a href="Concept.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Concept</a>
+                <a href="Calender.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Calender</a>
+                <a href="Perspective.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Perspective</a>
+                <a href="Santa.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Santa</a>
+                <a href="Presence.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Presence</a>
+                <a href="Cloud.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Cloud</a>
+                <a href="Ink.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Paint</a>
+                <a href="Butterfly.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Butterfly</a>
+                <a href="Weather.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Weather</a>
+                <a href="Spotlight.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Spotlight</a>
+                <a href="Room.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Room</a>
+                <a href="Radio.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Radio</a>
+                <a href="Food.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Food</a>
+                <a href="Music.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Music</a>
+                <a href="letter.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Letter</a>
+                <a href="Msg.html" class="desktop-nav-link p-2 rounded-md text-sm font-medium festive-text">Message</a>
+            </div>
+        </div>
+        <div class="px-6 pt-4 border-t border-yellow-500/30 mt-4 text-center text-xs text-gray-400">
+            <p>Sovereignty Streams</p>
+        </div>
+    </nav>
+    
+    <main id="mainContent" class="absolute inset-0 pt-28 overflow-y-auto lg:overflow-hidden lg:pt-0 lg:flex lg:flex-col lg:justify-center">
+
+        <div id="content-overlay">
+            <main class="w-full max-w-6xl p-4 sm:p-6 flex flex-col items-center justify-center lg:h-full">
+                
+                <header class="w-full text-center pb-8 pt-4 lg:pb-4 lg:pt-0 text-overlay-container">
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-wider gold-text font-title-serif">
+                        The Decuple Stream of Sovereignty
+                    </h1>
+                    <p class="mt-2 text-lg text-gray-300 italic">
+                        The Ten Hands of Power
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full justify-center mb-8 lg:hidden">
+                    
+                    <div id="stream-0" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(0, 'The Warrior’s Edge (Karate)', 'The discipline forged in motion gives you unshakeable confidence. Your strength is your grace and your focus.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #FF4D4D;">Karate</h3>
+                        <p class="text-sm text-gray-400">Dynamic Power</p>
+                    </div>
+
+                    <div id="stream-1" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(1, 'The Scholar’s Center (Yoga)', 'Your inner focus creates stability amidst life\'s chaos. This calm center allows you to pursue dreams with clarity and peace.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #4287F5;">Yoga</h3>
+                        <p class="text-sm text-gray-400">Inner Calm</p>
+                    </div>
+
+                    <div id="stream-2" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(2, 'The Future Architect (College)', 'Your hunger for knowledge proves your ambition. Every hour you spend studying is a brick laid for a magnificent future.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #4CAF50;">College</h3>
+                        <p class="text-sm text-gray-400">Magnificent Future</p>
+                    </div>
+                    
+                    <div id="stream-3" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(3, 'The Creative Flow (Drawing)', 'Your art is a window into your soul a vibrant world of colors and ideas. You put emotion in the canvas.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #FFC107;">Drawing</h3>
+                        <p class="text-sm text-gray-400">Vibrant Ideas</p>
+                    </div>
+
+                    <div id="stream-4" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(4, 'The Zenith of Focus (Olympic Shooting)', 'The stillness required for the perfect shot mirrors your inner calm under pressure. Your precision, patience, and unwavering focus ensure you always hit your mark in life.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #CD7F32;">Shooting</h3>
+                        <p class="text-sm text-gray-400">Unwavering Focus</p>
+                    </div>
+                    
+                    <div id="stream-5" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(5, 'The Torchbearer’s Light (Teaching)', 'Your ability to share knowledge and inspire growth illuminates paths for others. The wisdom you impart creates an infinite chain of light.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #00FFFF;">Teaching</h3>
+                        <p class="text-sm text-gray-400">Infinite Light</p>
+                    </div>
+
+                    <div id="stream-6" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(6, 'The Natural Healer (Tree Medicine)', 'Your connection to nature allows you to harness its quiet strength, providing healing and wisdom to those around you.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #FF9800;">Tree Medicine</h3>
+                        <p class="text-sm text-gray-400">Nurturing Wisdom</p>
+                    </div>
+
+                    <div id="stream-7" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(7, 'The Voyager’s Spirit (Seamanship)', 'Like a master of the seas, you navigate life’s unpredictable tides with intuition and grace. Your resilience steers you through every storm to new horizons.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #20B2AA;">Seamanship</h3>
+                        <p class="text-sm text-gray-400">Steadfast Navigation</p>
+                    </div>
+
+                    <div id="stream-8" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(8, 'The Fearless Spirit (Adventure Sports)', 'Whether trekking high peaks or diving from the skies, your courage conquers fear. You embrace challenges with a bold spirit that reaches new heights.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #8E24AA;">Adventure</h3>
+                        <p class="text-sm text-gray-400">Boundless Courage</p>
+                    </div>
+
+                    <div id="stream-9" class="stream-container rounded-xl p-4 text-center cursor-pointer w-full" 
+                        onclick="activateStream(9, 'The Nourishing Heart (Cooking)', 'You feed not just bodies but souls, blending love into every flavor. Your care provides the warmth that sustains us all.')">
+                        <h3 class="text-xl font-bold mb-1" style="color: #E91E63;">Cooking</h3>
+                        <p class="text-sm text-gray-400">Sustaining Love</p>
+                    </div>
+                </div>
+
+                <div class="hidden lg:flex relative w-full max-w-4xl mx-auto h-[450px] mb-4 lg:mb-0 items-center justify-center">
+                    
+                    <div class="durga-halo animate-spin-slow" style="width: 420px; height: 420px;"></div>
+                    <div class="durga-halo-inner animate-pulse-slow" style="width: 340px; height: 340px;"></div>
+                    
+                    <div class="relative z-20 h-[260px] w-auto flex justify-center items-center">
+                         <img src="durga.jpg" 
+                             alt="Ma Durga" 
+                             class="h-full w-auto object-contain drop-shadow-[0_0_25px_rgba(255,215,0,0.5)] rounded-lg"
+                             onerror="this.src='https://placehold.co/400x500/8B0000/FFD700?text=Ma+Durga+with+10+Hands';">
+                    </div>
+
+                    <div class="hand-trigger left-hand" style="top: 15%; left: 30%; transform: translate(-50%, -50%);" 
+                         onclick="activateStream(0, 'The Warrior’s Edge (Karate)', 'The discipline you’ve built through karate shows in every quiet choice you make.Strength looks different on you calm, controlled, beautifully steady.You carry power the way most people carry a secret.')">
+                         <span class="text-xl">🥋</span>
+                         <div class="hand-label">Karate (Warrior)</div>
+                    </div>
+                    
+                    <div class="hand-trigger left-hand" style="top: 32%; left: 22%; transform: translate(-50%, -50%);" 
+                         onclick="activateStream(1, 'The Scholar’s Center (Yoga)', 'The ease with which you find balance feels like a gift reserved for a few.There’s a softness in your calm that settles everything around you.Even stillness becomes graceful when it belongs to you.')">
+                         <span class="text-xl">🧘</span>
+                         <div class="hand-label">Yoga (Scholar)</div>
+                    </div>
+
+                    <div class="hand-trigger left-hand" style="top: 50%; left: 18%; transform: translate(-50%, -50%);" 
+                         onclick="activateStream(2, 'The Future Architect (College)', 'The future feels brighter when your name is attached to it.You don’t chase excellence you grow into it naturally. Anyone watching you study would know you’re made for something big.')">
+                         <span class="text-xl">🎓</span>
+                         <div class="hand-label">College (Future)</div>
+                    </div>
+
+                    <div class="hand-trigger left-hand" style="top: 68%; left: 22%; transform: translate(-50%, -50%);" 
+                         onclick="activateStream(3, 'The Creative Flow (Drawing)', 'The way you shape lines feels like you’re giving emotion a place to rest.Your art doesn’t just look good it feels lived in.You draw like someone who sees the world deeper than most.')">
+                         <span class="text-xl">🎨</span>
+                         <div class="hand-label">Drawing (Creative)</div>
+                    </div>
+
+                    <div class="hand-trigger left-hand" style="top: 85%; left: 30%; transform: translate(-50%, -50%);" 
+                         onclick="activateStream(4, 'The Zenith of Focus (Olympic Shooting)', 'Your focus is the kind that can quiet a crowded room.Precision isn’t just your skill it’s your character.You aim with intention, and that’s what makes you unforgettable.')">
+                         <span class="text-xl">🎯</span>
+                         <div class="hand-label">Shooting (Focus)</div>
+                    </div>
+
+
+                    <div class="hand-trigger right-hand" style="top: 15%; right: 30%; transform: translate(50%, -50%);" 
+                         onclick="activateStream(5, 'The Torchbearer’s Light (Teaching)', 'You explain things with a patience that feels almost healing.Some people teach facts you teach clarity.You make learning feel like light spreading into a room.')">
+                         <span class="text-xl">🕯️</span>
+                         <div class="hand-label">Teaching (Light)</div>
+                    </div>
+
+                    <div class="hand-trigger right-hand" style="top: 32%; right: 22%; transform: translate(50%, -50%);" 
+                         onclick="activateStream(6, 'The Natural Healer (Tree Medicine)', 'There’s something timeless in the way you understand nature.Caring for life even the quiet ones suits you perfectly.Your knowledge carries a kind of warmth that can’t be taught.')">
+                         <span class="text-xl">🌿</span>
+                         <div class="hand-label">Tree Medicine (Healer)</div>
+                    </div>
+
+                    <div class="hand-trigger right-hand" style="top: 50%; right: 18%; transform: translate(50%, -50%);" 
+                         onclick="activateStream(7, 'The Voyager’s Spirit (Seamanship)', 'You navigate challenges the way a skilled sailor reads the wind calmly, instinctively.Courage comes naturally to you, like you were born steady.Even storms feel smaller beside your strength.')">
+                         <span class="text-xl">⚓</span>
+                         <div class="hand-label">Seamanship (Voyager)</div>
+                    </div>
+
+                    <div class="hand-trigger right-hand" style="top: 68%; right: 22%; transform: translate(50%, -50%);" 
+                         onclick="activateStream(8, 'The Fearless Spirit (Adventure Sports)', 'Whether trekking high peaks or diving from the skies, your courage conquers fear. You embrace challenges with a bold spirit that reaches new heights.')">
+                         <span class="text-xl">🧗</span>
+                         <div class="hand-label">Adventure (Fearless)</div>
+                    </div>
+
+                    <div class="hand-trigger right-hand" style="top: 85%; right: 30%; transform: translate(50%, -50%);" 
+                         onclick="activateStream(9, 'The Nourishing Heart (Cooking)', 'You feed not just bodies but heart, blending love into every flavor. Your care provides the warmth that sustains us all.')">
+                         <span class="text-xl">🍳</span>
+                         <div class="hand-label">Cooking (Nourishing)</div>
+                    </div>
+
+                </div>
+                
+            </main>
+            <div class="h-96 w-full lg:hidden"></div> 
+        </div>
+
+    </main>
+
+    <div id="message-card" class="message-card">
+        <button onclick="closeMessageCard()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <h3 id="message-title" class="text-2xl sm:text-3xl font-bold gold-text mb-4 text-center min-h-8">
+            
+        </h3>
+        <p id="typed-message" class="text-lg italic text-gray-300 min-h-24 text-center">
+            
+        </p>
+        
+        <div id="unlock-container" class="mt-6 text-center hidden">
+            <button onclick="checkCompletion()" id="final-button"
+                class="bg-accent-pink hover:bg-red-500 text-white font-bold py-3 px-8 rounded-full text-lg 
+                            transition duration-300 transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                See the Final Wish (0/10)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const NUM_STREAMS = 10;
+        const collectedTributes = Array(NUM_STREAMS).fill(false);
+        const finalMessage = "Like Ma Durga, you wield ten powers: Discipline, peace, knowledge, creativity, focus, illumination, nurture, navigation, courage, and sustenance. On your birthday, I bow to the divinity within you. Happy Birthday!";
+        
+        let typingInterval = null;
+        let activeMessageIndex = -1;
+
+        const messageCard = document.getElementById('message-card');
+        const messageTitle = document.getElementById('message-title');
+        const typedMessageElement = document.getElementById('typed-message');
+        const finalButton = document.getElementById('final-button');
+        const finalTableau = document.getElementById('final-tableau');
+
+        const navLinks = document.querySelectorAll('.nav-panel .nav-link');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const bottomNav = document.getElementById('bottomNav');
+        const leftNav = document.getElementById('leftNav');
+        const rightNav = document.getElementById('rightNav');
+        
+        const desktopSidebar = document.getElementById('desktopSidebar');
+        const desktopNavLinks = document.querySelectorAll('.desktop-nav-link');
+        
+        const navToggle = document.getElementById('navToggle');
+        const navToggleIcon = document.getElementById('navToggleIcon');
+        const navToggleX = document.getElementById('navToggleX');
+        
+        let areNavsOpen = false;
+        
+        function enterExperience() {
+            const intro = document.getElementById('intro-screen');
+            const content = document.getElementById('content-overlay');
+            
+            intro.classList.add('hidden-intro');
+            content.classList.add('visible-content');
+        }
+
+        let scene, camera, renderer, particles, geometry, material;
+        let ambientLight;
+        const particleCount = 8000;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const velocities = new Float32Array(particleCount * 3);
+        const particleAttributes = [];
+        const particleSize = 0.5;
+        
+        let thaliGroups = []; 
+        let is3DThaliActive = false;
+
+        const colorsList = [
+            new THREE.Color(0xFF4D4D), 
+            new THREE.Color(0x4287F5), 
+            new THREE.Color(0x4CAF50), 
+            new THREE.Color(0xFFC107), 
+            new THREE.Color(0xCD7F32), 
+            new THREE.Color(0x00FFFF), 
+            new THREE.Color(0xFF9800), 
+            new THREE.Color(0x20B2AA), 
+            new THREE.Color(0x3F51B5), 
+            new THREE.Color(0xE91E63)  
+        ];
+
+        let finalExplosionActive = false;
+        let worshipDesignActive = false;
+        let alponaRings = []; 
+        
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(width, height);
+            container.appendChild(renderer.domElement);
+            camera.position.z = 50;
+
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xFFD700, 0, 100);
+            pointLight.position.set(0, 0, 0);
+            scene.add(pointLight);
+            scene.userData.pointLight = pointLight;
+
+            const orbGeometry = new THREE.SphereGeometry(1, 16, 16);
+            const orbMaterial = new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending });
+            const centralOrb = new THREE.Mesh(orbGeometry, orbMaterial);
+            centralOrb.position.set(0, 0, 0);
+            scene.add(centralOrb);
+            scene.userData.centralOrb = centralOrb;
+
+            geometry = new THREE.BufferGeometry();
+            
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+                
+                velocities[i * 3] = 0;
+                velocities[i * 3 + 1] = 0;
+                velocities[i * 3 + 2] = 0;
+
+                const colorIndex = i % NUM_STREAMS;
+                const color = colorsList[colorIndex];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+                
+                particleAttributes.push({
+                    colorIndex: colorIndex,
+                    target: new THREE.Vector3(0, 0, 0),
+                    collected: false,
+                    velocity: new THREE.Vector3(0, 0, 0),
+                    originalPos: new THREE.Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2])
+                });
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+
+            material = new THREE.PointsMaterial({
+                size: particleSize,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                sizeAttenuation: true
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            window.addEventListener('resize', onWindowResize, false);
+            
+            animate();
+        }
+
+        
+        function createFlameTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const context = canvas.getContext('2d');
+            
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 200, 1)'); 
+            gradient.addColorStop(0.3, 'rgba(255, 160, 0, 0.9)'); 
+            gradient.addColorStop(0.7, 'rgba(100, 0, 0, 0.4)'); 
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); 
+            
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 64, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            return texture;
+        }
+
+        function createGoldTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(0, 0, 128, 128);
+            
+            for (let i = 0; i < 500; i++) {
+                ctx.fillStyle = `rgba(184, 134, 11, ${Math.random() * 0.5})`;
+                ctx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
+            }
+            
+            ctx.strokeStyle = 'rgba(218, 165, 32, 0.5)';
+            ctx.lineWidth = 1;
+            for(let i=10; i<64; i+=5) {
+                ctx.beginPath();
+                ctx.arc(64, 64, i, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            return texture;
+        }
+
+        function create3DThali() {
+            const thaliGroup = new THREE.Group();
+
+            const goldTex = createGoldTexture();
+            const flameTex = createFlameTexture();
+
+            const goldMaterial = new THREE.MeshStandardMaterial({ 
+                map: goldTex,
+                color: 0xFFD700, 
+                metalness: 0.8, 
+                roughness: 0.4,
+                side: THREE.DoubleSide
+            });
+            
+            const marigoldMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xFFA500, 
+                roughness: 1.0,
+                emissive: 0xFF4500,
+                emissiveIntensity: 0.2
+            });
+
+            const diyaMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.8 });
+
+            const flameMaterial = new THREE.SpriteMaterial({ 
+                map: flameTex, 
+                color: 0xffffff,
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
+            
+            const plateGeo = new THREE.CylinderGeometry(4.5, 4.5, 0.1, 64);
+            const plate = new THREE.Mesh(plateGeo, goldMaterial);
+            thaliGroup.add(plate);
+
+            const rimGeo = new THREE.TorusGeometry(4.5, 0.15, 16, 64);
+            const rim = new THREE.Mesh(rimGeo, goldMaterial);
+            rim.rotation.x = Math.PI / 2;
+            thaliGroup.add(rim);
+
+            const flowerCount = 20;
+            const flowerRadius = 4.0;
+            for(let i=0; i<flowerCount; i++) {
+                const angle = (i / flowerCount) * Math.PI * 2;
+                const fGeo = new THREE.SphereGeometry(0.5, 8, 8);
+                const flower = new THREE.Mesh(fGeo, marigoldMaterial);
+                
+                const r = flowerRadius + (Math.random() - 0.5) * 0.2;
+                flower.position.set(Math.cos(angle)*r, 0.15, Math.sin(angle)*r);
+                
+                const centerGeo = new THREE.SphereGeometry(0.2, 4, 4);
+                const centerMat = new THREE.MeshBasicMaterial({color: 0xFFFF00});
+                const center = new THREE.Mesh(centerGeo, centerMat);
+                center.position.y = 0.4;
+                flower.add(center);
+
+                thaliGroup.add(flower);
+            }
+
+            const diyaGeo = new THREE.CylinderGeometry(1.2, 0.8, 0.8, 16);
+            const diya = new THREE.Mesh(diyaGeo, diyaMaterial);
+            diya.position.set(0, 0.4, 2.5); 
+            thaliGroup.add(diya);
+            
+            const oilGeo = new THREE.CircleGeometry(1.1, 16);
+            const oilMat = new THREE.MeshStandardMaterial({color: 0x331100, roughness: 0.2});
+            const oil = new THREE.Mesh(oilGeo, oilMat);
+            oil.rotation.x = -Math.PI / 2;
+            oil.position.y = 0.41;
+            diya.add(oil);
+
+            const flameSprite = new THREE.Sprite(flameMaterial);
+            flameSprite.scale.set(3, 3, 1);
+            flameSprite.position.set(0, 1.5, 0); 
+            flameSprite.userData = { isFlame: true, baseScale: 3 };
+            diya.add(flameSprite);
+            
+            const flameLight = new THREE.PointLight(0xFFaa00, 2, 8);
+            flameLight.position.set(0, 1, 0);
+            diya.add(flameLight);
+
+            const stickGeo = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
+            const stickMat = new THREE.MeshStandardMaterial({color: 0x222222});
+            const stick = new THREE.Mesh(stickGeo, stickMat);
+            stick.position.set(2, 1, -1);
+            stick.rotation.x = 0.2;
+            thaliGroup.add(stick);
+            
+            const smokeGeo = new THREE.BufferGeometry();
+            const smokeCount = 30;
+            const smokePos = new Float32Array(smokeCount * 3);
+            for(let i=0; i<smokeCount*3; i++) smokePos[i] = 0;
+            smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePos, 3));
+            
+            const smokeMat = new THREE.PointsMaterial({
+                color: 0xaaaaaa, 
+                size: 0.5, 
+                transparent: true, 
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const smoke = new THREE.Points(smokeGeo, smokeMat);
+            smoke.position.set(0, 1, 0); 
+            stick.add(smoke);
+            
+            stick.userData = { isIncense: true, smokeParticles: smoke, positions: smokePos };
+
+            thaliGroup.rotation.x = 0.4; 
+
+            return thaliGroup;
+        }
+
+        function createBengaliWorshipDesign() {
+            if (worshipDesignActive) return;
+            worshipDesignActive = true;
+
+            const worshipGroup = new THREE.Group();
+            worshipGroup.rotation.x = 0; 
+            scene.add(worshipGroup);
+            
+            worshipGroup.position.y = 5; 
+
+            const createHaloRing = (radius, color, tube = 0.1, segments = 64) => {
+                const geo = new THREE.TorusGeometry(radius, tube, 16, segments);
+                const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.6 });
+                const mesh = new THREE.Mesh(geo, mat);
+                worshipGroup.add(mesh);
+                return mesh;
+            };
+
+            const ring1 = createHaloRing(22, 0xFFD700, 0.2); 
+            const ring2 = createHaloRing(25, 0xB87333, 0.1); 
+            const ring3 = createHaloRing(28, 0xFFD700, 0.05); 
+            
+            const complexGeo = new THREE.TorusKnotGeometry(26, 0.5, 200, 32, 2, 3);
+            const complexMat = new THREE.MeshBasicMaterial({ color: 0xB87333, wireframe: true, transparent: true, opacity: 0.3 });
+            const complexRing = new THREE.Mesh(complexGeo, complexMat);
+            worshipGroup.add(complexRing);
+            
+            alponaRings.push({ mesh: complexRing, speed: 0.005, type: 'center' });
+            alponaRings.push({ mesh: ring1, speed: -0.01, type: 'ring' });
+            alponaRings.push({ mesh: ring2, speed: 0.008, type: 'ring' });
+
+
+            const rayCount = 24;
+            const rays = new THREE.Group();
+            for(let i=0; i<rayCount; i++) {
+                const angle = (i / rayCount) * Math.PI * 2;
+                const rayGeo = new THREE.BoxGeometry(0.2, 10, 0.1);
+                const rayMat = new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.4 });
+                const ray = new THREE.Mesh(rayGeo, rayMat);
+                
+                ray.position.set(Math.cos(angle) * 35, Math.sin(angle) * 35, -2);
+                ray.rotation.z = angle + Math.PI/2;
+                rays.add(ray);
+            }
+            worshipGroup.add(rays);
+            alponaRings.push({ mesh: rays, speed: 0.002, type: 'ring' });
+
+
+            const emberCount = 200;
+            const emberGeo = new THREE.BufferGeometry();
+            const emberPos = new Float32Array(emberCount * 3);
+            
+            for(let i=0; i<emberCount; i++) {
+                emberPos[i*3] = (Math.random() - 0.5) * 80; 
+                emberPos[i*3+1] = (Math.random() - 0.5) * 60 - 20; 
+                emberPos[i*3+2] = (Math.random() - 0.5) * 20;
+            }
+            emberGeo.setAttribute('position', new THREE.BufferAttribute(emberPos, 3));
+            const emberMat = new THREE.PointsMaterial({ color: 0xFF8800, size: 0.3, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+            const embers = new THREE.Points(emberGeo, emberMat);
+            worshipGroup.add(embers);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particles.rotation.z += 0.0005;
+            particles.rotation.x += 0.0002;
+            
+            if (worshipDesignActive) {
+                alponaRings.forEach(obj => {
+                    obj.mesh.rotation.z += obj.speed;
+                });
+            }
+
+            if (is3DThaliActive && thaliGroups.length > 0) {
+                const time = Date.now() * 0.001; 
+                
+                thaliGroups.forEach((group, index) => {
+                    if (group.userData.basePos) {
+                        const base = group.userData.basePos;
+                        const r = group.userData.radius;
+                        const speed = group.userData.speed;
+                        const phase = group.userData.phase || 0;
+
+                        group.position.x = base.x + Math.cos(time * speed + phase) * r;
+                        group.position.y = base.y + Math.sin(time * speed + phase) * r;
+                        group.position.z = base.z; 
+                        
+                        group.position.z += Math.sin(time * 3) * 0.5;
+                        
+                        group.rotation.z = Math.cos(time * speed + phase) * 0.2;
+                    }
+
+                    group.traverse((child) => {
+                        if (child.userData && child.userData.isFlame) {
+                            const flicker = 0.9 + Math.random() * 0.2;
+                            child.scale.setScalar(child.userData.baseScale * flicker);
+                            child.material.rotation += (Math.random()-0.5) * 0.1;
+                        }
+                        
+                        if (child.userData && child.userData.isIncense) {
+                            const positions = child.userData.positions;
+                            for(let i=0; i < positions.length; i+=3) {
+                                positions[i+1] += 0.05; 
+                                positions[i] += Math.sin(time + positions[i+1]) * 0.01;
+                                
+                                if(positions[i+1] > 3) {
+                                    positions[i+1] = 0;
+                                    positions[i] = 0;
+                                    positions[i+2] = 0;
+                                }
+                            }
+                            child.userData.smokeParticles.geometry.attributes.position.needsUpdate = true;
+                        }
+                    });
+                });
+            }
+            
+            const positionAttribute = geometry.attributes.position;
+            const velocityAttribute = geometry.attributes.velocity;
+            
+            const centralOrb = scene.userData.centralOrb;
+
+            if (centralOrb && !worshipDesignActive) {
+                if (collectedTributes.every(Boolean)) {
+                      centralOrb.material.opacity = 0.5 + Math.sin(Date.now() * 0.005) * 0.3;
+                      centralOrb.scale.setScalar(2 + Math.sin(Date.now() * 0.003) * 0.3);
+                      centralOrb.material.color.set(0xEC4899); 
+                } else if (collectedTributes.some(Boolean)) {
+                    centralOrb.material.color.set(0xFFD700);
+                    centralOrb.material.opacity = 0.4;
+                    centralOrb.scale.setScalar(1.2 + Math.sin(Date.now() * 0.008) * 0.1);
+                } else {
+                    centralOrb.material.color.set(0xFFD700);
+                    centralOrb.scale.setScalar(1 + Math.sin(Date.now() * 0.003) * 0.05);
+                    centralOrb.material.opacity = 0.15 + Math.cos(Date.now() * 0.001) * 0.05;
+                }
+            }
+
+
+            for (let i = 0; i < particleCount; i++) {
+                const attr = particleAttributes[i];
+                
+                if (finalExplosionActive) {
+                    positionAttribute.setX(i, positionAttribute.getX(i) + velocityAttribute.getX(i));
+                    positionAttribute.setY(i, positionAttribute.getY(i) + velocityAttribute.getY(i));
+                    positionAttribute.setZ(i, positionAttribute.getZ(i) + velocityAttribute.getZ(i));
+                    
+                    material.opacity = Math.max(0, material.opacity - 0.0002);
+
+                } else if (attr.collected && !worshipDesignActive) {
+                    const currentPos = new THREE.Vector3(
+                        positionAttribute.getX(i),
+                        positionAttribute.getY(i),
+                        positionAttribute.getZ(i)
+                    );
+                    
+                    currentPos.lerp(attr.target, 0.05);
+                    
+                    positionAttribute.setXYZ(i, currentPos.x, currentPos.y, currentPos.z);
+                } else {
+                    positionAttribute.setY(i, attr.originalPos.y + Math.sin(Date.now() * 0.001 + i) * 0.5);
+                    positionAttribute.setX(i, attr.originalPos.x + Math.cos(Date.now() * 0.001 + i) * 0.5);
+                }
+            }
+            
+            positionAttribute.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        function activateStream(index, title, message) {
+            
+            if (typingInterval) clearInterval(typingInterval);
+            typedMessageElement.textContent = '';
+            
+            messageCard.classList.add('active');
+            messageTitle.textContent = title;
+            typeMessage(message); 
+
+            if (!collectedTributes[index]) {
+                startParticleCollection(index);
+                collectedTributes[index] = true;
+                
+                const count = collectedTributes.filter(Boolean).length;
+                finalButton.textContent = `See the Final Wish (${count}/${NUM_STREAMS})`;
+                
+                const streamElement = document.getElementById(`stream-${index}`);
+                if (streamElement) {
+                    streamElement.classList.remove('cursor-pointer', 'stream-container:hover');
+                    streamElement.classList.add('opacity-50', 'cursor-default');
+                }
+            }
+        }
+        
+        function closeMessageCard() {
+            messageCard.classList.remove('active');
+            
+            if (finalExplosionActive && window.innerWidth >= 1024) {
+                const mainContent = document.getElementById('mainContent');
+                if (mainContent) {
+                    
+                    mainContent.style.opacity = '1';
+                }
+                if (!is3DThaliActive) {
+                    const thalis = document.querySelectorAll('.arti-thali');
+                    thalis.forEach(thali => {
+                        thali.classList.remove('opacity-0', 'pointer-events-none');
+                    });
+                }
+            }
+        }
+        
+        function startParticleCollection(indexToCollect) {
+            const centralOrb = scene.userData.centralOrb;
+            const collectionTarget = centralOrb ? centralOrb.position : new THREE.Vector3(0, 0, 0);
+
+            for (let i = 0; i < particleCount; i++) {
+                const attr = particleAttributes[i];
+                if (attr.colorIndex === indexToCollect) {
+                    attr.collected = true;
+                    attr.target = collectionTarget.clone().add(new THREE.Vector3(
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2
+                    ));
+                }
+            }
+        }
+
+        function typeMessage(message) {
+            let i = 0;
+            typedMessageElement.innerHTML = '';
+            const cursor = typedMessageElement.appendChild(document.createElement('span'));
+            cursor.classList.add('typing-cursor');
+
+            typingInterval = setInterval(() => {
+                if (i < message.length) {
+                    typedMessageElement.insertBefore(document.createTextNode(message.charAt(i)), cursor);
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    if (cursor) cursor.remove();
+                    checkCompletion();
+                }
+            }, 30); 
+        }
+        
+        function checkCompletion() {
+            const allCollected = collectedTributes.every(Boolean);
+            const container = document.getElementById('unlock-container');
+            
+            const count = collectedTributes.filter(Boolean).length;
+            finalButton.textContent = `See the Final Wish (${count}/${NUM_STREAMS})`;
+
+            if (allCollected) {
+                container.classList.remove('hidden');
+                finalButton.onclick = startFinalTyping;
+                finalButton.textContent = "Unlock FINAL BIRTHDAY WISH!";
+            } else {
+                 container.classList.remove('hidden');
+            }
+        }
+
+        function startFinalTyping() {
+            finalButton.disabled = true;
+            
+            messageTitle.textContent = "The Golden Finality";
+            typedMessageElement.textContent = '';
+            
+            startExplosion();
+            
+            startLightShow();
+            
+            if (window.innerWidth >= 1024) {
+                document.body.classList.add('worship-bg');
+                
+                if(finalTableau) {
+                    finalTableau.classList.remove('opacity-0', 'pointer-events-none');
+                    finalTableau.classList.add('opacity-100');
+                }
+                
+                document.getElementById('canvas-container').style.zIndex = "4000";
+
+                is3DThaliActive = true;
+                
+                const thaliCenter = create3DThali();
+                thaliCenter.userData.basePos = new THREE.Vector3(0, -12, 20); 
+                thaliCenter.userData.radius = 8; 
+                thaliCenter.userData.speed = 2.0;
+                thaliCenter.userData.phase = 0;
+                thaliCenter.scale.set(1.2, 1.2, 1.2);
+                scene.add(thaliCenter);
+                thaliGroups.push(thaliCenter);
+
+                const thaliLeft = create3DThali();
+                thaliLeft.userData.basePos = new THREE.Vector3(-35, -10, 10); 
+                thaliLeft.userData.radius = 6;
+                thaliLeft.userData.speed = 2.0;
+                thaliLeft.userData.phase = Math.PI / 3; 
+                thaliLeft.scale.set(0.8, 0.8, 0.8);
+                scene.add(thaliLeft);
+                thaliGroups.push(thaliLeft);
+
+                const thaliRight = create3DThali();
+                thaliRight.userData.basePos = new THREE.Vector3(35, -10, 10); 
+                thaliRight.userData.radius = 6;
+                thaliRight.userData.speed = 2.0;
+                thaliRight.userData.phase = Math.PI * 2 / 3; 
+                thaliRight.scale.set(0.8, 0.8, 0.8);
+                scene.add(thaliRight);
+                thaliGroups.push(thaliRight);
+            }
+            
+            setTimeout(() => {
+                typeFinalMessage(finalMessage);
+            }, 1500);
+        }
+        
+        function startExplosion() {
+            const velocityAttribute = geometry.attributes.velocity;
+            finalExplosionActive = true;
+            
+            const centralOrb = scene.userData.centralOrb;
+            if (centralOrb) centralOrb.visible = false;
+
+
+            for (let i = 0; i < particleCount; i++) {
+                const attr = particleAttributes[i];
+                
+                if (particleAttributes[i].collected) {
+                    geometry.attributes.position.setXYZ(i, 0, 0, 0);
+
+                    const speed = 1.0 + Math.random() * 2.0;
+                    const direction = new THREE.Vector3(
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2
+                    ).normalize().multiplyScalar(speed);
+
+                    velocityAttribute.setXYZ(i, direction.x, direction.y, direction.z);
+                    
+                    const finalColor = i % 2 === 0 ? colorsList[3] : new THREE.Color('#EC4899');
+                    geometry.attributes.color.setXYZ(i, finalColor.r, finalColor.g, finalColor.b);
+                } else {
+                    geometry.attributes.color.setXYZ(i, 0, 0, 0); 
+                }
+                
+                attr.collected = false; 
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+            geometry.attributes.color.needsUpdate = true;
+            velocityAttribute.needsUpdate = true;
+            
+            material.opacity = 1; 
+        }
+
+        function startLightShow() {
+            const pointLight = scene.userData.pointLight;
+            
+            pointLight.intensity = 5; 
+            
+            const lightColor = new THREE.Color('#FFD700'); 
+            ambientLight.color.set(lightColor);
+            ambientLight.intensity = 0.5;
+
+            setTimeout(() => {
+                pointLight.intensity = 0;
+                ambientLight.intensity = 0.1;
+            }, 500);
+        }
+        
+        function typeFinalMessage(message) {
+            let i = 0;
+            typedMessageElement.innerHTML = '';
+            const cursor = typedMessageElement.appendChild(document.createElement('span'));
+            cursor.classList.add('typing-cursor');
+
+            typingInterval = setInterval(() => {
+                if (i < message.length) {
+                    typedMessageElement.insertBefore(document.createTextNode(message.charAt(i)), cursor);
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    if (cursor) cursor.remove();
+                    
+                    messageTitle.classList.add('text-accent-pink', 'animate-pulse');
+                }
+            }, 60); 
+        }
+        
+        function openMobileNavs() {
+            topNav.classList.remove('-translate-y-full');
+            bottomNav.classList.remove('translate-y-full');
+            leftNav.classList.remove('-translate-x-full');
+            rightNav.classList.remove('translate-x-full');
+            mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+            mainContent.classList.remove('pt-28'); 
+            navToggleIcon.classList.add('hidden');
+            navToggleX.classList.remove('hidden');
+            areNavsOpen = true;
+        }
+
+        function closeMobileNavs() {
+            topNav.classList.add('-translate-y-full');
+            bottomNav.classList.add('translate-y-full');
+            leftNav.classList.add('-translate-x-full');
+            rightNav.classList.add('translate-x-full');
+            mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+            mainContent.classList.add('pt-28'); 
+            navToggleIcon.classList.remove('hidden');
+            navToggleX.classList.add('hidden');
+            areNavsOpen = false;
+        }
+
+        function openDesktopNav() {
+            desktopSidebar.classList.remove('-translate-x-full');
+            navToggleIcon.classList.add('hidden');
+            navToggleX.classList.remove('hidden');
+            areNavsOpen = true;
+        }
+
+        function closeDesktopNav() {
+            desktopSidebar.classList.add('-translate-x-full');
+            navToggleIcon.classList.remove('hidden');
+            navToggleX.classList.add('hidden');
+            areNavsOpen = false;
+        }
+
+        function toggleNavs() {
+            const isDesktop = window.innerWidth >= 1024;
+            
+            if (areNavsOpen) {
+                if (isDesktop) closeDesktopNav();
+                else closeMobileNavs();
+            } else {
+                if (isDesktop) openDesktopNav();
+                else openMobileNavs();
+            }
+        }
+        
+        window.onload = function() {
+            initThreeJS();
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                toggleNavs();
+            });
+            
+            document.addEventListener('click', (e) => {
+                const isDesktop = window.innerWidth >= 1024;
+                
+                if (areNavsOpen && !e.target.closest('.nav-panel') && !e.target.closest('#navToggle') && !e.target.closest('#desktopSidebar')) {
+                    if (isDesktop) closeDesktopNav();
+                    else closeMobileNavs();
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetHash = e.currentTarget.getAttribute('href');
+                    if (areNavsOpen && window.innerWidth < 1024) {
+                        if (!targetHash.startsWith('#')) {
+                             setTimeout(closeMobileNavs, 100); 
+                        } else {
+                            closeMobileNavs();
+                        }
+                    }
+                });
+            });
+
+            desktopNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (areNavsOpen && window.innerWidth >= 1024) {
+                         closeDesktopNav();
+                    }
+                });
+            });
+            
+            window.addEventListener('resize', () => {
+                if (areNavsOpen) {
+                    closeMobileNavs();
+                    closeDesktopNav();
+                }
+            });
+        };
+
+    </script>
+</body>
+</html>

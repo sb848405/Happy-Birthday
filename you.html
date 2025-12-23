@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Note For You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .nav-panel, #navToggleIcon, #navToggleX, #desktopNav {
+            transition: transform 0.3s ease-in-out;
+            will-change: transform;
+        }
+        #mainContent {
+            transition: padding 0.3s ease-in-out;
+        }
+        
+        #mainContent, .nav-panel, aside {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        aside::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        body {
+            background-color: #fce7f3; 
+            font-family: 'Inter', sans-serif;
+        }
+        
+        #mainContent {
+            background-color: #fefce8; 
+        }
+
+        h1, h2, h3 {
+             font-family: 'Pacifico', cursive;
+        }
+
+        @keyframes fallIn {
+            from {
+                opacity: 0;
+                transform: translateY(-100%) rotate(-5deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotate(0);
+            }
+        }
+
+        .card-animate {
+            opacity: 0; 
+            animation: fallIn 1s ease-out 0.3s forwards;
+            will-change: transform, opacity;
+        }
+        
+        button {
+            user-select: none;
+        }
+
+        .banner-container {
+            position: relative;
+            max-width: 320px; 
+            margin: 0 auto;
+            height: auto; 
+            margin-top: 30px;
+            background: linear-gradient(10deg, #4c111b, #881d33); 
+            
+            border: 6px solid #fcd34d; 
+            border-bottom: none;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.3);
+            border-radius: 4px 4px 0 0;
+            color: #fce7f3;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            transition: max-width 0.5s ease;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                background-color: #1a1a1a; 
+                background-image: url('Stone_Background.png');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh; 
+                margin: 0;
+                font-family: 'Cinzel', serif; 
+            }
+
+            body::after {
+                content: "";
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            #mainContent {
+                background-color: transparent; 
+            }
+            
+            #glitterCanvas {
+                display: none !important;
+            }
+
+            .castle-window {
+                display: block;
+                position: fixed;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 60px;
+                height: 200px;
+                background: #0d1b2a; 
+                border: 8px solid #333; 
+                border-radius: 30px 30px 4px 4px;
+                box-shadow: 
+                    inset 0 0 20px #000,
+                    0 0 5px rgba(255,255,255,0.1);
+                z-index: -1;
+            }
+            .castle-window::after {
+                content: '';
+                position: absolute;
+                top: 0; left: 28px;
+                width: 4px; height: 100%;
+                background: #333; 
+            }
+            .castle-window::before {
+                content: '';
+                position: absolute;
+                width: 100%; height: 100%;
+                background-image: 
+                    radial-gradient(white 1px, transparent 1px),
+                    radial-gradient(white 1px, transparent 1px);
+                background-size: 15px 15px;
+                background-position: 0 0, 7px 7px;
+                opacity: 0.5;
+            }
+
+            .window-left { left: 15%; }
+            .window-right { right: 15%; }
+
+
+            .banner-container {
+                max-width: 650px;
+                margin-top: 60px; 
+                margin-bottom: 80px;
+                background-color: #f3e5ab; 
+                background: radial-gradient(circle, #fcf6e3 0%, #e6dcb8 100%);
+                color: #3e2723; 
+                text-shadow: none; 
+                border: 14px solid #4e342e;
+                border-radius: 8px;
+                box-shadow: 
+                    0 0 0 2px #281815, 
+                    0 20px 60px 10px rgba(0,0,0,0.9); 
+                
+                overflow: visible; 
+            }
+
+            .banner-container::before {
+                content: '';
+                position: absolute;
+                top: -18px; left: -18px; right: -18px; bottom: -18px;
+                border: 4px solid #b7892b; 
+                border-radius: 12px;
+                pointer-events: none;
+                z-index: 2;
+            }
+
+            .banner-content h1 {
+                color: #7f1d1d; 
+                text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+                font-family: 'Cinzel', serif;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                border-bottom: 2px solid #7f1d1d;
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+            }
+            .banner-content p {
+                color: #2c1a1d;
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                line-height: 1.8;
+            }
+            .banner-content strong {
+                color: #881d33;
+            }
+            
+            .mobile-only-decor {
+                display: none !important;
+            }
+        }
+
+        .banner-content {
+            padding: 50px 40px; 
+        }
+        
+        .mobile-only-decor {
+            display: block;
+        }
+
+        .banner-rod {
+            position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 50%; max-width: 180px; height: 10px; background: linear-gradient(#5a2e0c, #3c1f08); border-radius: 5px; z-index: 10; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .banner-rope {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 30px; border: 4px solid #854d0e; border-top-left-radius: 40px; border-top-right-radius: 40px; border-bottom: none; z-index: 30; 
+        }
+        .banner-rope::before {
+            content: ''; position: absolute; top: 0px; left: 4px; width: calc(100% - 8px); height: 30px; border: 1px solid #ca8a04; border-top-left-radius: 36px; border-top-right-radius: 36px; border-bottom: none; clip-path: polygon(0 0, 100% 0, 100% 2px, 0 2px);
+        }
+        .banner-bottom-module {
+            position: relative; margin-top: -5px; left: 0; width: 100%; height: 120px; z-index: 20; pointer-events: none; 
+        }
+        .tassel-swallowtail {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90%; height: 70px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            background: radial-gradient(circle at 10% 20%, #291a1a 0%, #241414 10%, #1e1111 20%), linear-gradient(135deg, #1b0a0a 0%, #3a2222 100%);
+            border: 4px solid #fcd34d; clip-path: polygon(0% 0%, 100% 0%, 100% 75%, 50% 100%, 0% 75%); 
+        }
+        .banner-fringe {
+            position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 80%; height: 30px;
+            background: linear-gradient(90deg, #d97706, #fcd34d, #d97706); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            -webkit-mask-image: repeating-linear-gradient(45deg, transparent, transparent 10px, #000 10px, #000 20px), repeating-linear-gradient(-45deg, transparent, transparent 10px, #000 10px, #000 20px);
+            mask-image: repeating-linear-gradient(45deg, transparent, transparent 10px, #000 10px, #000 20px), repeating-linear-gradient(-45deg, transparent, transparent 10px, #000 10px, #000 20px);
+            -webkit-mask-composite: source-in; mask-composite: intersect; 
+        }
+
+    </style>
+</head>
+
+<body class="antialiased overflow-hidden text-gray-800">
+
+    <button id="navToggle" class="fixed top-6 left-6 z-[90] p-2 bg-red-800 text-yellow-100 rounded-full shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+
+    <div class="md:hidden">
+        <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-red-800 text-yellow-100 shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Massege</a>
+            <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Music</a>
+        </nav>
+
+        <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-red-800 text-yellow-100 shadow-md flex items-center justify-center space-x-2 translate-y-full">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Skill</a>
+            <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Paper Star</a>
+            <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-red-900 text-yellow-100 shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">21_Door</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Diary</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200 festive-text">Heaven</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200 festive-text">You</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Universe</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Teacher</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 bg-red-900 text-yellow-100 shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors duration-200 festive-text">Food</a>
+        </nav>
+    </div>
+
+    <aside id="desktopNav" class="hidden md:flex flex-col fixed left-0 top-0 bottom-0 w-80 bg-red-900 border-r-4 border-yellow-500 z-[80] overflow-y-auto shadow-2xl -translate-x-full">
+        <div class="p-6 text-center pt-24 pb-4">
+             <h2 class="text-3xl text-yellow-300 mb-2">My Dearest</h2>
+             <div class="h-1 w-20 bg-yellow-500 mx-auto rounded"></div>
+        </div>
+        
+        <div class="flex-1 px-4 pb-10">
+            <div class="grid grid-cols-2 gap-2">
+                <a href="index.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Home</a>
+                <a href="Cake.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Cake</a>
+                <a href="21_Wish.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">21 Door</a>
+                <a href="chat.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Heaven</a>
+                <a href="Diary.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Diary</a>
+                <a href="anatomy.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Anatomy</a>
+                <a href="Box.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Box</a>
+                <a href="Special.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Special</a>
+                <a href="color.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Color</a>
+                <a href="you.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">You</a>
+                <a href="Teacher.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Teacher</a>
+                <a href="Universe.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Universe</a>
+                <a href="The_River.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">River</a>
+                <a href="Mountain.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Mountain</a>
+                <a href="Skill.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Skill</a>
+                <a href="Paper_Star.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Paper Star</a>
+                <a href="Carttoon.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Cartoon</a>
+                <a href="Periodik_table.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Periodic</a>
+                <a href="Concept.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Concept</a>
+                <a href="Calender.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Calendar</a>
+                <a href="Perspective.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Perspect.</a>
+                <a href="Santa.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Santa</a>
+                <a href="Presence.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Presence</a>
+                <a href="Cloud.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Cloud</a>
+                <a href="Ink.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Paint</a>
+                <a href="Butterfly.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Butterfly</a>
+                <a href="Weather.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Weather</a>
+                <a href="Spotlight.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Spotlight</a>
+                <a href="Room.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Room</a>
+                <a href="Radio.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Radio</a>
+                <a href="Food.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Food</a>
+                <a href="Music.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Music</a>
+                <a href="letter.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Letter</a>
+                <a href="Msg.html" class="nav-link bg-red-800/50 hover:bg-red-800 text-yellow-100 text-sm py-2 rounded text-center transition festive-text border border-red-700/30">Message</a>
+            </div>
+        </div>
+    </aside>
+
+    
+    <main id="mainContent" class="absolute inset-0 pt-28 md:pt-10 overflow-y-auto">
+
+        
+        <div class="container mx-auto max-w-lg md:max-w-5xl px-4 py-12 sm:py-16 flex justify-center">
+            
+            
+            <div class="card-animate relative opacity-0 w-full max-w-xs sm:max-w-md md:max-w-none md:w-full z-[55]">
+
+                
+                <div class="hidden">
+                    <audio id="backgroundAudio" autoplay loop>
+                        <source src="aud.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+
+                <div class="banner-rope mobile-only-decor"></div>
+                <div class="banner-rod mobile-only-decor"></div>
+
+                <div class="banner-container">
+                    
+                    <div class="hidden md:block absolute -top-12 -right-8 z-20">
+                         <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-xl">
+                            <circle cx="50" cy="50" r="45" fill="#991b1b" stroke="#7f1d1d" stroke-width="2"/>
+                            <circle cx="50" cy="50" r="35" stroke="#fca5a5" stroke-width="1" stroke-dasharray="4 2"/>
+                            <path d="M35 50 Q50 25 65 50 T95 50" stroke="#fca5a5" stroke-width="2" stroke-opacity="0.5" fill="none"/>
+                            <text x="50" y="55" text-anchor="middle" fill="#fef2f2" font-family="'Pacifico', cursive" font-size="24">Love</text>
+                        </svg>
+                    </div>
+
+                    
+                    <div class="banner-content text-center md:text-left">
+                        <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-center mb-8 md:mb-12">
+                            A Note For You
+                        </h1>
+                        
+                        
+                        <div class="text-lg md:text-xl md:px-8 leading-relaxed space-y-5 md:space-y-8 font-medium">
+                            <p class="md:text-2xl md:mb-6">My Dearest,</p>
+
+                            <p>
+                                Juhi,You are a vision soft and kind,<br>
+                                A blend of beauty, soul, and mind.<br>
+                                your presence feels like morning dew,<br>
+                                So calm, so pure, so deeply true.<br>
+                                You moves with grace, you breathes in peace,<br>
+                                And turns each moment into ease.
+                            </p>
+
+                            <p>
+                                Your face ~ a poem carved by light,<br>
+                                Where day meets dream and wrong meets right.<br>
+                                No mask of pride, no shade of lies,<br>
+                                Just gentle truth behind your eyes.<br>
+                                Your calm expression, soft and clear,<br>
+                                Brings peace to all who stand near.
+                            </p>
+
+                            <p>
+                                Your eyes ~ two worlds that softly gleam,<br>
+                                Half in thought and half in dream.<br>
+                                They do not seek to conquer hearts,<br>
+                                But heal through calm and gentle parts.<br>
+                                They hold a depth both wise and wide,<br>
+                                Where truth and tenderness reside.
+                            </p>
+
+                            <p>
+                                Your hair ~ a river dark and free,<br>
+                                Flowing with quiet dignity.<br>
+                                Each strand a thought, each wave a song,<br>
+                                That’s drifted peacefully along.<br>
+                                It moves with grace, it shines with ease,<br>
+                                Like whispered words the soul can’t seize.
+                            </p>
+
+                            <p>
+                                Your cheeks ~ where laughter likes to stay,<br>
+                                Hold dimples deep in their own way.<br>
+                                When joy awakes, they softly bloom,<br>
+                                And turn all gray to golden room.<br>
+                                They are the proof that life can smile,<br>
+                                And make the wait for joy worthwhile.
+                            </p>
+
+                            <p>
+                                Your smile ~ a dawn in human form,<br>
+                                So calm, so tender, pure, and warm.<br>
+                                It doesn’t shout, it doesn’t boast,<br>
+                                Yet warms each soul that needs it most.<br>
+                                It heals the air, it melts the pain,<br>
+                                And brings the sun through clouds again.
+                            </p>
+
+                            <p>
+                                Your ears ~ they listen, not to hear,<br>
+                                But feel what hearts keep hidden near.<br>
+                                No judgment lives within your gaze,<br>
+                                You understands in quiet ways.<br>
+                                You knows the world in tone and sound,<br>
+                                Where meaning more than words is found.
+                            </p>
+
+                            <p>
+                                Your voice ~ so steady, soft, and sure,<br>
+                                Carries a power calm and pure.<br>
+                                Each word is placed with gentle thought,<br>
+                                Each phrase a lesson life has taught.<br>
+                                You never seeks to sound profound,<br>
+                                Yet leaves your wisdom all around.
+                            </p>
+                            
+                            <p>
+                                Your laughter ~ light as drops of rain,<br>
+                                A song that washes off the pain.<br>
+                                It doesn’t linger, doesn’t fade,<br>
+                                Just leaves behind the joy it made.<br>
+                                It fills the air with sweet release,<br>
+                                A melody of quiet peace.
+                            </p>
+
+                            <p>
+                                The way you eats ~ serene and neat,<br>
+                                As though each meal were calm and sweet.<br>
+                                you tastes with care, with grace, with prayer,<br>
+                                Grateful for what the world prepares.<br>
+                                Your calm in moments small and still,<br>
+                                Shows discipline wrapped in goodwill.
+                            </p>
+
+                            <p>
+                                Your hobbies ~ small, yet pure delight,<br>
+                                Reflect your heart so warm and light.<br>
+                                you keeps keychains from places gone,<br>
+                                Like stories resting one by one.<br>
+                                And balloons, you loves their flight,<br>
+                                Their colors mirror Your delight.
+                            </p>
+
+                            <p>
+                                Your silence ~ not of loss or fear,<br>
+                                But peace the restless long to hear.<br>
+                                When storms arrive, You stays composed,<br>
+                                A strength the world has not yet posed.<br>
+                                Your quiet calm, Your steady grace,<br>
+                                Turns chaos into soft embrace.
+                            </p>
+                            
+                            <p>
+                                Your dreams ~ they shine through every night,<br>
+                                With gentle hope and fearless light.<br>
+                                SYour dreams not grand of crown or fame,<br>
+                                But better worlds, not just Your name.<br>
+                                In dreams Your builds, You grows, You learns,
+                                And every loss to wisdom turns.
+                            </p>
+
+                            <p>
+                                Your patience ~ vast as morning sky,<br>
+                                You lets the moments drift, not fly.<br>
+                                You knows what blooms begins in seed,<br>
+                                You trusts the heart before the deed.<br>
+                                Each waiting hour, each quiet phase,<br>
+                                Refines her soul in subtle ways.
+                            </p>
+
+                            <p>
+                                Yet when you stands for what is right,<br>
+                                Your eyes turn fierce, her soul alight.<br>
+                                No fear can shake her steady will,<br>
+                                Your calm grows sharper, brighter still.<br>
+                                you fights not loud, but firm and fair,<br>
+                                With truth as armor everywhere.
+                            </p>
+
+                            <p>
+                                Your lives so simply, yet so whole,<br>
+                                With purpose deep within her soul.<br>
+                                A cup of tea, a book, a song,<br>
+                                Are all you needs to feel you are strong.<br>
+                                Your peace resides not in her place,<br>
+                                But in your heart’s unhurried grace.
+                            </p>
+                            
+                            <p>
+                                Your presence leaves a sacred air,<br>
+                                A warmth that whispers, “Your was there.”<br>
+                                No perfume’s trace, no fleeting show,<br>
+                                Just peace that lingers soft and slow.<br>
+                                You turns the ordinary bright,<br>
+                                By just existing in the light.
+                            </p>
+
+                            <p>
+                                In art and books, you finds Your peace,<br>
+                                Your restless thoughts in them release.<br>
+                                In music’s tone or poet’s word,<br>
+                                You truest voice is softly heard.<br>
+                                Your paints, Your reads, Your hums, Your dreams,<br>
+                                Where life is more than what it seems.
+                            </p>
+
+                            <p>
+                                Your hands ~ they build, they heal, they guide,<br>
+                                They craft with love and steady pride.<br>
+                                No gesture wasted, none too small,<br>
+                                You care is written in them all.<br>
+                                They speak of work, of heart, of art,<br>
+                                The language born from soul and heart.
+                            </p>
+
+                            <p>
+                                Your soul ~ so pure, so bright, so deep,<br>
+                                Where faith and hope together sleep.<br>
+                                No greed, no envy, no disguise,<br>
+                                Just calm truth living in Your eyes.<br>
+                                You gives, forgives, You lifts, you learns,<br>
+                                You glows through all that life returns.
+                            </p>
+                            
+                            <p>
+                                Your kindness ~ endless, quiet, wide,<br>
+                                A flowing warmth you cannot hide.<br>
+                                Your heals the world through gentle deeds,<br>
+                                By tending others’ unseen needs.<br>
+                                Your joy is found where others rise,<br>
+                                Your love reflected in your eyes.
+                            </p>
+
+                            <p>
+                                Your skill ~ in every path Your tries,<br>
+                                A spark of excellence never dies.<br>
+                                From art to thought, from word to deed,<br>
+                                Your blends her grace with will to lead.<br>
+                                You learns, You teaches, You inspires,<br>
+                                And fuels Your world with quiet fires.
+                            </p>
+                            
+                            <p>
+                                You leaves behind, where’er Your’s been,<br>
+                                A softer world, a brighter scene.<br>
+                                Your presence plants what words can’t sow,<br>
+                                And makes the hearts Your touches grow.<br>
+                                Through Your, the world learns how to be <br>
+                                Strong, yet soft, with dignity.
+                            </p>
+
+                            <p>
+                                Your walks with calm, Your breathes with care,<br>
+                                Your spirit sweetens every air.<br>
+                                Your being hums with life’s embrace,<br>
+                                A timeless art, a quiet grace.<br>
+                                You are not beauty for the eyes,<br>
+                                But truth made flesh serene and wise.
+                            </p>
+                        </div>
+
+                        <div class="font-semibold text-center pt-8 md:text-3xl md:mt-12 md:mb-6 festive-text text-red-900">
+                            Thank you for being you.
+                        </div>
+                    </div>
+                </div> 
+
+                
+                
+                <div class="banner-bottom-module mobile-only-decor">
+                    
+                    <div class="tassel-swallowtail"></div>
+                    
+                    <div class="banner-fringe"></div>
+                </div>
+
+            </div>
+        </div>
+
+        
+        <footer class="text-center py-10 mt-16 bg-white/90 backdrop-blur-sm border-t border-gray-200 relative z-10">
+            <p class="text-gray-600">Made with ❤️ just for you.</p>
+        </footer>
+
+    </main> 
+
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link, #desktopNav .nav-link'); 
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            const desktopNav = document.getElementById('desktopNav'); 
+            const navToggle = document.getElementById('navToggle');
+            const navToggleIcon = document.getElementById('navToggleIcon');
+            const navToggleX = document.getElementById('navToggleX');
+
+            let areNavsOpen = false;
+
+            function openAllNavs() {
+                topNav.classList.remove('-translate-y-full');
+                bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full');
+                rightNav.classList.remove('translate-x-full');
+                
+                desktopNav.classList.remove('-translate-x-full');
+                
+                if (window.innerWidth < 768) {
+                    mainContent.classList.add('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                    mainContent.classList.remove('pt-28'); 
+                }
+                
+                navToggleIcon.classList.add('hidden');
+                navToggleX.classList.remove('hidden');
+                areNavsOpen = true;
+            }
+
+            function closeAllNavs() {
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                rightNav.classList.add('translate-x-full');
+                
+                desktopNav.classList.add('-translate-x-full');
+                
+                if (window.innerWidth < 768) {
+                    mainContent.classList.remove('pt-16', 'pb-16', 'pl-24', 'pr-24');
+                    mainContent.classList.add('pt-28'); 
+                }
+
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+                areNavsOpen = false;
+            }
+
+            function toggleAllNavs() {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                } else {
+                    openAllNavs();
+                }
+            }
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                toggleAllNavs();
+            });
+            
+            mainContent.addEventListener('click', () => {
+                if (areNavsOpen) {
+                    closeAllNavs();
+                }
+            });
+
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetHash = e.currentTarget.getAttribute('href');
+                    if (targetHash.startsWith('#')) {
+                         e.preventDefault(); 
+                    }
+                    
+                    if (areNavsOpen) {
+                        closeAllNavs();
+                    }
+                });
+            });
+
+            
+            const audio = document.getElementById('backgroundAudio');
+            
+            if (audio) {
+                if (audio.querySelector('source').src.endsWith('A_Note_For_You.html')) {
+                    console.log("Audio source is empty. Please add a valid audio file path.");
+                    return;
+                }
+
+                audio.play().then(() => {
+                    console.log("Audio autoplay started successfully.");
+                }).catch(error => {
+                    console.log("Autoplay prevented. Waiting for user interaction.");
+                    
+                    const playAudioOnInteraction = () => {
+                        audio.play().then(() => {
+                            console.log("Audio started after user interaction.");
+                        }).catch(err => {
+                            console.log("Still couldn't play after interaction:", err);
+                        });
+                        
+                        document.body.removeEventListener('click', playAudioOnInteraction);
+                        document.body.removeEventListener('touchstart', playAudioOnInteraction);
+                    };
+
+                    document.body.addEventListener('click', playAudioOnInteraction, { once: true });
+                    document.body.addEventListener('touchstart', playAudioOnInteraction, { once: true });
+                });
+            }
+
+            
+            initGlitterEffect();
+
+        });
+        
+        
+        function initGlitterEffect() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'glitterCanvas';
+            
+            canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;';
+            document.body.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            let W = window.innerWidth;
+            let H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+
+            const maxParticles = 40; 
+            let particles = [];
+            
+            const colors = ['#fde68a', '#fbcfe8', '#f87171', '#ffffff', '#eab308']; 
+
+            function Particle() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.size = Math.random() * 1.5 + 0.5; 
+                this.speedY = Math.random() * 0.4 + 0.3; 
+                this.speedX = Math.random() * 0.4 - 0.2; 
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.opacity = Math.random() * 0.6 + 0.4; 
+            }
+
+            Particle.prototype.draw = function() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`; 
+                
+                ctx.shadowBlur = 1; 
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            Particle.prototype.update = function() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+
+                
+                if (this.y > H) {
+                    this.y = -5;
+                    this.x = Math.random() * W;
+                }
+                
+                if (this.x > W) this.x = -5;
+                if (this.x < -5) this.x = W;
+            }
+
+            function createParticles() {
+                for (let i = 0; i < maxParticles; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                requestAnimationFrame(animateParticles);
+                
+                ctx.fillStyle = 'rgba(254, 252, 232, 0.05)'; 
+                ctx.fillRect(0, 0, W, H);
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+            }
+
+            
+            window.addEventListener('resize', () => {
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W;
+                canvas.height = H;
+                
+                particles = [];
+                createParticles();
+            });
+
+            createParticles();
+            animateParticles();
+        }
+    </script>
+</body>
+</html>

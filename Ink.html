@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(-45deg, #fbcfe8, #f472b6, #c084fc, #fde047);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .font-cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+        .hidden {
+            display: none;
+        }
+
+        #page-slider {
+            position: fixed;
+            inset: 0;
+            background-color: #2a231f; 
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            overflow: hidden; 
+        }
+        #page-slider.hidden {
+            display: none;
+        }
+        #page-slider.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        #wonders-view {
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            inset: 0;
+            z-index: 40; 
+            padding-top: 5rem; 
+            padding-bottom: 2rem;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #wonders-view::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Clean Card Styling (No Poster) */
+        .wonder-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .wonder-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            border-color: white;
+        }
+
+        #embers-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1; 
+        }
+
+        .ember {
+            position: absolute;
+            bottom: -20px; 
+            background-color: #fde047; 
+            border-radius: 50%;
+            opacity: 0;
+            animation: rise 10s infinite linear;
+            box-shadow: 0 0 5px #fde047, 0 0 10px #fde047, 0 0 15px #be185d;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-110vh); 
+                opacity: 0;
+            }
+        }
+
+        .slider-wrapper {
+            width: 100%;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            position: relative;
+            z-index: 2; 
+        }
+        .cards {
+            display: flex;
+            flex-wrap: nowrap;
+            user-select: none;
+        }
+        .card {
+            flex-shrink: 0;
+            width: 70vw; 
+            height: 90vw;
+            max-width: 300px; 
+            max-height: 400px; 
+            padding: 0.75rem;
+        }
+        
+        @media (min-width: 768px) {
+            .card {
+                width: 30vw;
+                height: 40vw;
+            }
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+        }
+
+        .nav-panel, #mainContent, #navToggleIcon, #navToggleX, #desktopNav {
+            transition: all 0.3s ease-in-out;
+        }
+        #mainContent, .nav-panel, #desktopNav {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #mainContent::-webkit-scrollbar,
+        .nav-panel::-webkit-scrollbar,
+        #desktopNav::-webkit-scrollbar {
+            display: none;
+        }
+        .festive-text {
+            font-family: 'Gochi Hand', cursive;
+        }
+        
+        h1, h2, h3 {
+             font-family: 'Pacifico', cursive;
+        }
+
+        button {
+            user-select: none;
+        }
+
+        #desktopNav .nav-link {
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Modal Animations */
+        .modal-enter {
+            animation: modalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes modalPopIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Floating Animation for Title */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Static Background Texture */
+        .bg-texture {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+    </style>
+</head>
+<body class="antialiased overflow-hidden text-gray-800">
+
+    <!-- Static Background Pattern & Corner Decorations -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <!-- Texture Overlay -->
+        <div class="absolute inset-0 bg-texture"></div>
+        
+        <!-- Top Left Corner Ornament -->
+        <svg class="absolute top-4 left-4 w-24 h-24 md:w-40 md:h-40 text-white/40" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 40 V 5 Q 2 2 30 2 H 60" />
+            <path d="M2 70 V 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <path d="M70 2 H 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <circle cx="15" cy="15" r="4" fill="currentColor" stroke="none" class="text-rose-200"/>
+            <circle cx="35" cy="5" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="5" cy="35" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+
+        <!-- Top Right Corner Ornament -->
+        <svg class="absolute top-4 right-4 w-24 h-24 md:w-40 md:h-40 text-white/40 transform scale-x-[-1]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 40 V 5 Q 2 2 30 2 H 60" />
+            <path d="M2 70 V 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <path d="M70 2 H 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <circle cx="15" cy="15" r="4" fill="currentColor" stroke="none" class="text-rose-200"/>
+            <circle cx="35" cy="5" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="5" cy="35" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+
+        <!-- Bottom Left Corner Ornament -->
+        <svg class="absolute bottom-4 left-4 w-24 h-24 md:w-40 md:h-40 text-white/40 transform scale-y-[-1]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 40 V 5 Q 2 2 30 2 H 60" />
+            <path d="M2 70 V 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <path d="M70 2 H 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <circle cx="15" cy="15" r="4" fill="currentColor" stroke="none" class="text-rose-200"/>
+            <circle cx="35" cy="5" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="5" cy="35" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+
+        <!-- Bottom Right Corner Ornament -->
+        <svg class="absolute bottom-4 right-4 w-24 h-24 md:w-40 md:h-40 text-white/40 transform scale-[-1]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 40 V 5 Q 2 2 30 2 H 60" />
+            <path d="M2 70 V 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <path d="M70 2 H 90" stroke-opacity="0.5" stroke-dasharray="4 4"/>
+            <circle cx="15" cy="15" r="4" fill="currentColor" stroke="none" class="text-rose-200"/>
+            <circle cx="35" cy="5" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="5" cy="35" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+    </div>
+    
+    <button id="navToggle" class="fixed top-6 left-6 z-[70] p-2 bg-rose-600 text-white rounded-full shadow-lg hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
+        <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+        <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    
+    <nav id="topNav" class="nav-panel lg:hidden fixed top-0 left-0 right-0 z-[60] h-16 bg-[#42200e] text-[#f5eeda] shadow-md flex items-center justify-center space-x-2 -translate-y-full">
+        <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Massege</a>
+        <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#5a2d14] transition-colors duration-200 festive-text">Letter</a>
+        <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Music</a>
+    </nav>
+    
+    <nav id="bottomNav" class="nav-panel lg:hidden fixed bottom-0 left-0 right-0 z-[60] h-16 bg-[#42200e] text-[#f5eeda] shadow-md flex items-center justify-center space-x-2 translate-y-full">
+        <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Skill</a>
+        <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Paper Star</a>
+        <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="nav-panel lg:hidden fixed left-0 top-0 bottom-0 z-[60] w-20 bg-[#2a231f] text-[#f5eeda] shadow-md flex flex-col items-center space-y-2 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#5a2d14] transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#5a2d14] transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#5a2d14] transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#5a2d14] transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-[#5a2d14] transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <!-- ADDED MISSING RIGHT NAV -->
+        <nav id="rightNav" class="nav-panel lg:hidden fixed right-0 top-0 bottom-0 z-[60] w-20 bg-[#2a231f] text-[#f5eeda] shadow-md flex flex-col items-center space-y-2 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Periodik</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Perspective</a>
+            <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-220 festive-text">Presence</a>
+            <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Cloud</a>
+            <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Paint</a>
+            <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Butterfly</a>
+            <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#4K-200e] transition-colors duration-200 festive-text">Weather</a>
+            <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Spotlight</a>
+            <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Room</a>
+            <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Radio</a>
+            <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text">Food</a>
+        </nav>
+        
+        <nav id="desktopNav" class="hidden lg:block fixed left-0 top-0 bottom-0 z-[60] w-80 bg-[#2a231f] text-[#f5eeda] shadow-2xl transform -translate-x-full overflow-y-auto">
+            <div class="p-8 pt-24 pb-12">
+                <h3 class="text-3xl text-[#fde047] mb-8 text-center font-cursive">Navigation</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="index.html" id="nav-home-desktop" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Home</a>
+                    <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Cake</a>
+                    <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">21_Door</a>
+                    <a href="chat.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Heaven</a>
+                    <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Diary</a>
+                    <a href="anatomy.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Anatomy</a>
+                    <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Box</a>
+                    <a href="Special.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Special</a>
+                    <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Color</a>
+                    <a href="you.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">You</a>
+                    <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Teacher</a>
+                    <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Universe</a>
+                    <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">River</a>
+                    <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Mountain</a>
+                    <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Skill</a>
+                    <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Paper Star</a>
+                    <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Cartoon</a>
+                    <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Periodik_table</a>
+                    <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Concept</a>
+                    <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Calender</a>
+                    <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Perspective</a>
+                    <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Santa</a>
+                    <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-220 festive-text border border-[#42200e]">Presence</a>
+                    <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Cloud</a>
+                    <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e] bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Paint</a>
+                    <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Butterfly</a>
+                    <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#4K-200e] transition-colors duration-200 festive-text border border-[#42200e]">Weather</a>
+                    <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Spotlight</a>
+                    <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Room</a>
+                    <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Radio</a>
+                    <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Food</a>
+                    <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Music</a>
+                    <a href="letter.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Letter</a>
+                    <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-[#42200e] transition-colors duration-200 festive-text border border-[#42200e]">Massege</a>
+                </div>
+            </div>
+        </nav>
+        
+    <div id="mainContent" class="pt-24 lg:pt-0 flex items-center justify-center min-h-screen p-4 md:p-6 relative">
+
+        <div id="wonders-view" class="hidden container mx-auto px-4 lg:px-12">
+            
+            <!-- Scenario / Intro Text -->
+            <div class="text-center mb-12">
+                <h2 class="font-cursive text-5xl md:text-7xl text-[#f5eeda] mb-4 text-center drop-shadow-md">The 8 Wonders</h2>
+                <p class="text-white text-lg md:text-xl font-medium font-cursive opacity-90 animate-pulse">
+                    Tap a card to uncover its story...
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-10">
+                
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Great Wall of China" data-desc="It stretches over 13,000 miles and is the longest man-made structure ever built, standing as a symbol of endurance and strength throughout history.">
+                    <img src="https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80" alt="Great Wall of China" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Great Wall</h3>
+                        <p class="text-sm text-gray-600">China</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Petra" data-desc="Carved directly into vibrant red, white, and pink sandstone cliffs, this 'Rose City' was a thriving trading center and remains an engineering masterpiece lost to the West for centuries.">
+                    <img src="https://www.historyhit.com/app/uploads/bis-images/5160776/Petra-788x537.jpg?x10081" alt="Petra" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Petra</h3>
+                        <p class="text-sm text-gray-600">Jordan</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Colosseum" data-desc="The largest amphitheater ever built, it is a testament to Roman engineering brilliance, capable of holding 50,000 spectators for gladiatorial contests and public spectacles.">
+                    <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80" alt="Colosseum" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Colosseum</h3>
+                        <p class="text-sm text-gray-600">Italy</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Chichen Itza" data-desc="This ancient Mayan city features El Castillo, a pyramid designed as a calendar. During equinoxes, shadows look like a serpent slithering down the steps—a feat of astronomical precision.">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Chichen_Itza_3.jpg" alt="Chichen Itza" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Chichen Itza</h3>
+                        <p class="text-sm text-gray-600">Mexico</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Machu Picchu" data-desc="Hidden in the clouds of the Andes, this 'Lost City of the Incas' was built without wheels or iron tools. Its polished dry-stone walls fit together so perfectly that not even a knife blade can fit between them.">
+                    <img src="https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=800&q=80" alt="Machu Picchu" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Machu Picchu</h3>
+                        <p class="text-sm text-gray-600">Peru</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Taj Mahal" data-desc="A white marble mausoleum built by Emperor Shah Jahan in memory of his favorite wife. It changes color depending on the light of the day—pinkish in the morning, milky white in the evening, and golden at night.">
+                    <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80" alt="Taj Mahal" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Taj Mahal</h3>
+                        <p class="text-sm text-gray-600">India</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Christ the Redeemer" data-desc="Standing atop Mount Corcovado, this massive Art Deco statue stands with open arms, symbolizing peace and welcoming all. It is a cultural icon of both Brazil and Christianity.">
+                    <img src="https://destinationlesstravel.com/wp-content/uploads/2022/10/Christ-the-Redeemer-statue-Rio-de-Janeiro-Brazil.jpg" alt="Christ the Redeemer" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Christ the Redeemer</h3>
+                        <p class="text-sm text-gray-600">Brazil</p>
+                    </div>
+                </div>
+
+                <div class="wonder-card bg-white rounded-xl overflow-hidden shadow-xl" data-title="Juhi" data-desc="Just like the wonders of the world, you are unique, beautiful, and timeless. You are the most special wonder of all.">
+                    <div class="w-full h-48 relative">
+                        <img src="8_Wander.png" alt="Juhi" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                        <svg class="w-full h-full bg-pink-200 pointer-events-none hidden" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M200 60 C 140 0 40 80 200 180 C 360 80 260 0 200 60 Z" fill="#db2777" />
+                            <circle cx="100" cy="50" r="5" fill="#fcd34d">
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="300" cy="50" r="5" fill="#fcd34d">
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" begin="1s" repeatCount="indefinite" />
+                            </circle>
+                        </svg>
+                    </div>
+                    <div class="p-4 text-center pointer-events-none">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">Juhi</h3>
+                        <p class="text-sm text-gray-600">The One & Only</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pb-20">
+                <button id="wondersNextBtn" class="bg-rose-600 text-yellow-100 font-semibold py-4 px-10 rounded-full shadow-lg hover:bg-rose-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50 text-xl">
+                    See Memories <span class="ml-2">→</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="page-card" class="w-full max-w-6xl flex flex-col items-center justify-center relative z-10 transition-opacity duration-300 p-2 md:p-4">
+    
+            <!-- Framed Artwork Container -->
+            <div class="bg-[#fdfbf7] p-6 md:p-12 rounded-sm shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] border-[12px] md:border-[20px] border-[#5d4037] relative w-full transform transition-transform duration-700 hover:scale-[1.005] flex flex-col items-center justify-center">
+                
+                <!-- Inner gold trim -->
+                <div class="absolute inset-0 border-[2px] md:border-[4px] border-[#d4af37] pointer-events-none -m-[12px] md:-m-[20px]"></div>
+                
+                <!-- Canvas Texture Effect Overlay (Optional, simple css opacity) -->
+                <div class="absolute inset-0 bg-repeat opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDAwIiAvPgo8L3N2Zz4=');"></div>
+
+                <div class="flex flex-col items-center text-center relative z-10 w-full">
+                    
+                    <h1 class="font-cursive text-5xl md:text-7xl lg:text-8xl text-gray-900 mb-4 md:mb-6 drop-shadow-sm leading-tight">
+                        <span class="block text-xl md:text-2xl font-serif text-[#8d6e63] mb-2 md:mb-4 tracking-[0.2em] uppercase">The Masterpiece</span>
+                        Happy Birthday
+                        <br>
+                        <span class="text-rose-600">Juhi</span>
+                    </h1>
+
+                    <div class="w-24 md:w-32 h-1 bg-rose-400 my-4 md:my-6 rounded-full"></div>
+
+                    <p class="text-lg md:text-2xl lg:text-3xl text-gray-700 font-serif leading-relaxed max-w-4xl mx-auto px-4">
+                        "Not every work of art is painted on canvas. Some are living, breathing, and lighting up the world just by being in it."
+                    </p>
+                    
+                    <p class="mt-4 md:mt-6 text-base md:text-xl text-gray-500 font-cursive italic">
+                        - The rarest collection
+                    </p>
+
+                    <button id="revealButton" class="mt-8 md:mt-10 bg-[#5d4037] text-[#fdfbf7] font-bold py-3 px-8 md:py-4 md:px-12 rounded-full shadow-xl hover:bg-[#4e342e] transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#d4af37]/50 text-lg md:text-2xl tracking-wide border-2 border-[#d4af37]">
+                        View The Exhibit <span class="ml-2">→</span>
+                    </button>
+                </div>
+
+                <!-- Museum Plaque (Decorative) -->
+                <div class="hidden xl:block absolute -bottom-20 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 shadow-md p-3 w-56 text-center">
+                    <p class="text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-1 mb-1">Exhibition Piece</p>
+                    <p class="text-base font-serif italic text-gray-800">"Juhi"</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">Timeless Elegance</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-slider" class="hidden">
+            
+            <div id="embers-container"></div>
+
+            <div class="slider-wrapper">
+                <div class="cards">
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW Wonder Detail Modal -->
+        <div id="wonder-detail-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full relative shadow-2xl modal-enter border-4 border-amber-800">
+                <button id="closeWonderDetail" class="absolute top-2 right-2 text-gray-400 hover:text-red-600 p-2 text-2xl font-bold">&times;</button>
+                <div class="text-center">
+                    <div id="wonder-detail-svg" class="w-full h-40 mb-4 rounded-lg overflow-hidden border-2 border-amber-200"></div>
+                    <h3 id="wonder-detail-title" class="text-3xl font-cursive text-amber-900 mb-2">Title</h3>
+                    <div class="w-16 h-1 bg-amber-500 mx-auto mb-4 rounded-full"></div>
+                    <p id="wonder-detail-desc" class="text-gray-700 text-lg leading-relaxed font-medium">Description goes here.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW 8th Wonder Modal -->
+        <div id="eighth-wonder-view" class="hidden fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl transform scale-95 opacity-0 transition-all duration-500 border-8 border-rose-200" id="eighth-wonder-card">
+                <h2 class="font-cursive text-5xl md:text-7xl text-rose-600 mb-6">Surprise</h2>
+                <div class="text-2xl md:text-3xl font-serif text-gray-800 leading-relaxed mb-8 space-y-4">
+                    <p>Just like the 7 Wonders of the World,</p>
+                    <p class="text-gray-500 text-xl">you are unique, beautiful, and timeless.</p>
+                    <div class="py-4">
+                        <span class="text-rose-500 font-bold block mt-2 text-4xl md:text-5xl transform scale-110 drop-shadow-sm font-cursive">You are the 8th Wonder.</span>
+                    </div>
+                </div>
+                <p class="text-2xl text-rose-800 mb-10 font-handwriting font-bold">You are a living Masterpiece ❤️</p>
+                <button id="toMemoriesBtn" class="bg-rose-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-rose-700 hover:scale-105 transition-all">
+                    See Your Journey →
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const pageCard = document.getElementById('page-card');
+        const pageSlider = document.getElementById('page-slider');
+        const wondersView = document.getElementById('wonders-view');
+        
+        // New Elements
+        const wonderDetailModal = document.getElementById('wonder-detail-modal');
+        const closeWonderDetail = document.getElementById('closeWonderDetail');
+        const eighthWonderView = document.getElementById('eighth-wonder-view');
+        const eighthWonderCard = document.getElementById('eighth-wonder-card');
+        const toMemoriesBtn = document.getElementById('toMemoriesBtn');
+
+        const revealButton = document.getElementById('revealButton');
+        const cardsContainer = document.querySelector('.cards');
+
+        const navWondersDesktop = document.getElementById('nav-wonders-desktop');
+        const navHomeDesktop = document.getElementById('nav-home-desktop');
+        const navToggle = document.getElementById('navToggle');
+        const navToggleIcon = document.getElementById('navToggleIcon');
+        const navToggleX = document.getElementById('navToggleX');
+        const desktopNav = document.getElementById('desktopNav');
+        const mainContent = document.getElementById('mainContent');
+
+        function closeAllNavs() {
+             desktopNav.classList.add('-translate-x-full');
+             mainContent.classList.remove('pl-[21rem]');
+             
+             const topNav = document.getElementById('topNav');
+             const bottomNav = document.getElementById('bottomNav');
+             const leftNav = document.getElementById('leftNav');
+             const rightNav = document.getElementById('rightNav');
+             
+             topNav.classList.add('-translate-y-full');
+             bottomNav.classList.add('translate-y-full');
+             leftNav.classList.add('-translate-x-full');
+             rightNav.classList.add('translate-x-full');
+             
+             mainContent.classList.remove('pt-16', 'pb-16', 'pl-20', 'pr-20');
+             mainContent.classList.add('pt-28');
+             
+             navToggleIcon.classList.remove('hidden');
+             navToggleX.classList.add('hidden');
+        }
+
+        if (navWondersDesktop) {
+            navWondersDesktop.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                pageCard.classList.add('hidden');
+                pageSlider.classList.add('hidden');
+                wonderDetailModal.classList.add('hidden');
+                if(sliderTween) sliderTween.pause();
+
+                wondersView.classList.remove('hidden');
+
+                desktopNav.classList.add('-translate-x-full');
+                mainContent.classList.remove('pl-[21rem]');
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+            });
+        }
+
+        if (navHomeDesktop) {
+            navHomeDesktop.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                wondersView.classList.add('hidden');
+                pageSlider.classList.add('hidden');
+                wonderDetailModal.classList.add('hidden');
+                if(sliderTween) sliderTween.pause();
+                
+                pageCard.classList.remove('hidden');
+
+                desktopNav.classList.add('-translate-x-full');
+                mainContent.classList.remove('pl-[21rem]');
+                navToggleIcon.classList.remove('hidden');
+                navToggleX.classList.add('hidden');
+            });
+        }
+
+
+        const photoGallery = [
+            "Aurora.png",
+            "cold breeze.png",
+            "River.jpg",
+            "Sand.jpg",
+            "Sea.png",
+            "Snow.png",
+            "starlight.png",
+            "Night_Sky.png",
+            "Nature.png",
+            "Mountain.png",
+            "Fog.png",
+            "dew.png"
+        ];
+        
+        let sliderTween;
+
+        function initSlider() {
+            cardsContainer.innerHTML = '';
+            
+            const sliderPhotos = [...photoGallery, ...photoGallery];
+
+            sliderPhotos.forEach(url => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = "Birthday Memory";
+                img.onerror = () => { 
+                    img.src = 'https://placehold.co/600x800/FF0000/FFF?text=Image+Error'; 
+                };
+                card.appendChild(img);
+                cardsContainer.appendChild(card);
+            });
+
+            let totalWidth = 0;
+            const cards = cardsContainer.querySelectorAll('.card');
+            if (cards.length > 0) {
+                const cardStyle = window.getComputedStyle(cards[0]);
+                const cardWidth = cards[0].offsetWidth; 
+                totalWidth = cardWidth * photoGallery.length;
+            }
+
+            gsap.set(cardsContainer, { x: 0 });
+            
+            if (sliderTween) {
+                sliderTween.kill();
+            }
+
+            sliderTween = gsap.to(cardsContainer, {
+                x: -totalWidth,
+                duration: 40,
+                ease: 'none',
+                repeat: -1,
+                modifiers: {
+                    x: gsap.utils.unitize(x => parseFloat(x) % totalWidth)
+                }
+            });
+            
+            sliderTween.pause();
+        }
+
+        revealButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pageCard.classList.add('hidden');
+            
+            wondersView.classList.remove('hidden'); 
+            pageSlider.classList.add('hidden');
+        });
+
+        // 1. Click "Who is the 8th?" -> Show Modal
+        const wondersNextBtn = document.getElementById('wondersNextBtn');
+        if (wondersNextBtn) {
+            wondersNextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // Go straight to slider since 8th is revealed
+                wondersView.classList.add('hidden');
+                pageSlider.classList.remove('hidden');
+                
+                // Initialize slider here to ensure widths are calculated correctly now that element is visible
+                initSlider();
+
+                setTimeout(() => {
+                    pageSlider.classList.add('visible');
+                }, 10);
+                if (sliderTween) {
+                    sliderTween.play();
+                }
+            });
+        }
+        
+        // 3. Logic for individual Wonder Cards (The Scenario)
+        const wonderCards = document.querySelectorAll('.wonder-card');
+        const detailTitle = document.getElementById('wonder-detail-title');
+        const detailDesc = document.getElementById('wonder-detail-desc');
+        const detailSvgContainer = document.getElementById('wonder-detail-svg');
+
+        wonderCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                const title = card.getAttribute('data-title');
+                const desc = card.getAttribute('data-desc');
+                
+                // Check if card has an image that is currently visible
+                const img = card.querySelector('img');
+                const svg = card.querySelector('svg');
+                let contentClone;
+
+                if (img && img.style.display !== 'none') {
+                     // Clone the image
+                     contentClone = img.cloneNode(true);
+                     contentClone.className = "w-full h-full object-cover rounded-lg border-2 border-amber-200";
+                } else if (svg) {
+                     // Clone the SVG
+                     contentClone = svg.cloneNode(true);
+                     contentClone.classList.remove('pointer-events-none', 'hidden'); 
+                     contentClone.classList.add('rounded-lg', 'border-2', 'border-amber-200');
+                }
+
+                // Populate Modal
+                detailTitle.textContent = title;
+                detailDesc.textContent = desc;
+                detailSvgContainer.innerHTML = '';
+                if(contentClone) detailSvgContainer.appendChild(contentClone);
+                
+                // Show Modal
+                wonderDetailModal.classList.remove('hidden');
+            });
+        });
+
+        closeWonderDetail.addEventListener('click', () => {
+             wonderDetailModal.classList.add('hidden');
+        });
+        
+        // Click outside modal to close
+        wonderDetailModal.addEventListener('click', (e) => {
+            if (e.target === wonderDetailModal) {
+                 wonderDetailModal.classList.add('hidden');
+            }
+        });
+
+
+        cardsContainer.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            if(sliderTween) sliderTween.pause();
+        });
+        cardsContainer.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            if(sliderTween) sliderTween.pause();
+        }, { passive: true });
+        
+        window.addEventListener('mouseup', () => {
+             if(sliderTween && pageSlider.classList.contains('visible')) sliderTween.play();
+        });
+        window.addEventListener('touchend', () => {
+             if(sliderTween && pageSlider.classList.contains('visible')) sliderTween.play();
+        });
+
+        window.addEventListener('load', initSlider);
+        window.addEventListener('resize', initSlider);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-panel .nav-link, #desktopNav .nav-link');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+            const bottomNav = document.getElementById('bottomNav');
+            const leftNav = document.getElementById('leftNav');
+            const rightNav = document.getElementById('rightNav');
+            
+            function createEmbers() {
+                const embersContainer = document.getElementById('embers-container');
+                if (!embersContainer) return;
+                
+                for (let i = 0; i < 50; i++) {
+                    const ember = document.createElement('span');
+                    ember.className = 'ember';
+                    
+                    const size = Math.random() * 5 + 2; 
+                    ember.style.width = `${size}px`;
+                    ember.style.height = `${size}px`;
+                    
+                    ember.style.left = `${Math.random() * 100}vw`; 
+                    
+                    const duration = Math.random() * 5 + 8; 
+                    ember.style.animationDuration = `${duration}s`;
+                    
+                    const delay = Math.random() * 10; 
+                    ember.style.animationDelay = `${delay}s`;
+
+                    embersContainer.appendChild(ember);
+                }
+            }
+            createEmbers();
+
+            let areNavsOpen = false;
+
+            function isDesktop() {
+                return window.innerWidth >= 1024; 
+            }
+
+            function openMobileNavs() {
+                topNav.classList.remove('-translate-y-full');
+                bottomNav.classList.remove('translate-y-full');
+                leftNav.classList.remove('-translate-x-full');
+                if(rightNav) rightNav.classList.remove('translate-x-full');
+                
+                // Add padding to mainContent so it isn't covered by navs
+                // using standard tailwind pr-20 (5rem) for right nav width
+                mainContent.classList.add('pt-16', 'pb-16', 'pl-20', 'pr-20');
+                mainContent.classList.remove('pt-28');
+            }
+
+            function closeMobileNavs() {
+                topNav.classList.add('-translate-y-full');
+                bottomNav.classList.add('translate-y-full');
+                leftNav.classList.add('-translate-x-full');
+                if(rightNav) rightNav.classList.add('translate-x-full');
+                
+                mainContent.classList.remove('pt-16', 'pb-16', 'pl-20', 'pr-20');
+                mainContent.classList.add('pt-28');
+            }
+
+            function openDesktopNav() {
+                desktopNav.classList.remove('-translate-x-full');
+                mainContent.classList.add('pl-[21rem]'); 
+            }
+
+            function closeDesktopNav() {
+                desktopNav.classList.add('-translate-x-full');
+                mainContent.classList.remove('pl-[21rem]');
+            }
+
+            function toggleAllNavs() {
+                if (!areNavsOpen) {
+                }
+
+                areNavsOpen = !areNavsOpen;
+
+                if (areNavsOpen) {
+                    navToggleIcon.classList.add('hidden');
+                    navToggleX.classList.remove('hidden');
+
+                    if (isDesktop()) {
+                        openDesktopNav();
+                    } else {
+                        openMobileNavs();
+                    }
+                } else {
+                    navToggleIcon.classList.remove('hidden');
+                    navToggleX.classList.add('hidden');
+
+                    if (isDesktop()) {
+                        closeDesktopNav();
+                    } else {
+                        closeMobileNavs();
+                    }
+                }
+            }
+            
+             if (navWondersDesktop) {
+                 navWondersDesktop.addEventListener('click', () => { areNavsOpen = false; });
+             }
+             if (navHomeDesktop) {
+                 navHomeDesktop.addEventListener('click', () => { areNavsOpen = false; });
+             }
+
+            window.addEventListener('resize', () => {
+                if (areNavsOpen) {
+                    areNavsOpen = false;
+                    navToggleIcon.classList.remove('hidden');
+                    navToggleX.classList.add('hidden');
+                    closeMobileNavs();
+                    closeDesktopNav();
+                }
+            });
+
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleAllNavs();
+            });
+            
+            mainContent.addEventListener('click', (e) => {
+                if (areNavsOpen) {
+                    areNavsOpen = false;
+                    navToggleIcon.classList.remove('hidden');
+                    navToggleX.classList.add('hidden');
+                    closeMobileNavs();
+                    closeDesktopNav();
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetHref = e.currentTarget.getAttribute('href');
+                    
+                    if (targetHref.startsWith('#')) {
+                    } else {
+                    }
+                    e.stopPropagation(); 
+                });
+            });
+            
+        });
+
+    </script>
+
+</body>
+</html>
