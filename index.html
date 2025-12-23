@@ -14,18 +14,33 @@
         body {
             font-family: 'Inter', sans-serif;
             overflow: hidden; 
+            background-color: #000;
         }
 
         .nav-panel, #navToggleIcon, #navToggleX {
             transition: all 0.3s ease-in-out;
         }
+        
         .nav-panel {
             -ms-overflow-style: none;  
-            scrollbar-width: none;  
+            scrollbar-width: thin;
+            scrollbar-color: #4c1d95 #111827; 
         }
         .nav-panel::-webkit-scrollbar {
-            display: none; 
+            width: 8px;
         }
+        .nav-panel::-webkit-scrollbar-track {
+            background: #111827; 
+        }
+        .nav-panel::-webkit-scrollbar-thumb {
+            background-color: #4c1d95; 
+            border-radius: 4px; 
+        }
+        
+        #desktopNav {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         h1, h2, h3 {
             font-family: 'Pacifico', cursive; 
         }
@@ -37,7 +52,6 @@
         }
         
         #lock-screen {
-            /* Using the same cool cosmic background for consistency */
             background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
             z-index: 100;
         }
@@ -68,10 +82,6 @@
         
         #step1-screen .content-card {
             animation: fadeInUp 0.8s ease-out;
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
         }
 
         #step1-screen {
@@ -97,10 +107,8 @@
             }
         }
 
-
         .lamp-cord {
-            width: 4px; /* Slightly thicker */
-            height: 120px; /* Longer cord */
+            width: 4px; 
             background-color: #373055;
             position: absolute;
             top: 0;
@@ -111,17 +119,23 @@
         }
 
         .lamp-shade {
-            width: 250px; /* Larger shade */
-            height: 140px; /* Taller shade */
             background: linear-gradient(to bottom, #f8d0e8, #e0b0d0);
             border-radius: 0 0 40% 40% / 0 0 100% 100%;
             position: absolute;
-            top: 120px; /* Positioned lower to match longer cord */
             left: 50%;
             transform: translateX(-50%);
             z-index: 10; 
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: opacity 0.5s ease-in-out; 
+        }
+
+        @media (min-width: 768px) {
+            .lamp-cord, .lamp-shade { display: none; }
+        }
+
+        @media (max-width: 767px) {
+            .lamp-cord { height: 80px; }
+            .lamp-shade { width: 160px; height: 90px; top: 80px; }
         }
         
         .lamp-glow {
@@ -144,47 +158,18 @@
             mix-blend-mode: lighten;
             transition: clip-path 1.5s ease-in-out;
             z-index: 30; 
+            pointer-events: none;
         }
         
-        #spotlight-red {
-            background-color: rgba(255, 69, 58, 0.9); 
-            clip-path: polygon(100% 75%, 100% 75%, 100% 75%);
-        }
+        #spotlight-red { background-color: rgba(255, 69, 58, 0.9); clip-path: polygon(100% 75%, 100% 75%, 100% 75%); }
+        #spotlight-orange { background-color: rgba(255, 149, 0, 0.9); clip-path: polygon(0% 75%, 0% 75%, 0% 75%); }
+        #spotlight-yellow { background-color: rgba(255, 214, 10, 0.9); clip-path: polygon(100% 25%, 100% 25%, 100% 25%); }
+        #spotlight-green { background-color: rgba(50, 215, 75, 0.9); clip-path: polygon(25% 0%, 25% 0%, 25% 0%); }
+        #spotlight-blue { background-color: rgba(10, 132, 255, 0.9); clip-path: polygon(75% 100%, 75% 100%, 75% 100%); }
+        #spotlight-indigo { background-color: rgba(90, 200, 250, 0.9); clip-path: polygon(25% 100%, 25% 100%, 25% 100%); }
+        #spotlight-violet { background-color: rgba(190, 75, 219, 0.9); clip-path: polygon(75% 0%, 75% 0%, 75% 0%); }
+        #spotlight-magenta { background-color: rgba(255, 20, 147, 0.9); clip-path: polygon(0% 25%, 0% 25%, 0% 25%); }
 
-        #spotlight-orange {
-            background-color: rgba(255, 149, 0, 0.9); 
-            clip-path: polygon(0% 75%, 0% 75%, 0% 75%);
-        }
-
-        #spotlight-yellow {
-            background-color: rgba(255, 214, 10, 0.9); 
-            clip-path: polygon(100% 25%, 100% 25%, 100% 25%);
-        }
-
-        #spotlight-green {
-            background-color: rgba(50, 215, 75, 0.9);
-            clip-path: polygon(25% 0%, 25% 0%, 25% 0%);
-        }
-
-        #spotlight-blue {
-            background-color: rgba(10, 132, 255, 0.9); 
-            clip-path: polygon(75% 100%, 75% 100%, 75% 100%);
-        }
-        
-        #spotlight-indigo {
-            background-color: rgba(90, 200, 250, 0.9); 
-            clip-path: polygon(25% 100%, 25% 100%, 25% 100%);
-        }
-
-        #spotlight-violet {
-            background-color: rgba(190, 75, 219, 0.9); 
-            clip-path: polygon(75% 0%, 75% 0%, 75% 0%);
-        }
-        
-        #spotlight-magenta { 
-            background-color: rgba(255, 20, 147, 0.9); 
-            clip-path: polygon(0% 25%, 0% 25%, 0% 25%);
-        }
         .sprinkle {
             position: absolute;
             width: 8px;
@@ -195,23 +180,14 @@
         }
 
         @keyframes fall {
-            0% {
-                transform: translateY(-100px) rotateZ(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotateZ(720deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(-100px) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
         }
         
-        #sprinkle-container-final {
-            z-index: 80; 
-        }
+        #sprinkle-container-final { z-index: 80; }
 
         .sequence-text-style {
             font-family: 'Dancing Script', cursive; 
-            font-size: 2.5rem; 
             line-height: 1.4;
             text-align: center;
             background: linear-gradient(90deg, #FFD700, #FF8C00, #FF4500);
@@ -224,7 +200,6 @@
         
         .sequence-text-style-long {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.5rem; 
             line-height: 1.4;
             text-align: center;
             background: linear-gradient(90deg, #FFD700, #FF8C00, #FF4500);
@@ -238,7 +213,6 @@
         .sequence-text-style-bold {
             font-family: 'Inter', sans-serif;
             font-weight: 900;
-            font-size: 4rem;
             text-align: center;
             color: #dc2626; 
             text-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
@@ -246,25 +220,23 @@
         
         .sequence-text-style-transition {
              font-family: 'Gochi Hand', cursive;
-             font-size: 2.5rem; 
              text-align: center;
              color: #e5e7eb; 
              text-shadow: 0 0 10px rgba(229, 231, 235, 0.3);
         }
 
-        @media (max-width: 640px) {
-            .sequence-text-style {
-                font-size: 1.75rem; 
-            }
-            .sequence-text-style-long {
-                font-size: 1.5rem; 
-            }
-            .sequence-text-style-bold {
-                font-size: 2.5rem; 
-            }
-            .sequence-text-style-transition {
-                font-size: 1.75rem; 
-            }
+        @media (min-width: 768px) {
+            .sequence-text-style { font-size: 2.25rem; }
+            .sequence-text-style-long { font-size: 2.25rem; }
+            .sequence-text-style-bold { font-size: 3.5rem; }
+            .sequence-text-style-transition { font-size: 2.25rem; }
+        }
+
+        @media (max-width: 767px) {
+            .sequence-text-style { font-size: 1.75rem; }
+            .sequence-text-style-long { font-size: 1.5rem; }
+            .sequence-text-style-bold { font-size: 2.5rem; }
+            .sequence-text-style-transition { font-size: 1.75rem; }
         }
 
         @keyframes textFadeIn {
@@ -275,12 +247,8 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(-10px); }
         }
-        .text-fade-in {
-            animation: textFadeIn 0.5s ease-out forwards;
-        }
-        .text-fade-out {
-            animation: textFadeOut 0.5s ease-in forwards;
-        }
+        .text-fade-in { animation: textFadeIn 0.5s ease-out forwards; }
+        .text-fade-out { animation: textFadeOut 0.5s ease-in forwards; }
         
         #text-sequence-container {
             position: absolute;
@@ -288,9 +256,12 @@
             left: 50%; 
             transform: translate(-50%, -50%); 
             width: 90%;
-            max-width: 800px; 
+            max-width: 1000px; 
             z-index: 40; 
             min-height: 200px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .typewrite > .wrap { 
@@ -304,31 +275,157 @@
             from, to { border-color: transparent }
             50% { border-color: #fff; }
         }
+        
+        /* === REALISTIC STAGE STYLES === */
+        .stage-container {
+            perspective: 1500px;
+            overflow: hidden;
+        }
+        
+        /* Realistic Curtains with Folds */
+        .curtain-side {
+            background: repeating-linear-gradient(90deg, 
+                #3a0202 0%, 
+                #6b0505 10%, 
+                #8a0808 15%, 
+                #6b0505 20%, 
+                #3a0202 30%
+            );
+            box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+            z-index: 20;
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 15%;
+        }
+        .curtain-left { left: 0; }
+        .curtain-right { right: 0; }
+
+        /* Valance (Top Curtain) */
+        .curtain-top {
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 20%;
+            background: repeating-linear-gradient(180deg, 
+                #3a0202 0%, 
+                #750606 30%, 
+                #3a0202 100%
+            );
+            border-radius: 0 0 50% 50%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            z-index: 25;
+        }
+
+        /* Realistic Wooden Floor */
+        .stage-floor {
+            position: absolute;
+            bottom: -20%;
+            left: -20%;
+            width: 140%;
+            height: 70%;
+            background: 
+                repeating-linear-gradient(90deg, 
+                    #2e1a1a 0px, 
+                    #3e2723 2px, 
+                    #4e342e 4px,
+                    #2e1a1a 40px
+                );
+            transform: rotateX(75deg);
+            transform-origin: bottom center;
+            box-shadow: inset 0 20px 150px #000;
+            z-index: 5;
+        }
+
+        /* Volumetric Light Beam (God Rays) */
+        .volumetric-light {
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            width: 400px;
+            height: 150%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            transform: translateX(-50%) perspective(500px) rotateX(20deg);
+            filter: blur(20px);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 15;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        /* Floating dust particles effect animation */
+        @keyframes floatParticles {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+        .stage-particles {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            animation: floatParticles 20s linear infinite;
+            z-index: 16;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+        }
+
+        /* Mic Stand Improvements */
+        .mic-head-grid {
+            background-image: radial-gradient(#222 1px, transparent 1px);
+            background-size: 3px 3px;
+        }
+        
+        /* New Nav Button Hover Effect */
+        .nav-btn-glow:hover {
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.6);
+            border-color: rgba(236, 72, 153, 0.8);
+            background-color: rgba(139, 92, 246, 0.3);
+        }
+
+        /* DESKTOP CURSOR TRAIL */
+        .cursor-trail {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            margin-left: -6px;
+            margin-top: -6px;
+            animation: cursorTrailAnim 0.6s ease-out forwards;
+        }
+
+        @keyframes cursorTrailAnim {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(0.2); opacity: 0; }
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 h-full m-0 p-0">
 
     <div id="app-container" class="relative w-full h-full">
 
+        <!-- LOCK SCREEN -->
         <div id="lock-screen" class="w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden text-white">
-            <div class="relative z-10 w-full max-w-lg p-8 sm:p-12 bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-700">
-                <h1 class="text-4xl sm:text-5xl font-bold text-pink-500 text-center mb-6" style="font-family: 'Pacifico', cursive;">
+            <div class="relative z-10 w-full max-w-lg p-6 sm:p-12 bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-700">
+                <h1 class="text-3xl sm:text-5xl font-bold text-pink-500 text-center mb-6" style="font-family: 'Pacifico', cursive;">
                     Access Locked 🔒
                 </h1>
-                <p class="text-xl text-center mb-6 festive-text text-pink-300">
+                <p class="text-lg sm:text-xl text-center mb-6 festive-text text-pink-300">
                     The magic is building. Count down to your royal moment:
                 </p>
-                <div id="countdown-timer" class="text-center">
-                </div>
+                <div id="countdown-timer" class="text-center"></div>
             </div>
             <div id="star-container-lock" class="absolute inset-0 w-full h-full pointer-events-none"></div>
         </div>
 
+        <!-- INITIAL SCREEN -->
         <div id="initial-screen" class="hidden w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden">
             <div id="star-container" class="absolute inset-0 w-full h-full pointer-events-none"></div>
 
             <div class="relative z-10 w-full max-w-md p-8 sm:p-12 bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20">
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-white text-center shadow-lg mb-12">
+                <h1 class="text-4xl sm:text-6xl font-bold text-white text-center shadow-lg mb-12">
                     Are You the Birthday Queen?
                 </h1>
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 w-full">
@@ -342,32 +439,75 @@
             </div>
         </div>
 
-        <div id="step1-screen" class="hidden w-full h-full p-4 sm:p-8 overflow-hidden">
+        <!-- STEP 1 SCREEN -->
+        <div id="step1-screen" class="hidden w-full h-full overflow-hidden flex items-center justify-center p-4">
             
             <div id="sprinkle-container-1" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"></div>
             
-            <div class="content-card relative z-20 flex flex-col items-center w-full max-w-md p-6 sm:p-8 bg-black/20 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20">
-
-                <p class="birthday-message text-2xl text-white mb-8 text-center">
-                    Happy Birthday my birthday queen
-                </p>
+            <div class="content-card relative z-20 flex flex-col md:flex-row items-center w-full max-w-sm md:max-w-4xl p-6 md:p-10 bg-black/40 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 gap-8">
                 
-                <img src="Cute-Durga.jpg" alt="Birthday Queen" class="rounded-lg shadow-2xl border-4 border-white mb-6 w-full max-w-sm h-auto" onerror="this.src='https://placehold.co/600x400/f472b6/ffffff?text=Birthday+Queen';">
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <img src="Cute-Durga.jpg" alt="Birthday Queen" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-sm h-auto object-cover transform md:rotate-[-3deg] transition hover:rotate-0 duration-500" onerror="this.src='https://placehold.co/600x400/f472b6/ffffff?text=Birthday+Queen';">
+                </div>
                 
-                <button id="step1-ok-btn" class="px-10 py-4 text-white text-xl sm:text-2xl font-bold rounded-lg shadow-xl hover:bg-blue-700 transform hover:scale-105 transition-transform duration-300">
-                    Thanks
-                </button>
+                <div class="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
+                    <h2 class="birthday-message text-3xl md:text-5xl text-white mb-4 md:mb-8 font-bold leading-tight">
+                        Happy Birthday<br><span class="text-pink-400">My Queen</span> 👑
+                    </h2>
+                    <p class="text-gray-200 text-lg mb-8 festive-text">
+                        Today the stars align just for you. May you will get the vibe you want😅 & hope it will be your best day.
+                    </p>
+                    <button id="step1-ok-btn" class="w-full md:w-auto px-12 py-4 text-white text-xl md:text-2xl font-bold rounded-lg shadow-xl hover:bg-blue-700 transform hover:scale-105 transition-transform duration-300">
+                        Thanks
+                    </button>
+                </div>
 
             </div>
         </div>
 
-        <div id="main-show-screen" class="hidden w-full h-full flex-col items-center justify-center bg-black overflow-hidden p-4 sm:p-8" id="mainContent">
+        <div id="main-show-screen" class="hidden w-full h-full flex flex-col items-center justify-center bg-black overflow-hidden p-4 sm:p-8" id="mainContent">
             
+            <!-- REALISTIC STAGE ENVIRONMENT (Desktop Only Background) -->
+            <div id="stage-environment" class="hidden md:block absolute inset-0 w-full h-full pointer-events-none stage-container bg-[#1a0505]">
+                
+                <!-- Background Wall -->
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                
+                <!-- Stage Curtains -->
+                <div class="curtain-side curtain-left"></div>
+                <div class="curtain-side curtain-right"></div>
+                <div class="curtain-top"></div>
+                
+                <!-- Stage Floor -->
+                <div class="stage-floor"></div>
+            
+                <!-- Lighting Effects -->
+                <div class="volumetric-light"></div>
+                <div class="stage-particles"></div>
+            </div>
+
+            <!-- Realistic Standing Mic (Desktop Only - 'hidden md:flex') -->
+            <div id="mic-stand" class="hidden md:flex absolute bottom-[10vh] left-1/2 -translate-x-1/2 z-10 flex-col items-center opacity-0 transition-opacity duration-1000 scale-100 origin-bottom">
+                <!-- Mic Head -->
+                <div class="relative w-12 h-16 bg-gradient-to-r from-gray-400 to-gray-200 rounded-full border-2 border-gray-400 shadow-[0_0_20px_rgba(255,255,255,0.6)] overflow-hidden z-20">
+                        <div class="mic-head-grid absolute inset-0 opacity-60"></div>
+                        <div class="absolute inset-0 bg-gradient-to-tr from-black/50 to-transparent"></div>
+                </div>
+                <!-- Connector/Neck -->
+                <div class="w-4 h-6 bg-gradient-to-r from-gray-800 to-gray-600 z-10 mt-[-2px]"></div>
+                <!-- Main Pole -->
+                <div class="w-2 h-[45vh] bg-gradient-to-r from-gray-400 via-white to-gray-400 shadow-lg z-10"></div>
+                <!-- Round Base -->
+                <div class="w-32 h-8 bg-[#111] rounded-[50%] border-t border-gray-700 shadow-[0_10px_20px_rgba(0,0,0,0.8)] mt-[-4px] z-10"></div>
+            </div>
+
+            <!-- LAMP (Mobile Only) -->
             <div id="lamp-cord" class="lamp-cord"></div>
             <div id="lamp-shade" class="lamp-shade">
                 <div id="lamp-glow" class="lamp-glow"></div>
             </div>
 
+            <!-- Spotlights (Dynamic) -->
             <div id="spotlight-red" class="spotlight"></div>
             <div id="spotlight-orange" class="spotlight"></div>
             <div id="spotlight-yellow" class="spotlight"></div>
@@ -382,10 +522,10 @@
             </div>
 
             <div id="final-photo-container" class="relative z-[50] opacity-0 transition-opacity duration-1000 scale-90 transform w-full px-4"
-                 style="position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%) scale(0.9);">
-                <img src="Main.jpg" alt="Happy Birthday" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-sm h-auto mx-auto" onerror="this.src='https://placehold.co/600x400/8b5cf6/ffffff?text=Happy+Birthday';">
+                 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);">
+                <img src="Main1.jpg" alt="Happy Birthday" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-xs md:max-w-md max-h-[60vh] object-contain mx-auto" onerror="this.src='https://placehold.co/600x400/8b5cf6/ffffff?text=Happy+Birthday';">
                 
-                <h2 id="special-wish" class="text-3xl sm:text-4xl text-white text-center mt-8" style="font-family: 'Gochi Hand', cursive; text-shadow: 0 0 10px #f0abfc;">
+                <h2 id="special-wish" class="text-2xl sm:text-4xl text-white text-center mt-6 md:mt-8" style="font-family: 'Gochi Hand', cursive; text-shadow: 0 0 10px #f0abfc;">
                     Happy Birthday to the one who makes the world brighter. ✨
                 </h2>
                </div>
@@ -393,57 +533,106 @@
             <div id="sprinkle-container-final" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
         </div>
 
-        <button id="navToggle" class="hidden fixed top-6 left-6 z-[70] p-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-            <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
-            <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <button id="navToggle" class="hidden fixed top-6 left-6 z-[90] p-3 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-transform transform hover:scale-110">
+            <svg id="navToggleIcon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
+            <svg id="navToggleX" class="w-8 h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <nav id="topNav" class="nav-panel fixed top-0 left-0 right-0 z-[60] h-16 bg-purple-600 text-yellow-100 shadow-md flex items-center justify-center space-x-6 -translate-y-full">
-            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Home</a>
-            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Special</a>
+        <nav id="desktopNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-[650px] max-w-[90vw] bg-gray-900/95 backdrop-blur-xl border-r border-purple-500/30 flex-col hidden md:flex -translate-x-full shadow-[20px_0_50px_rgba(0,0,0,0.8)]">
+            <div class="p-8 pt-24 h-full overflow-y-auto w-full">
+                <h3 class="text-4xl text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 font-bold mb-8 text-center drop-shadow-lg" style="font-family: 'Pacifico', cursive;">
+                    Magical Destinations
+                </h3>
+                
+                <div class="grid grid-cols-2 gap-4 w-full">
+                    <a href="index.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300 bg-yellow-500/10 text-yellow-200 border-yellow-500/30">Home</a>
+                    <a href="Cake.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Cake</a>
+                    <a href="21_Wish.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">21 Door</a>
+                    <a href="chat.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Heaven</a>
+                    <a href="Diary.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Diary</a>
+                    <a href="anatomy.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Anatomy</a>
+                    <a href="Box.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Box</a>
+                    <a href="Special.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Special</a>
+                    <a href="color.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Colors</a>
+                    <a href="you.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">You</a>
+                    <a href="Teacher.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Teacher</a>
+                    <a href="Universe.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Universe</a>
+                    <a href="The_River.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">River</a>
+                    <a href="Mountain.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Mountain</a>
+                    <a href="Skill.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Skills</a>
+                    <a href="Paper_Star.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Paper Star</a>
+                    <a href="Carttoon.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Cartoon</a>
+                    <a href="Periodik_table.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Periodic</a>
+                    <a href="Concept.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Concept</a>
+                    <a href="Calender.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Calendar</a>
+                    <a href="Perspective.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Perspective</a>
+                    <a href="Santa.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Santa</a>
+                    <a href="Presence.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Presence</a>
+                    <a href="Cloud.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Cloud</a>
+                    <a href="Ink.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Paint</a>
+                    <a href="Butterfly.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Butterfly</a>
+                    <a href="Weather.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Weather</a>
+                    <a href="Spotlight.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Spotlight</a>
+                    <a href="Room.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Room</a>
+                    <a href="Radio.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Radio</a>
+                    <a href="Food.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Food</a>
+                    <a href="Music.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Music</a>
+                    <a href="letter.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Letter</a>
+                    <a href="Msg.html" class="nav-link nav-btn-glow block p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-white festive-text text-xl transition-all duration-300">Message</a>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <p class="text-gray-400 text-sm italic">You are the center of this Universe ✨</p>
+                </div>
+            </div>
+        </nav>
+        
+        <nav id="topNav" class="nav-panel md:hidden fixed top-0 left-0 right-0 z-[80] h-16 bg-purple-600 text-yellow-100 shadow-md flex items-center justify-center space-x-6 -translate-y-full">
+            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Massege</a>
             <a href="letter.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Letter</a>
+            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Music</a>
         </nav>
-
-        <nav id="bottomNav" class="nav-panel fixed bottom-0 left-0 right-0 z-[60] h-16 bg-purple-600 text-yellow-100 shadow-md flex items-center justify-center space-x-6 translate-y-full">
-            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Anatomy</a>
-            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Heaven</a>
-            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">You</a>
-        </nav>
-
-        <nav id="leftNav" class="nav-panel fixed left-0 top-0 bottom-0 z-[60] w-20 bg-purple-800 text-yellow-100 shadow-md flex flex-col items-center space-y-6 -translate-x-full overflow-y-auto py-20">
-            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Diary</a>
-            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Universe</a>
-            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Box</a>
-            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Color</a>
-            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Teacher</a>
-            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">River</a>
-            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Mountain</a>
+        
+        <nav id="bottomNav" class="nav-panel md:hidden fixed bottom-0 left-0 right-0 z-[80] h-16 bg-purple-600 text-yellow-100 shadow-md flex items-center justify-center space-x-6 translate-y-full">
+            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Skill</a>
             <a href="Paper_Star.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Paper Star</a>
             <a href="Carttoon.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cartoon</a>
+        </nav>
+        
+        <nav id="leftNav" class="nav-panel md:hidden fixed left-0 top-0 bottom-0 z-[60] w-20 bg-purple-800 text-yellow-100 shadow-md flex flex-col items-center space-y-1 -translate-x-full overflow-y-auto py-20">
+            <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Home</a>
+            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cake</a>
+            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">21_Door</a>
+            <a href="chat.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Heaven</a>
+            <a href="Diary.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Diary</a>
+            <a href="anatomy.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Anatomy</a>
+            <a href="Box.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Box</a>
+            <a href="Special.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Special</a>
+            <a href="color.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Color</a>
+            <a href="you.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">You</a>
+            <a href="Teacher.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Teacher</a>
+            <a href="Universe.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Universe</a>
+            <a href="The_River.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">River</a>
+            <a href="Mountain.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Mountain</a>
+        </nav>
+        
+        <nav id="rightNav" class="nav-panel md:hidden fixed right-0 top-0 bottom-0 z-[60] w-20 bg-purple-800 text-yellow-100 shadow-md flex flex-col items-center space-y-1 translate-x-full overflow-y-auto py-20">
+            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Periodik_table</a>
+            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Concept</a>
+            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Calender</a>
+            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Perspective</a>
             <a href="Santa.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Santa</a>
+            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Presence</a>
             <a href="Cloud.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cloud</a>
             <a href="Ink.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Paint</a>
             <a href="Butterfly.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Butterfly</a>
             <a href="Weather.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Weather</a>
-        </nav>
-
-        <nav id="rightNav" class="nav-panel fixed right-0 top-0 bottom-0 z-[60] w-20 bg-purple-800 text-yellow-100 shadow-md flex flex-col items-center space-y-6 translate-x-full overflow-y-auto py-20">
-            <a href="Skill.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Skill</a>
-            <a href="Msg.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Massege</a>
-            <a href="21_Wish.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">21_Door</a>
-            <a href="Cake.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Cake</a>
-            <a href="Periodik_table.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Periodik_table</a>
-            <a href="Presence.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Presence</a>
-            <a href="Concept.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Concept</a>
-            <a href="Calender.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Calender</a>
-            <a href="Perspective.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Perspective</a>
             <a href="Spotlight.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Spotlight</a>
             <a href="Room.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Room</a>
             <a href="Radio.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Radio</a>
             <a href="Food.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Food</a>
-            <a href="Music.html" class="nav-link p-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors duration-200 festive-text">Music</a>
         </nav>
-        
+
         <div id="no-modal" class="hidden fixed inset-0 w-full h-full flex items-center justify-center z-[100]">
             <div class="modal-backdrop absolute inset-0 w-full h-full"></div>
             <div class="relative z-10 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-2xl max-w-sm w-full mx-4">
@@ -460,7 +649,7 @@
     </div> 
 
     <script>
-        const lockDate = new Date('2025-12-26T00:00:00'); 
+        const lockDate = new Date('2025-11-25T00:00:00'); 
         const ONE_DAY = 1000 * 60 * 60 * 24;
         const ONE_HOUR = 1000 * 60 * 60;
         const ONE_MINUTE = 1000 * 60;
@@ -482,6 +671,7 @@
         const sprinkleContainer1 = document.getElementById('sprinkle-container-1');
         const sprinkleContainerFinal = document.getElementById('sprinkle-container-final');
         const starContainer = document.getElementById('star-container'); 
+        
         const spotlightRed = document.getElementById('spotlight-red');
         const spotlightOrange = document.getElementById('spotlight-orange');
         const spotlightYellow = document.getElementById('spotlight-yellow');
@@ -490,19 +680,28 @@
         const spotlightIndigo = document.getElementById('spotlight-indigo');
         const spotlightViolet = document.getElementById('spotlight-violet');
         const spotlightMagenta = document.getElementById('spotlight-magenta');
+        
         const finalPhotoContainer = document.getElementById('final-photo-container');
         const lampCord = document.getElementById('lamp-cord');
         const lampShade = document.getElementById('lamp-shade');
         const lampGlow = document.getElementById('lamp-glow'); 
+        const micStand = document.getElementById('mic-stand');
+        
+        const desktopNav = document.getElementById('desktopNav');
         const topNav = document.getElementById('topNav');
         const bottomNav = document.getElementById('bottomNav');
         const leftNav = document.getElementById('leftNav');
         const rightNav = document.getElementById('rightNav');
+        const mobileNavTrigger = document.getElementById('mobileNavTrigger');
+        const mobileNavIcon = document.getElementById('mobileNavIcon');
+        const mobileNavCloseIcon = document.getElementById('mobileNavCloseIcon');
+        
         const navLinks = document.querySelectorAll('.nav-link');
         const mainContent = document.getElementById('mainContent'); 
         const navToggle = document.getElementById('navToggle');
         const navToggleIcon = document.getElementById('navToggleIcon');
         const navToggleX = document.getElementById('navToggleX');
+        
         const textSequenceContainer = document.getElementById('text-sequence-container');
         const sequenceText = document.getElementById('sequence-text');
         let areNavsOpen = false;
@@ -510,7 +709,59 @@
         let sprinkleIntervalFinal;
         const colors = ['#f87171', '#ec4899', '#a855f7', '#3b82f6', '#facc15', '#4ade80', '#2dd4bf'];
 
-        // --- Core Functions ---
+        var TxtType = function(el, toRotate, period) {
+            this.toRotate = toRotate;
+            this.el = el;
+            this.loopNum = 0;
+            this.period = parseInt(period, 10) || 2000;
+            this.txt = '';
+            this.isDeleting = false;
+            this.onComplete = null; 
+            this.tick();
+        };
+
+        TxtType.prototype.tick = function() {
+            var i = this.loopNum % this.toRotate.length;
+            var fullTxt = this.toRotate[i];
+
+            if (this.isDeleting) {
+                this.txt = fullTxt.substring(0, this.txt.length - 1);
+            } else {
+                this.txt = fullTxt.substring(0, this.txt.length + 1);
+            }
+
+            this.el.innerHTML = '<span class="wrap">' + this.txt.replace(/\n/g, '<br>') + '</span>';
+
+            var that = this;
+            var delta = 100 - Math.random() * 50; 
+
+            if (this.isDeleting) { delta /= 4; } 
+
+            if (!this.isDeleting && this.txt === fullTxt) {
+                if (this.loopNum >= this.toRotate.length - 1) {
+                    if (this.onComplete) {
+                        this.onComplete(); 
+                    }
+                    const wrap = this.el.querySelector('.wrap');
+                    if (wrap) {
+                        wrap.style.borderRight = 'none';
+                        wrap.style.animation = 'none';
+                    }
+                    return; 
+                }
+
+                delta = this.period;
+                this.isDeleting = true;
+            } else if (this.isDeleting && this.txt === '') {
+                this.isDeleting = false;
+                this.loopNum++;
+                delta = 500; 
+            }
+            
+            setTimeout(function() {
+                that.tick();
+            }, delta);
+        };
 
         function createSprinkle(container) {
             const sprinkle = document.createElement('div');
@@ -597,21 +848,21 @@
             if (countdownTimer) {
                 countdownTimer.innerHTML = `
                     <div class="flex justify-center space-x-2 sm:space-x-4 text-white">
-                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[70px]">
-                            <span class="text-4xl sm:text-6xl font-extrabold text-pink-500">${days}</span>
-                            <span class="text-sm sm:text-lg festive-text text-gray-300">Days</span>
+                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[60px] sm:min-w-[70px]">
+                            <span class="text-3xl sm:text-6xl font-extrabold text-pink-500">${days}</span>
+                            <span class="text-xs sm:text-lg festive-text text-gray-300">Days</span>
                         </div>
-                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[70px]">
-                            <span class="text-4xl sm:text-6xl font-extrabold text-pink-500">${hours}</span>
-                            <span class="text-sm sm:text-lg festive-text text-gray-300">Hours</span>
+                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[60px] sm:min-w-[70px]">
+                            <span class="text-3xl sm:text-6xl font-extrabold text-pink-500">${hours}</span>
+                            <span class="text-xs sm:text-lg festive-text text-gray-300">Hours</span>
                         </div>
-                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[70px]">
-                            <span class="text-4xl sm:text-6xl font-extrabold text-pink-500">${minutes}</span>
-                            <span class="text-sm sm:text-lg festive-text text-gray-300">Minutes</span>
+                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[60px] sm:min-w-[70px]">
+                            <span class="text-3xl sm:text-6xl font-extrabold text-pink-500">${minutes}</span>
+                            <span class="text-xs sm:text-lg festive-text text-gray-300">Minutes</span>
                         </div>
-                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[70px]">
-                            <span class="text-4xl sm:text-6xl font-extrabold text-pink-500">${seconds}</span>
-                            <span class="text-sm sm:text-lg festive-text text-gray-300">Seconds</span>
+                        <div class="flex flex-col items-center p-2 rounded-lg bg-white/10 min-w-[60px] sm:min-w-[70px]">
+                            <span class="text-3xl sm:text-6xl font-extrabold text-pink-500">${seconds}</span>
+                            <span class="text-xs sm:text-lg festive-text text-gray-300">Seconds</span>
                         </div>
                     </div>
                 `;
@@ -637,20 +888,39 @@
         }
 
         function openAllNavs() {
-            if (topNav) topNav.classList.remove('-translate-y-full');
-            if (bottomNav) bottomNav.classList.remove('translate-y-full');
-            if (leftNav) leftNav.classList.remove('-translate-x-full');
-            if (rightNav) rightNav.classList.remove('translate-x-full');
+            const isMobile = window.innerWidth < 768; 
+            
+            if (isMobile) {
+                if (topNav) topNav.classList.remove('-translate-y-full');
+                if (bottomNav) bottomNav.classList.remove('translate-y-full');
+                if (leftNav) leftNav.classList.remove('-translate-x-full');
+                if (rightNav) rightNav.classList.remove('translate-x-full');
+                
+            } else {
+                if(desktopNav) {
+                    desktopNav.classList.remove('-translate-x-full');
+                }
+            }
+
             if (navToggleIcon) navToggleIcon.classList.add('hidden');
             if (navToggleX) navToggleX.classList.remove('hidden');
             areNavsOpen = true;
         }
 
         function closeAllNavs() {
-            if (topNav) topNav.classList.add('-translate-y-full');
-            if (bottomNav) bottomNav.classList.add('translate-y-full');
-            if (leftNav) leftNav.classList.add('-translate-x-full');
-            if (rightNav) rightNav.classList.add('translate-x-full');
+            const isMobile = window.innerWidth < 768;
+
+            if (isMobile) {
+                if (topNav) topNav.classList.add('-translate-y-full');
+                if (bottomNav) bottomNav.classList.add('translate-y-full');
+                if (leftNav) leftNav.classList.add('-translate-x-full');
+                if (rightNav) rightNav.classList.add('translate-x-full');
+            } else {
+                if (desktopNav) {
+                    desktopNav.classList.add('-translate-x-full');
+                }
+            }
+
             if (navToggleIcon) navToggleIcon.classList.remove('hidden');
             if (navToggleX) navToggleX.classList.add('hidden');
             areNavsOpen = false;
@@ -664,9 +934,14 @@
             }
         }
         
-        // --- Event Listeners and Initial Load ---
+        window.addEventListener('resize', () => {
+            if (areNavsOpen) {
+                closeAllNavs();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
-            initCountdownLock(); // NEW: Start the lock logic immediately
+            initCountdownLock();
         });
 
         if (noBtn) {
@@ -683,8 +958,12 @@
 
         if (yesBtn) {
             yesBtn.addEventListener('click', async () => {
-                await Tone.start();
-                console.log('Audio Context Started');
+                try {
+                    await Tone.start();
+                    console.log('Audio Context Started');
+                } catch (e) {
+                    console.log('Audio context rejected or failed', e);
+                }
                 
                 if (initialScreen) initialScreen.classList.add('hidden');
                 if (step1Screen) step1Screen.classList.remove('hidden');
@@ -696,12 +975,21 @@
 
         if (step1OkBtn) {
             step1OkBtn.addEventListener('click', async () => {
-                await Tone.start();
+                try {
+                      await Tone.start();
+                } catch(e) {}
                 
                 if (step1Screen) step1Screen.classList.add('hidden');
                 stopSprinkles(sprinkleContainer1);
                 
                 if (mainShowScreen) mainShowScreen.classList.remove('hidden');
+                mainShowScreen.style.display = 'flex';
+                
+                // Show Mic on all screens
+                if (micStand) {
+                    micStand.style.opacity = '1';
+                }
+                
                 startNewSequence();
             });
         }
@@ -713,44 +1001,21 @@
             });
         }
         
-        function createContentClickListener(element) {
-            if (element) {
-                element.addEventListener('click', (e) => {
-                    if (areNavsOpen) {
-                        if (e.target === element || e.target === textSequenceContainer || e.target === finalPhotoContainer) {
-                           closeAllNavs();
-                        }
-                    }
-                });
-            }
-        }
-        
-        if (step1Screen) {
-            step1Screen.addEventListener('click', (e) => {
-                const contentCard = step1Screen.querySelector('.content-card');
-                if (areNavsOpen && contentCard && !contentCard.contains(e.target)) {
+        // Global click listener for closing navs when clicking outside
+        document.addEventListener('click', (e) => {
+            if (areNavsOpen) {
+                const clickedInsideNav = e.target.closest('.nav-panel');
+                const clickedOnToggle = e.target.closest('#navToggle');
+                
+                if (!clickedInsideNav && !clickedOnToggle) {
                     closeAllNavs();
                 }
-            });
-        }
-
-        createContentClickListener(mainShowScreen); 
-        if (textSequenceContainer) {
-            textSequenceContainer.addEventListener('click', () => {
-                if (areNavsOpen) closeAllNavs();
-            });
-        }
-        if (finalPhotoContainer) {
-            finalPhotoContainer.addEventListener('click', () => {
-                if (areNavsOpen) closeAllNavs();
-            });
-        }
-
+            }
+        });
 
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 const targetHash = e.currentTarget.getAttribute('href');
-                
                 if (targetHash && targetHash.startsWith('#')) {
                     e.preventDefault();
                     if (areNavsOpen) {
@@ -759,61 +1024,6 @@
                 }
             });
         });
-
-        var TxtType = function(el, toRotate, period) {
-            this.toRotate = toRotate;
-            this.el = el;
-            this.loopNum = 0;
-            this.period = parseInt(period, 10) || 2000;
-            this.txt = '';
-            this.isDeleting = false;
-            this.onComplete = null; 
-            this.tick();
-        };
-
-        TxtType.prototype.tick = function() {
-            var i = this.loopNum % this.toRotate.length;
-            var fullTxt = this.toRotate[i];
-
-            if (this.isDeleting) {
-                this.txt = fullTxt.substring(0, this.txt.length - 1);
-            } else {
-                this.txt = fullTxt.substring(0, this.txt.length + 1);
-            }
-
-            this.el.innerHTML = '<span class="wrap">' + this.txt.replace(/\n/g, '<br>') + '</span>';
-
-            var that = this;
-            var delta = 100 - Math.random() * 50; 
-
-            if (this.isDeleting) { delta /= 4; } 
-
-            if (!this.isDeleting && this.txt === fullTxt) {
-                delta = this.period;
-                this.isDeleting = true;
-            } else if (this.isDeleting && this.txt === '') {
-                this.isDeleting = false;
-                this.loopNum++;
-                delta = 500; 
-            }
-            
-            if (this.loopNum === this.toRotate.length) {
-                if (this.onComplete) {
-                    this.onComplete(); 
-                }
-             
-                const wrap = this.el.querySelector('.wrap');
-                if (wrap) {
-                    wrap.style.borderRight = 'none';
-                    wrap.style.animation = 'none';
-                }
-                return;
-            }
-
-            setTimeout(function() {
-                that.tick();
-            }, delta);
-        };
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -836,6 +1046,7 @@
             }
             
             sequenceText.innerHTML = text.replace(/\n/g, '<br>');
+            sequenceText.classList.remove('text-fade-out');
             sequenceText.classList.add('text-fade-in'); 
         };
 
@@ -847,7 +1058,7 @@
             await updateText("Sirf Thanks?\n\nOk... let me try something better.", 'transition');
             await sleep(4000); 
 
-            await updateText("SORRY for the inconvinece", 'bold');
+            await updateText("SORRY for the inconvenience", 'bold');
             await sleep(2000); 
             
             sequenceText.classList.remove('text-fade-in');
@@ -858,15 +1069,16 @@
             await sleep(500); 
             
             sequenceText.className = 'sequence-text-style typewrite'; 
+            sequenceText.classList.remove('text-fade-out');
             sequenceText.classList.add('text-fade-in');     
             
             const linesToType = [
-                "Ladies and Gentlemen…\nGather around, because today we’re not just celebrating a birthday —\nwe’re celebrating a phenomenon!",
-                "She’s the girl who’s done it all —\nAchieved with grace, dreamed with passion,\nAnd inspired everyone around her with her kindness and power.",
-                "She’s not just strong — she’s unstoppable.", 
-                "She’s not just special — she’s spectacular.", 
-                "She doesn’t follow trends — she creates them.", 
-                "She doesn’t wait for opportunities — she builds them.", 
+                "Ladies and Gentlemen…\nGather around, because today we’re not just celebrating a birthday \nwe’re celebrating a phenomenon",
+                "She’s the girl who’s done it all \nAchieved with grace, dreamed with passion,\nAnd inspired everyone around her with her kindness and power.",
+                "She’s not just strong - she’s unstoppable.", 
+                "She’s not just special - she’s spectacular.", 
+                "She doesn’t follow trends - she creates them.", 
+                "She doesn’t wait for opportunities - she builds them.", 
                 "Her smile? It could outshine the stars.", 
                 "Her presence? It turns ordinary moments into magic.", 
                 "Her heart? Pure gold wrapped in kindness and grace.", 
@@ -875,9 +1087,9 @@
                 "Nor India,",
                 "Nor even Asia…",
                 "But from the entire Universe 🌌",
-                "💫✨ The one and only… Missssss Jess! ✨💫",
-                "And now, ladies and gentlemen —\nPlease make a BIG round of applause 👏👏👏",
-                "for the birthday girl who defines beauty, brilliance, and beyond —\nMiss Jess! 🎂💖"
+                "💫✨ The one and only… Missssss Juhiiiii✨💫",
+                "And now, ladies and gentlemen \nPlease make a BIG round of applause 👏👏👏",
+                "for the birthday girl who defines beauty, brilliance, and beyond \nMiss Juhi 🎂💖"
             ];
             
             var typewriter = new TxtType(sequenceText, linesToType, 2000);
@@ -889,8 +1101,13 @@
                 await sleep(800);
                 
                 if (textSequenceContainer) textSequenceContainer.style.opacity = '0'; 
-                if (lampCord) lampCord.style.opacity = '1';
-                if (lampShade) lampShade.style.opacity = '1';
+                
+                const isDesktop = window.innerWidth >= 768;
+                if (!isDesktop) {
+                    if (lampCord) lampCord.style.opacity = '1';
+                    if (lampShade) lampShade.style.opacity = '1';
+                }
+
                 await sleep(500); 
 
                 startLightShowFinale();
@@ -899,7 +1116,6 @@
 
         function startLightShowFinale() {
             const targetCenter = '50% 30%';
-
             const p_tl = '0% 0%';
             const p_tm = '50% 0%';
             const p_tr = '100% 0%';
@@ -921,7 +1137,7 @@
             if(spotlightBlue) spotlightBlue.style.clipPath = `polygon(${targetCenter}, ${p_br}, ${p_bm})`;
             if(spotlightIndigo) spotlightIndigo.style.clipPath = `polygon(${targetCenter}, ${p_bm}, ${p_bl})`;
             if(spotlightViolet) spotlightViolet.style.clipPath = `polygon(${targetCenter}, ${p_tm}, ${p_tr})`;
-            if(spotlightMagenta) spotlightMagenta.style.clipPath = `polygon(${targetCenter}, ${p_lm}, ${p_tl}, ${p_tm})`; // Corrected magenta path
+            if(spotlightMagenta) spotlightMagenta.style.clipPath = `polygon(${targetCenter}, ${p_lm}, ${p_tl}, ${p_tm})`;
 
             if (finalPhotoContainer) {
                 finalPhotoContainer.style.opacity = '1';
@@ -930,19 +1146,34 @@
             
             startSprinkles(sprinkleContainerFinal);
 
-            if (topNav && bottomNav && leftNav && rightNav) {
-                topNav.classList.remove('-translate-y-full');
-                bottomNav.classList.remove('translate-y-full');
-                leftNav.classList.remove('-translate-x-full');
-                rightNav.classList.remove('translate-x-full');
-                
-                closeAllNavs(); 
+            if (areNavsOpen) {
+                closeAllNavs();
             }
 
             console.log('GRAND FINALE!');
-
         }
 
+ 
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768) return; 
+
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            
+       
+            trail.style.left = `${e.clientX}px`;
+            trail.style.top = `${e.clientY}px`;
+            const trailColors = ['#f87171', '#ec4899', '#a855f7', '#3b82f6', '#facc15', '#4ade80', '#2dd4bf'];
+            const color = trailColors[Math.floor(Math.random() * trailColors.length)];
+            trail.style.backgroundColor = color;
+            trail.style.boxShadow = `0 0 10px ${color}`;
+
+            document.body.appendChild(trail);
+
+            setTimeout(() => {
+                trail.remove();
+            }, 600);
+        });
     </script>
 </body>
 </html>
