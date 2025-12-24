@@ -11,6 +11,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Dancing+Script:wght@400;700&family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
     
     <style>
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             overflow: hidden; 
@@ -89,6 +104,7 @@
         }
         #step1-screen img {
             box-shadow: 0 0 15px #ffffff, 0 0 5px #f0abfc;
+            pointer-events: none;
         }
         
         #step1-ok-btn {
@@ -276,13 +292,11 @@
             50% { border-color: #fff; }
         }
         
-        /* === REALISTIC STAGE STYLES === */
         .stage-container {
             perspective: 1500px;
             overflow: hidden;
         }
         
-        /* Realistic Curtains with Folds */
         .curtain-side {
             background: repeating-linear-gradient(90deg, 
                 #3a0202 0%, 
@@ -301,7 +315,6 @@
         .curtain-left { left: 0; }
         .curtain-right { right: 0; }
 
-        /* Valance (Top Curtain) */
         .curtain-top {
             position: absolute;
             top: -5%;
@@ -318,7 +331,6 @@
             z-index: 25;
         }
 
-        /* Realistic Wooden Floor */
         .stage-floor {
             position: absolute;
             bottom: -20%;
@@ -338,7 +350,6 @@
             z-index: 5;
         }
 
-        /* Volumetric Light Beam (God Rays) */
         .volumetric-light {
             position: absolute;
             top: -20%;
@@ -354,7 +365,6 @@
             clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
         }
 
-        /* Floating dust particles effect animation */
         @keyframes floatParticles {
             0% { background-position: 0 0; }
             100% { background-position: 100px 100px; }
@@ -370,20 +380,17 @@
             mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
         }
 
-        /* Mic Stand Improvements */
         .mic-head-grid {
             background-image: radial-gradient(#222 1px, transparent 1px);
             background-size: 3px 3px;
         }
         
-        /* New Nav Button Hover Effect */
         .nav-btn-glow:hover {
             box-shadow: 0 0 15px rgba(236, 72, 153, 0.6);
             border-color: rgba(236, 72, 153, 0.8);
             background-color: rgba(139, 92, 246, 0.3);
         }
 
-        /* DESKTOP CURSOR TRAIL */
         .cursor-trail {
             position: fixed;
             width: 12px;
@@ -402,11 +409,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 h-full m-0 p-0">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 h-full m-0 p-0" oncontextmenu="return false;">
 
     <div id="app-container" class="relative w-full h-full">
 
-        <!-- LOCK SCREEN -->
         <div id="lock-screen" class="w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden text-white">
             <div class="relative z-10 w-full max-w-lg p-6 sm:p-12 bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-700">
                 <h1 class="text-3xl sm:text-5xl font-bold text-pink-500 text-center mb-6" style="font-family: 'Pacifico', cursive;">
@@ -420,7 +426,6 @@
             <div id="star-container-lock" class="absolute inset-0 w-full h-full pointer-events-none"></div>
         </div>
 
-        <!-- INITIAL SCREEN -->
         <div id="initial-screen" class="hidden w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden">
             <div id="star-container" class="absolute inset-0 w-full h-full pointer-events-none"></div>
 
@@ -439,7 +444,6 @@
             </div>
         </div>
 
-        <!-- STEP 1 SCREEN -->
         <div id="step1-screen" class="hidden w-full h-full overflow-hidden flex items-center justify-center p-4">
             
             <div id="sprinkle-container-1" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"></div>
@@ -447,7 +451,7 @@
             <div class="content-card relative z-20 flex flex-col md:flex-row items-center w-full max-w-sm md:max-w-4xl p-6 md:p-10 bg-black/40 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 gap-8">
                 
                 <div class="w-full md:w-1/2 flex justify-center">
-                    <img src="Cute-Durga.jpg" alt="Birthday Queen" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-sm h-auto object-cover transform md:rotate-[-3deg] transition hover:rotate-0 duration-500" onerror="this.src='https://placehold.co/600x400/f472b6/ffffff?text=Birthday+Queen';">
+                    <img src="Cute-Durga.jpg" alt="Birthday Queen" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-sm h-auto object-cover transform md:rotate-[-3deg] transition hover:rotate-0 duration-500 pointer-events-none" onerror="this.src='https://placehold.co/600x400/f472b6/ffffff?text=Birthday+Queen';">
                 </div>
                 
                 <div class="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
@@ -467,47 +471,35 @@
 
         <div id="main-show-screen" class="hidden w-full h-full flex flex-col items-center justify-center bg-black overflow-hidden p-4 sm:p-8" id="mainContent">
             
-            <!-- REALISTIC STAGE ENVIRONMENT (Desktop Only Background) -->
             <div id="stage-environment" class="hidden md:block absolute inset-0 w-full h-full pointer-events-none stage-container bg-[#1a0505]">
                 
-                <!-- Background Wall -->
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 
-                <!-- Stage Curtains -->
                 <div class="curtain-side curtain-left"></div>
                 <div class="curtain-side curtain-right"></div>
                 <div class="curtain-top"></div>
                 
-                <!-- Stage Floor -->
                 <div class="stage-floor"></div>
             
-                <!-- Lighting Effects -->
                 <div class="volumetric-light"></div>
                 <div class="stage-particles"></div>
             </div>
 
-            <!-- Realistic Standing Mic (Desktop Only - 'hidden md:flex') -->
             <div id="mic-stand" class="hidden md:flex absolute bottom-[10vh] left-1/2 -translate-x-1/2 z-10 flex-col items-center opacity-0 transition-opacity duration-1000 scale-100 origin-bottom">
-                <!-- Mic Head -->
                 <div class="relative w-12 h-16 bg-gradient-to-r from-gray-400 to-gray-200 rounded-full border-2 border-gray-400 shadow-[0_0_20px_rgba(255,255,255,0.6)] overflow-hidden z-20">
                         <div class="mic-head-grid absolute inset-0 opacity-60"></div>
                         <div class="absolute inset-0 bg-gradient-to-tr from-black/50 to-transparent"></div>
                 </div>
-                <!-- Connector/Neck -->
                 <div class="w-4 h-6 bg-gradient-to-r from-gray-800 to-gray-600 z-10 mt-[-2px]"></div>
-                <!-- Main Pole -->
                 <div class="w-2 h-[45vh] bg-gradient-to-r from-gray-400 via-white to-gray-400 shadow-lg z-10"></div>
-                <!-- Round Base -->
                 <div class="w-32 h-8 bg-[#111] rounded-[50%] border-t border-gray-700 shadow-[0_10px_20px_rgba(0,0,0,0.8)] mt-[-4px] z-10"></div>
             </div>
 
-            <!-- LAMP (Mobile Only) -->
             <div id="lamp-cord" class="lamp-cord"></div>
             <div id="lamp-shade" class="lamp-shade">
                 <div id="lamp-glow" class="lamp-glow"></div>
             </div>
 
-            <!-- Spotlights (Dynamic) -->
             <div id="spotlight-red" class="spotlight"></div>
             <div id="spotlight-orange" class="spotlight"></div>
             <div id="spotlight-yellow" class="spotlight"></div>
@@ -523,7 +515,7 @@
 
             <div id="final-photo-container" class="relative z-[50] opacity-0 transition-opacity duration-1000 scale-90 transform w-full px-4"
                  style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);">
-                <img src="Main1.jpg" alt="Happy Birthday" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-xs md:max-w-md max-h-[60vh] object-contain mx-auto" onerror="this.src='https://placehold.co/600x400/8b5cf6/ffffff?text=Happy+Birthday';">
+                <img src="Main1.jpg" alt="Happy Birthday" class="rounded-lg shadow-2xl border-4 border-white w-full max-w-xs md:max-w-md max-h-[60vh] object-contain mx-auto pointer-events-none" onerror="this.src='https://placehold.co/600x400/8b5cf6/ffffff?text=Happy+Birthday';">
                 
                 <h2 id="special-wish" class="text-2xl sm:text-4xl text-white text-center mt-6 md:mt-8" style="font-family: 'Gochi Hand', cursive; text-shadow: 0 0 10px #f0abfc;">
                     Happy Birthday to the one who makes the world brighter. ✨
@@ -649,6 +641,19 @@
     </div> 
 
     <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && ['c', 'C', 'v', 'V', 'x', 'X', 'a', 'A', 'u', 'U', 's', 'S', 'p', 'P'].includes(e.key)) {
+                e.preventDefault();
+            }
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('dragstart', event => event.preventDefault());
+
         const lockDate = new Date('2025-11-25T00:00:00'); 
         const ONE_DAY = 1000 * 60 * 60 * 24;
         const ONE_HOUR = 1000 * 60 * 60;
@@ -985,7 +990,6 @@
                 if (mainShowScreen) mainShowScreen.classList.remove('hidden');
                 mainShowScreen.style.display = 'flex';
                 
-                // Show Mic on all screens
                 if (micStand) {
                     micStand.style.opacity = '1';
                 }
@@ -1001,7 +1005,6 @@
             });
         }
         
-        // Global click listener for closing navs when clicking outside
         document.addEventListener('click', (e) => {
             if (areNavsOpen) {
                 const clickedInsideNav = e.target.closest('.nav-panel');
@@ -1070,7 +1073,7 @@
             
             sequenceText.className = 'sequence-text-style typewrite'; 
             sequenceText.classList.remove('text-fade-out');
-            sequenceText.classList.add('text-fade-in');     
+            sequenceText.classList.add('text-fade-in');      
             
             const linesToType = [
                 "Ladies and Gentlemen…\nGather around, because today we’re not just celebrating a birthday \nwe’re celebrating a phenomenon",
