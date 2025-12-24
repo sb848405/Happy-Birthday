@@ -556,7 +556,6 @@
             </div>
         </div>
         
-        <!-- Far Background Trees (smaller) -->
         <div class="tree" style="left: 5%; bottom: 18vh; transform: scale(0.5); z-index: 0;">
             <div class="tree-trunk"></div>
             <div class="tree-leaves">
@@ -843,7 +842,7 @@
 
             function createRainDrops() {
                 const isBigScreen = window.innerWidth >= 1024;
-                const dropCount = isBigScreen ? 500 : 100; // Increased density for big screen
+                const dropCount = isBigScreen ? 500 : 100;
 
                 for (let i = 0; i < dropCount; i++) {
                     const drop = document.createElement('div');
@@ -1020,7 +1019,7 @@
                     if (landscape) landscape.classList.add('day-mode');
 
                     setTimeout(() => {
-                        FINAL_MESSAGE_EL.innerHTML = `<h2>Happy Birthday, ${CRUSH_NAME}!</h2>A New Journey Begins.<br>The whole world is waiting for you. <br>Your journey has a long, beautiful path ahead, and I’d be honoured to support you and walk alongside you whenever you need.`;
+                        FINAL_MESSAGE_EL.innerHTML = `<h2>Happy Birthday, ${CRUSH_NAME}</h2>A New Journey Begins.<br>The whole world is waiting for you. <br>Your journey has a long, beautiful path ahead, and I’d be honoured to support you and walk alongside you whenever you need.`;
                         FINAL_MESSAGE_EL.style.opacity = 1;
                         
                         startBalloons();
@@ -1104,4 +1103,5 @@
         });
     </script>
 </body>
+
 </html>
