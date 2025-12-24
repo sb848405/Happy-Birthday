@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>365 Reasons Why You're Special</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdn.tailwindcss.com"></script>  
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@300;400;500;600&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
@@ -178,7 +177,6 @@
             filter: invert(0.5);
         }
 
-        /* Overlay for desktop nav */
         #desktopNavOverlay.active {
             opacity: 1;
             pointer-events: auto;
@@ -187,13 +185,11 @@
 </head>
 <body class="antialiased bg-gray-50 overflow-hidden text-gray-800 h-screen w-screen relative flex">
 
-    <!-- Mobile Nav Toggle (Hamburger) -->
     <button id="navToggle" class="lg:hidden fixed top-6 left-6 z-[80] p-3 bg-rose-500 text-white rounded-full shadow-xl hover:bg-rose-600 active:scale-95 transition-transform duration-200">
         <svg id="navToggleIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-8 6h8"></path></svg>
         <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
 
-    <!-- Mobile Navigation Panels (Top, Bottom, Left, Right) -->
     <nav id="topNav" class="lg:hidden nav-panel fixed top-0 left-0 right-0 z-[70] h-20 flex items-center justify-center space-x-2 -translate-y-full rose-nav-style border-b border-rose-200">
         <a href="Msg.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Message</a>
         <a href="letter.html" class="nav-link px-3 py-2 rounded-lg text-sm font-bold festive-text">Letter</a>
@@ -240,10 +236,8 @@
         <a href="Food.html" class="nav-link p-2 rounded-lg text-sm font-medium festive-text">Food</a>
     </nav>
 
-    <!-- Desktop Nav Overlay (Background dimmer) -->
     <div id="desktopNavOverlay" class="hidden lg:block fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
-    <!-- Desktop Sidebar (Collapsible, Double Column) -->
     <aside id="desktopNav" class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-[100] w-[500px] bg-white/90 backdrop-blur-xl border-r border-rose-100 transform -translate-x-full h-full overflow-y-auto">
         <div class="p-8 pb-4">
             <div class="flex items-center justify-between mb-8">
@@ -304,8 +298,7 @@
 
     
     <main id="mainContent" class="absolute inset-0 bg-rose-50/50 p-6 pt-28 overflow-y-auto transition-all duration-300 lg:static lg:w-full lg:p-0 lg:h-full lg:bg-[#fafafa] relative isolate">
-        
-        <!-- Desktop Menu Toggle Button (Visible only on LG) -->
+     
         <button id="desktopMenuToggle" class="hidden lg:flex fixed top-8 left-8 z-[60] items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm hover:shadow-md hover:border-rose-200 hover:text-rose-500 transition-all group">
             <svg class="w-5 h-5 text-gray-500 group-hover:text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             <span class="text-sm font-medium text-gray-600 group-hover:text-rose-600">Menu</span>
@@ -347,7 +340,7 @@
                 </div>
             </header>
             
-            <!-- Mobile View Controls -->
+          
             <div class="lg:hidden w-full mb-6">
                 <button id="see-all-mobile-btn" class="w-full bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-3 text-center text-sm font-bold text-rose-500 uppercase tracking-widest hover:bg-rose-50 hover:shadow-md transition-all shadow-sm">
                     View Daily Card
@@ -385,7 +378,6 @@
                 </div>
             </div>
 
-            <!-- Grid View (Visible by default on mobile) -->
             <div id="grid-view" class="flex-1 overflow-y-auto pb-10 h-full w-full lg:hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="all-reasons-grid">
                 </div>
@@ -394,7 +386,7 @@
         </main>
 
         <footer class="text-center py-8 mt-auto border-t border-rose-100/50 lg:hidden">
-            <p class="text-xs text-rose-300">Made with ❤️ just for you.</p>
+            <p class="text-xs text-rose-300">Happywalla Birthday Juhi.</p>
         </footer>
 
         <div id="reason-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -826,7 +818,7 @@
         const modalDateDisplay = document.getElementById('modal-date-display');
 
         let currentReasonIndex = 0;
-        // Initialize based on screen size: Mobile (<1024) defaults to Grid, Desktop defaults to Calendar (False)
+
         let isGridView = window.innerWidth < 1024;
         let isCalendarView = true;
         let modalIndex = 0;
@@ -842,7 +834,7 @@
 
             modalDateDisplay.textContent = dateString;
             modalCounter.textContent = index + 1;
-            modalText.textContent = `"${reason}"`;
+            modalText.textContent = `${reason}`;
             modalEmoji.textContent = emoji;
             
             modal.classList.remove('hidden');
@@ -882,7 +874,7 @@
                     <span class="text-6xl my-8 block animate-pulse filter drop-shadow-md transform transition-transform group-hover:scale-110 duration-500">${emoji}</span>
                     
                     <p class="text-xl font-medium text-gray-800 leading-relaxed serif-text italic festive-text drop-shadow-sm">
-                        "${reason}"
+                        ${reason}
                     </p>
                 </div>
             `;
@@ -1010,7 +1002,7 @@
                         <span class="text-3xl group-hover:scale-125 transition-transform">${emoji}</span>
                         <span class="text-xs font-bold text-rose-300">#${index + 1}</span>
                     </div>
-                    <p class="text-gray-700 font-medium leading-relaxed font-serif text-sm">"${reason}"</p>
+                    <p class="text-gray-700 font-medium leading-relaxed font-serif text-sm">${reason}</p>
                 `;
                 allReasonsGrid.appendChild(cardEl);
             });
@@ -1027,11 +1019,11 @@
             const calendar = document.getElementById('calendar-dashboard'); 
             
             if (isGridView) {
-                // Show Grid Mode
+        
                 if(calendar) calendar.classList.add('hidden', 'lg:hidden');
                 if(deck) {
                     deck.classList.add('hidden');
-                    deck.classList.remove('flex'); // Ensure flex is removed
+                    deck.classList.remove('flex'); 
                 }
                 
                 grid.classList.remove('hidden', 'lg:hidden');
@@ -1153,4 +1145,5 @@
         });
     </script>
 </body>
+
 </html>
