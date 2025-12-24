@@ -299,7 +299,6 @@
             display: none;
         }
 
-        /* Desktop Sidebar Styles */
         #sidebar-nav {
             position: fixed;
             top: 0;
@@ -344,13 +343,12 @@
             justify-content: center;
         }
         
-        /* Mobile specific link sizing */
         @media (max-width: 1023px) {
             #topNav .nav-link, #bottomNav .nav-link {
                 width: auto;
-                min-width: 60px; /* Reduced min-width */
-                padding: 6px 6px; /* Reduced padding significantly */
-                font-size: 0.8rem; /* Smaller font for horizontal navs */
+                min-width: 60px; 
+                padding: 6px 6px; 
+                font-size: 0.8rem; 
                 margin: 0 1px;
             }
 
@@ -358,7 +356,7 @@
                 width: 90%;
                 min-width: 60px;
                 padding: 8px 4px;
-                font-size: 0.75rem; /* Smaller font for side navs to fit long text */
+                font-size: 0.75rem; 
             }
         }
 
@@ -907,7 +905,6 @@
         <svg id="navToggleX" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
     
-    <!-- MOBILE NAVS (4 PANELS) - UPDATED SPACING (space-x-1) -->
     <nav id="topNav" class="lg:hidden nav-panel fixed top-0 left-0 right-0 z-[20000] h-16 shadow-md flex items-center justify-center space-x-1 -translate-y-full">
         <a href="Msg.html" class="nav-link festive-text">Message</a>
         <a href="letter.html" class="nav-link festive-text">Letter</a>
@@ -920,7 +917,6 @@
         <a href="Carttoon.html" class="nav-link festive-text">Cartoon</a>
     </nav>
     
-    <!-- UPDATED SIDE NAV WIDTH (w-24 to fit text) -->
     <nav id="leftNav" class="lg:hidden nav-panel fixed left-0 top-0 bottom-0 z-[10000] w-24 shadow-md flex flex-col items-center space-y-1 overflow-y-auto py-20 -translate-x-full">
         <a href="index.html" class="nav-link festive-text">Home</a>
         <a href="Cake.html" class="nav-link festive-text">Cake</a>
@@ -938,7 +934,6 @@
         <a href="Mountain.html" class="nav-link festive-text">Mountain</a>
     </nav>
     
-    <!-- UPDATED SIDE NAV WIDTH (w-24 to fit text) -->
     <nav id="rightNav" class="lg:hidden nav-panel fixed right-0 top-0 bottom-0 z-[10000] w-24 shadow-md flex flex-col items-center space-y-1 overflow-y-auto py-20 translate-x-full">
         <a href="Periodik_table.html" class="nav-link festive-text">Periodic Table</a>
         <a href="Concept.html" class="nav-link festive-text">Concept</a>
@@ -956,7 +951,6 @@
         <a href="Food.html" class="nav-link festive-text">Food</a>
     </nav>
 
-    <!-- DESKTOP NAV (SIDEBAR) -->
     <nav id="sidebar-nav" class="hidden lg:grid grid-cols-2 gap-3">
         <a href="index.html" class="nav-link festive-text">Home</a>
         <a href="anatomy.html" class="nav-link festive-text">Anatomy</a>
@@ -1023,7 +1017,7 @@
 
             <h1>The Paper Stars Cathedral</h1>
             <p>
-                Welcome to a quiet sanctuary built only of kindness and light. Scroll down to enter the cathedral. Each star is a folded secret waiting for your touch. Go on, Mam. Dare to tap one and see the message meant only for you.
+                Welcome to a quiet sanctuary built only of kindness and light. Scroll down to enter the cathedral. Each star is a folded secret waiting for your touch. Go on, Mam. Tap one and see the message meant only for you.
             </p>
             <div class="scroll-down">&#x25BC;</div>
         </section>
@@ -1109,13 +1103,13 @@
                 }
 
                 const sideGhostMessages = {
-                    'ghost1': "Boop! You found me! 👻",
-                    'ghost2': "Brains... or maybe just stardust? 🧟‍♀️",
-                    'ghost3': "The shadows are cold, but you are warm. 🧟‍♂️",
+                    'ghost1': "Boop, You found me! 👻",
+                    'ghost2': "You prove you can. 🧟‍♀️",
+                    'ghost3': "You prove them wrong. 🧟‍♂️",
                     'ghost4': "Silence speaks louder than words... 💀",
                     'ghost5': "We come in peace... mostly. 👽",
-                    'ghost6': "I vant to suck... your sadness away! 🧛",
-                    'ghost7': "Squeak! The night is young. 🦇",
+                    'ghost6': "You prove your strength 🧛",
+                    'ghost7': "You prove fear wrong. 🦇",
                     'ghost8': "Shiny things? No, just stars. 👺"
                 };
 
@@ -1347,7 +1341,6 @@
                 observer.observe(endMessage);
             }
 
-            // NAV LOGIC
             const sidebarNav = document.getElementById('sidebar-nav');
             const topNav = document.getElementById('topNav');
             const bottomNav = document.getElementById('bottomNav');
@@ -1381,8 +1374,7 @@
                 } else {
                     navToggleIcon.classList.remove('hidden');
                     navToggleX.classList.add('hidden');
-                    
-                    // Close everything to be safe
+            
                     sidebarNav.classList.remove('open');
                     topNav.classList.add('-translate-y-full');
                     bottomNav.classList.add('translate-y-full');
@@ -1390,11 +1382,10 @@
                     rightNav.classList.add('translate-x-full');
                 }
             }
-            
-            // Handle resizing to reset state or switch modes smoothly
+      
             window.addEventListener('resize', () => {
                 if (areNavsOpen) {
-                    // Close navs on resize to prevent layout weirdness
+               
                     areNavsOpen = false;
                     navToggleIcon.classList.remove('hidden');
                     navToggleX.classList.add('hidden');
@@ -1435,4 +1426,5 @@
         });
     </script>
 </body>
+
 </html>
